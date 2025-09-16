@@ -101,27 +101,33 @@ export default function Page() {
     }
   };
 
-  const handleOpen = () => {
-    if (videoRef.current && !isOpen) {
-      const video = videoRef.current;
-      video.pause();
-      video.currentTime = video.duration; // jump to end
-      setIsOpen(true);
+const handleOpen = () => {
+  if (videoRef.current && !isOpen) {
+    const video = videoRef.current;
+    video.pause();
+    video.currentTime = video.duration; // jump to end (closed)
+    setIsOpen(true);
 
-      // Manual rewind
-      const step = () => {
-        if (!videoRef.current) return;
-        if (video.currentTime <= 0.05) {
-          video.pause();
-          video.currentTime = 0;
-          return;
-        }
-        video.currentTime -= 0.05; // rewind speed
-        requestAnimationFrame(step);
-      };
+    const duration = video.duration;
+    const fps = 60; // target frames per second for smoothness
+    const stepSize = duration / (fps * 2); 
+    // 👆 controls speed. "2" means ~2 seconds to fully rewind.
+    // Increase to 3 for ~3s, etc.
+
+    const step = () => {
+      if (!videoRef.current) return;
+      if (video.currentTime <= 0.05) {
+        video.pause();
+        video.currentTime = 0; // snap cleanly to start
+        return;
+      }
+      video.currentTime -= stepSize;
       requestAnimationFrame(step);
-    }
-  };
+    };
+
+    requestAnimationFrame(step);
+  }
+};
 
   // Pause video automatically at start or end
   useEffect(() => {
