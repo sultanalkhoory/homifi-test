@@ -124,7 +124,7 @@ export default function Page() {
         ]}
       />
 
-{/* CURTAINS (one right-side panel) */}
+{/* CURTAINS (video test) */}
 <section className="section">
   <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 md:grid-cols-2 md:[&>*:first-child]:order-2">
     {/* Text */}
@@ -148,7 +148,7 @@ export default function Page() {
       </div>
     </div>
 
-    {/* iPhone with animated single curtain */}
+    {/* iPhone with video */}
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -159,28 +159,21 @@ export default function Page() {
       <div className="iphone-frame shadow-iphone">
         <div className="iphone-notch" />
         <div className="iphone-screen relative">
-          {/* Base room (no curtains) */}
-          <Image
-            src="/room-base.png"
-            alt="Room background"
-            fill
-            style={{ objectFit: 'cover' }}
-          />
-
-          {/* Right curtain sliding */}
-          <motion.img
-            src="/curtain-right.png"
-            alt="Curtain"
-            className="absolute top-0 right-0 h-full"
-            initial={false}
-            animate={{ x: curtainsOpen ? '100%' : '0%' }}
-            transition={{ duration: 1.2, ease: 'easeInOut' }}
+          <video
+            key={curtainsOpen ? "open" : "closed"}
+            className="absolute inset-0 h-full w-full object-cover"
+            src={curtainsOpen ? "/curtains-video.mp4" : "/curtains-video.mp4"}
+            autoPlay
+            muted
+            loop={false}
+            playsInline
           />
         </div>
       </div>
     </motion.div>
   </div>
 </section>
+
 
 
       {/* CLIMATE */}
