@@ -6,6 +6,7 @@ import Image from 'next/image';
 
 export default function Page() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isOpen, setIsOpen] = useState(true); // Curtains start open
 
   // Reusable iPhone Frame for Images
   const IphoneFrame = ({ scenes, active }: any) => (
@@ -92,35 +93,42 @@ export default function Page() {
 
   // Control video playback
   const handleClose = () => {
-    if (videoRef.current) {
+    if (videoRef.current && isOpen) {
       videoRef.current.playbackRate = 1.0; // forward
       videoRef.current.currentTime = 0;
       videoRef.current.play();
+      setIsOpen(false);
     }
   };
 
   const handleOpen = () => {
-    if (videoRef.current) {
+    if (videoRef.current && !isOpen) {
       videoRef.current.playbackRate = -1.0; // reverse
       videoRef.current.currentTime = videoRef.current.duration || 0;
       videoRef.current.play();
+      setIsOpen(true);
     }
   };
 
-  // Pause at end of playback
+  // Pause video automatically at start or end
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const handleEnded = () => {
-      video.pause();
+    const handleTimeUpdate = () => {
+      if (!isOpen && video.currentTime >= video.duration) {
+        video.pause(); // pause at end when closed
+      }
+      if (isOpen && video.currentTime <= 0.05) {
+        video.pause(); // pause at start when open
+      }
     };
 
-    video.addEventListener('ended', handleEnded);
+    video.addEventListener('timeupdate', handleTimeUpdate);
     return () => {
-      video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('timeupdate', handleTimeUpdate);
     };
-  }, []);
+  }, [isOpen]);
 
   return (
     <main className="[--pad:clamp(16px,4vw,48px)]">
@@ -156,7 +164,7 @@ export default function Page() {
         ]}
       />
 
-      {/* CURTAINS (video controlled + right-aligned) */}
+      {/* CURTAINS */}
       <section className="section">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 md:grid-cols-2 md:[&>*:first-child]:order-2">
           {/* Text */}
@@ -190,13 +198,13 @@ export default function Page() {
                   className="absolute inset-0 h-full w-full"
                   style={{ objectFit: 'cover', objectPosition: '80% 50%' }}
                   src="/curtains-video.mp4"
-                  playsInline
                   muted
+                  playsInline
                   preload="auto"
                   onLoadedData={() => {
                     if (videoRef.current) {
                       videoRef.current.pause();
-                      videoRef.current.currentTime = 0;
+                      videoRef.current.currentTime = 0; // start open
                     }
                   }}
                 />
