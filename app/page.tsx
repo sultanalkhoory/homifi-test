@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
 export default function Page() {
+  const [curtainsOpen, setCurtainsOpen] = useState(false);
   // 🔹 Reusable iPhone Frame (inline)
   const IphoneFrame = ({ scenes, active }: any) => (
     <div className="iphone-frame shadow-iphone">
@@ -123,21 +124,64 @@ export default function Page() {
         ]}
       />
 
-      {/* CURTAINS */}
-      <FeatureSection
-        kicker="Perfect Privacy"
-        title="Comfort and control."
-        subtitle="Exactly when you need it."
-        scenes={[
-          { id: 'curtains-closed', src: '/iphone-scenes/curtains-closed.jpg', alt: 'Closed' },
-          { id: 'curtains-open', src: '/iphone-scenes/curtains-open.jpg', alt: 'Open' },
-        ]}
-        left
-        buttons={[
-          { label: 'Close Curtains', sceneId: 'curtains-closed', tone: 'dark' },
-          { label: 'Open Curtains', sceneId: 'curtains-open', tone: 'light' },
-        ]}
-      />
+{/* CURTAINS (one right-side panel) */}
+<section className="section">
+  <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 md:grid-cols-2 md:[&>*:first-child]:order-2">
+    {/* Text */}
+    <div>
+      <div className="kicker">Perfect Privacy</div>
+      <h2 className="h1">Comfort and control.</h2>
+      <p className="sub">Exactly when you need it.</p>
+      <div className="mt-6 flex flex-wrap gap-3">
+        <button
+          className="btn btn-dark"
+          onClick={() => setCurtainsOpen(false)}
+        >
+          Close Curtains
+        </button>
+        <button
+          className="btn btn-light"
+          onClick={() => setCurtainsOpen(true)}
+        >
+          Open Curtains
+        </button>
+      </div>
+    </div>
+
+    {/* iPhone with animated single curtain */}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.6 }}
+      transition={{ duration: 0.6 }}
+      className="flex justify-center"
+    >
+      <div className="iphone-frame shadow-iphone">
+        <div className="iphone-notch" />
+        <div className="iphone-screen relative">
+          {/* Base room (no curtains) */}
+          <Image
+            src="/room-base.png"
+            alt="Room background"
+            fill
+            style={{ objectFit: 'cover' }}
+          />
+
+          {/* Right curtain sliding */}
+          <motion.img
+            src="/curtain-right.png"
+            alt="Curtain"
+            className="absolute top-0 right-0 h-full"
+            initial={false}
+            animate={{ x: curtainsOpen ? '100%' : '0%' }}
+            transition={{ duration: 1.2, ease: 'easeInOut' }}
+          />
+        </div>
+      </div>
+    </motion.div>
+  </div>
+</section>
+
 
       {/* CLIMATE */}
       <FeatureSection
