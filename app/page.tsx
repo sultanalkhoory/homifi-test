@@ -1,4 +1,3 @@
-// app/page.tsx
 'use client';
 
 import { useState } from 'react';
@@ -7,11 +6,12 @@ import Image from 'next/image';
 
 export default function Page() {
   const [curtainsOpen, setCurtainsOpen] = useState(false);
-  // 🔹 Reusable iPhone Frame (inline)
+
+  // 🔹 Reusable iPhone Frame for Images
   const IphoneFrame = ({ scenes, active }: any) => (
     <div className="iphone-frame shadow-iphone">
       <div className="iphone-notch" />
-      <div className="iphone-screen">
+      <div className="iphone-screen relative">
         <div className="absolute inset-0 screen-gradient" />
         <AnimatePresence mode="wait">
           {scenes.map(
@@ -41,7 +41,7 @@ export default function Page() {
     </div>
   );
 
-  // 🔹 Reusable Feature Section (inline)
+  // 🔹 Reusable Feature Section
   const FeatureSection = ({
     kicker,
     title,
@@ -115,8 +115,8 @@ export default function Page() {
         title="Every room. Every moment."
         subtitle="Exactly as you want it."
         scenes={[
-          { id: 'lights-off', src: '/iphone-scenes/lights-off.jpg', alt: 'Room dark' },
-          { id: 'lights-on', src: '/iphone-scenes/lights-on.jpg', alt: 'Room lit' },
+          { id: 'lights-off', src: '/lights-off.jpg', alt: 'Room dark' },
+          { id: 'lights-on', src: '/lights-on.jpg', alt: 'Room lit' },
         ]}
         buttons={[
           { label: 'Lights Off', sceneId: 'lights-off', tone: 'dark' },
@@ -124,57 +124,55 @@ export default function Page() {
         ]}
       />
 
-{/* CURTAINS (video test) */}
-<section className="section">
-  <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 md:grid-cols-2 md:[&>*:first-child]:order-2">
-    {/* Text */}
-    <div>
-      <div className="kicker">Perfect Privacy</div>
-      <h2 className="h1">Comfort and control.</h2>
-      <p className="sub">Exactly when you need it.</p>
-      <div className="mt-6 flex flex-wrap gap-3">
-        <button
-          className="btn btn-dark"
-          onClick={() => setCurtainsOpen(false)}
-        >
-          Close Curtains
-        </button>
-        <button
-          className="btn btn-light"
-          onClick={() => setCurtainsOpen(true)}
-        >
-          Open Curtains
-        </button>
-      </div>
-    </div>
+      {/* CURTAINS (video) */}
+      <section className="section">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 md:grid-cols-2 md:[&>*:first-child]:order-2">
+          {/* Text */}
+          <div>
+            <div className="kicker">Perfect Privacy</div>
+            <h2 className="h1">Comfort and control.</h2>
+            <p className="sub">Exactly when you need it.</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                className="btn btn-dark"
+                onClick={() => setCurtainsOpen(false)}
+              >
+                Close Curtains
+              </button>
+              <button
+                className="btn btn-light"
+                onClick={() => setCurtainsOpen(true)}
+              >
+                Open Curtains
+              </button>
+            </div>
+          </div>
 
-    {/* iPhone with video */}
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.6 }}
-      transition={{ duration: 0.6 }}
-      className="flex justify-center"
-    >
-      <div className="iphone-frame shadow-iphone">
-        <div className="iphone-notch" />
-        <div className="iphone-screen relative">
-          <video
-            key={curtainsOpen ? "open" : "closed"}
-            className="absolute inset-0 h-full w-full object-cover"
-            src={curtainsOpen ? "/curtains-video.mp4" : "/curtains-video.mp4"}
-            autoPlay
-            muted
-            loop={false}
-            playsInline
-          />
+          {/* iPhone with video */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.6 }}
+            transition={{ duration: 0.6 }}
+            className="flex justify-center"
+          >
+            <div className="iphone-frame shadow-iphone">
+              <div className="iphone-notch" />
+              <div className="iphone-screen relative">
+                <video
+                  key={curtainsOpen ? 'open' : 'closed'}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  src="/curtains-video.mp4"
+                  autoPlay
+                  muted
+                  playsInline
+                  loop
+                />
+              </div>
+            </div>
+          </motion.div>
         </div>
-      </div>
-    </motion.div>
-  </div>
-</section>
-
-
+      </section>
 
       {/* CLIMATE */}
       <FeatureSection
@@ -182,8 +180,8 @@ export default function Page() {
         title="Always the right temperature."
         subtitle="Effortless comfort that adapts to you."
         scenes={[
-          { id: 'cool', src: '/iphone-scenes/cool.jpg', alt: 'Cool' },
-          { id: 'warm', src: '/iphone-scenes/warm.jpg', alt: 'Warm' },
+          { id: 'cool', src: '/cool.jpg', alt: 'Cool' },
+          { id: 'warm', src: '/warm.jpg', alt: 'Warm' },
         ]}
         buttons={[
           { label: 'Cool', sceneId: 'cool', tone: 'light' },
@@ -211,7 +209,7 @@ export default function Page() {
               <div className="iphone-screen">
                 <video
                   className="absolute inset-0 h-full w-full object-cover"
-                  src="/iphone-scenes/all-connected.mp4"
+                  src="/all-connected.mp4"
                   autoPlay
                   muted
                   loop
