@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
 export default function Page() {
-  const [curtainsOpen, setCurtainsOpen] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
+  const [isOpening, setIsOpening] = useState(false);
 
-  // 🔹 Reusable iPhone Frame for Images
+  // Reusable iPhone Frame for Images
   const IphoneFrame = ({ scenes, active }: any) => (
     <div className="iphone-frame shadow-iphone">
       <div className="iphone-notch" />
@@ -41,7 +43,7 @@ export default function Page() {
     </div>
   );
 
-  // 🔹 Reusable Feature Section
+  // Reusable Feature Section
   const FeatureSection = ({
     kicker,
     title,
@@ -90,6 +92,42 @@ export default function Page() {
     );
   };
 
+  // Control video playback
+  const handleClose = () => {
+    if (videoRef.current) {
+      setIsClosing(true);
+      setIsOpening(false);
+      videoRef.current.playbackRate = 1.0; // forward
+      videoRef.current.currentTime = 0;
+      videoRef.current.play();
+    }
+  };
+
+  const handleOpen = () => {
+    if (videoRef.current) {
+      setIsClosing(false);
+      setIsOpening(true);
+      videoRef.current.playbackRate = -1.0; // reverse
+      videoRef.current.currentTime = videoRef.current.duration || 0; // start at end
+      videoRef.current.play();
+    }
+  };
+
+  // Pause at end of playback (both forward & reverse)
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleEnded = () => {
+      video.pause();
+    };
+
+    video.addEventListener('ended', handleEnded);
+    return () => {
+      video.removeEventListener('ended', handleEnded);
+    };
+  }, []);
+
   return (
     <main className="[--pad:clamp(16px,4vw,48px)]">
       {/* HERO */}
@@ -124,7 +162,7 @@ export default function Page() {
         ]}
       />
 
-      {/* CURTAINS (video) */}
+      {/* CURTAINS (video controlled) */}
       <section className="section">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 md:grid-cols-2 md:[&>*:first-child]:order-2">
           {/* Text */}
@@ -133,16 +171,10 @@ export default function Page() {
             <h2 className="h1">Comfort and control.</h2>
             <p className="sub">Exactly when you need it.</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <button
-                className="btn btn-dark"
-                onClick={() => setCurtainsOpen(false)}
-              >
+              <button className="btn btn-dark" onClick={handleClose}>
                 Close Curtains
               </button>
-              <button
-                className="btn btn-light"
-                onClick={() => setCurtainsOpen(true)}
-              >
+              <button className="btn btn-light" onClick={handleOpen}>
                 Open Curtains
               </button>
             </div>
@@ -160,13 +192,19 @@ export default function Page() {
               <div className="iphone-notch" />
               <div className="iphone-screen relative">
                 <video
-                  key={curtainsOpen ? 'open' : 'closed'}
+                  ref={videoRef}
                   className="absolute inset-0 h-full w-full object-cover"
                   src="/curtains-video.mp4"
-                  autoPlay
-                  muted
                   playsInline
-                  loop
+                  muted
+                  preload="auto"
+                  // starts paused, showing first frame
+                  onLoadedData={() => {
+                    if (videoRef.current) {
+                      videoRef.current.pause();
+                      videoRef.current.currentTime = 0;
+                    }
+                  }}
                 />
               </div>
             </div>
