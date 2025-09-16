@@ -1,26 +1,61 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+--background: #ffffff;
+--foreground: #0a0a0a;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root { --background: #0a0a0a; --foreground: #ededed; }
 }
 
-body {
-  background-color: var(--background); /* 👈 switched to background-color */
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+
+html, body { height: 100%; }
+body { background-color: var(--background); color: var(--foreground); }
+
+
+/* iPhone frame helpers */
+.iphone-frame {
+position: relative;
+width: min(360px, 82vw);
+aspect-ratio: 1125 / 2436; /* iPhone 15-ish viewport proportion */
+border-radius: 40px;
+box-shadow: var(--tw-shadow, 0 10px 30px rgba(0,0,0,0.25));
+overflow: hidden;
+background: #000; /* bezel */
+}
+.iphone-screen {
+position: absolute;
+inset: 2.5%; /* inner bezel padding */
+border-radius: 28px;
+overflow: hidden;
+}
+.iphone-notch {
+position: absolute;
+top: 0.75rem; left: 50%; transform: translateX(-50%);
+width: 38%; height: 22px; border-radius: 12px;
+background: #000;
+filter: drop-shadow(0 1px 1px rgba(255,255,255,0.05));
+}
+
+
+/* smooth section spacing */
+.section { @apply w-full py-24 md:py-36; }
+.kicker { @apply text-sm uppercase tracking-wide text-neutral-500 mb-3; }
+.h1 { @apply text-4xl md:text-6xl font-semibold leading-tight; }
+.sub { @apply text-base md:text-lg text-neutral-500 mt-3; }
+.cta { @apply inline-flex items-center gap-2 rounded-full border border-neutral-200 px-5 py-2.5 text-sm hover:bg-neutral-100 transition; }
+.btn { @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm border transition; }
+.btn-dark { @apply border-neutral-800 bg-neutral-900 text-white hover:bg-black; }
+.btn-light { @apply border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-50; }
+
+
+/* subtle gradient used for idle state */
+.screen-gradient {
+background: radial-gradient(120% 140% at 70% 10%, rgba(90,122,255,0.35) 0%, rgba(0,0,0,0.0) 55%),
+linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.65) 100%);
 }
