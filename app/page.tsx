@@ -6,8 +6,6 @@ import Image from 'next/image';
 
 export default function Page() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [isClosing, setIsClosing] = useState(false);
-  const [isOpening, setIsOpening] = useState(false);
 
   // Reusable iPhone Frame for Images
   const IphoneFrame = ({ scenes, active }: any) => (
@@ -95,8 +93,6 @@ export default function Page() {
   // Control video playback
   const handleClose = () => {
     if (videoRef.current) {
-      setIsClosing(true);
-      setIsOpening(false);
       videoRef.current.playbackRate = 1.0; // forward
       videoRef.current.currentTime = 0;
       videoRef.current.play();
@@ -105,15 +101,13 @@ export default function Page() {
 
   const handleOpen = () => {
     if (videoRef.current) {
-      setIsClosing(false);
-      setIsOpening(true);
       videoRef.current.playbackRate = -1.0; // reverse
-      videoRef.current.currentTime = videoRef.current.duration || 0; // start at end
+      videoRef.current.currentTime = videoRef.current.duration || 0;
       videoRef.current.play();
     }
   };
 
-  // Pause at end of playback (both forward & reverse)
+  // Pause at end of playback
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -162,7 +156,7 @@ export default function Page() {
         ]}
       />
 
-      {/* CURTAINS (video controlled) */}
+      {/* CURTAINS (video controlled + right-aligned) */}
       <section className="section">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 md:grid-cols-2 md:[&>*:first-child]:order-2">
           {/* Text */}
@@ -193,12 +187,12 @@ export default function Page() {
               <div className="iphone-screen relative">
                 <video
                   ref={videoRef}
-                  className="absolute inset-0 h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full"
+                  style={{ objectFit: 'cover', objectPosition: '80% 50%' }}
                   src="/curtains-video.mp4"
                   playsInline
                   muted
                   preload="auto"
-                  // starts paused, showing first frame
                   onLoadedData={() => {
                     if (videoRef.current) {
                       videoRef.current.pause();
