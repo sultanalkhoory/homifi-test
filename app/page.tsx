@@ -231,7 +231,7 @@ function HeroSection() {
                   alt="Beautiful home interior"
                   fill
                   className="object-cover"
-                  style={{ objectPosition: 'center center' }}
+                  style={{ objectPosition: '45% center' }}
                   quality={100}
                   priority
                 />
@@ -291,13 +291,13 @@ function LightsSection() {
         >
           <IPhoneFrame>
             <div className="relative w-full h-full">
-              {/* Base Image - Lights Off - positioned to show left side (lamp area) */}
+              {/* Base Image - Lights Off - positioned so lamp is at edge */}
               <Image
                 src="/Curtains-Closed-Lights-Off.png"
                 alt="Room with lights off"
                 fill
-                className="object-cover"
-                style={{ objectPosition: '25% center' }}
+                className="object-cover object-left"
+                style={{ objectPosition: '5% center' }}
                 quality={100}
                 priority
               />
@@ -316,8 +316,8 @@ function LightsSection() {
                   src="/Curtains-Closed-Lights-On.png"
                   alt="Room with lights on"
                   fill
-                  className="object-cover"
-                  style={{ objectPosition: '25% center' }}
+                  className="object-cover object-left"
+                  style={{ objectPosition: '5% center' }}
                   quality={100}
                 />
               </motion.div>
