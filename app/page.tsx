@@ -1,294 +1,319 @@
 'use client';
 
-import Head from 'next/head';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
-// ---------------------------------------------------------------------------
-// iPhone Chrome (visual shell)
-// ---------------------------------------------------------------------------
-function IphoneShell({ children }: { children: React.ReactNode }) {
+// iPhone 15/16 Frame Component with Dynamic Island
+function IPhoneFrame({ children }: { children: React.ReactNode }) {
   return (
-    <div className="iphone-frame shadow-iphone">
-      <div className="iphone-notch" />
-      <div className="iphone-screen relative overflow-hidden rounded-[28px]">
-        {/* Keep the gradient VERY subtle so it doesn't soften the image */}
-        <div className="pointer-events-none absolute inset-0"
-             style={{
-               background:
-                 'radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0) 55%)'
-             }}
-        />
-        {children}
+    <div className="relative">
+      {/* iPhone Frame */}
+      <div className="relative w-[280px] h-[560px] bg-black rounded-[45px] p-2 shadow-[0_0_0_2px_#1a1a1a,0_0_60px_rgba(0,0,0,0.4)]">
+        {/* Screen */}
+        <div className="relative w-full h-full bg-white rounded-[37px] overflow-hidden">
+          {/* Dynamic Island */}
+          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-[100px] h-[25px] bg-black rounded-full z-20">
+            <div className="flex items-center justify-center h-full">
+              <div className="w-2 h-2 bg-gray-800 rounded-full mr-2"></div>
+              <div className="w-1 h-1 bg-gray-700 rounded-full"></div>
+            </div>
+          </div>
+          
+          {/* Status Bar Elements */}
+          <div className="absolute top-1 left-4 text-black text-xs font-medium z-10">9:41</div>
+          <div className="absolute top-1 right-4 flex items-center space-x-1 text-black z-10">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor">
+              <rect x="0" y="4" width="4" height="4" rx="1"/>
+              <rect x="5" y="2" width="4" height="8" rx="1"/>
+              <rect x="10" y="1" width="4" height="10" rx="1"/>
+              <rect x="15" y="0" width="3" height="12" rx="1"/>
+            </svg>
+            <svg width="16" height="10" viewBox="0 0 16 10" fill="currentColor">
+              <path d="M1 2h14a1 1 0 011 1v4a1 1 0 01-1 1H1a1 1 0 01-1-1V3a1 1 0 011-1zm13 2v2h1V4h-1z"/>
+            </svg>
+          </div>
+          
+          {/* Content */}
+          <div className="absolute inset-0 pt-8">
+            {children}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Lights (static images) – crisp & smooth
-// ---------------------------------------------------------------------------
-function LightsSection() {
-  const [active, setActive] = useState<'off' | 'on'>('off');
-
-  // Use exact file names from /public (case-sensitive on Vercel)
-  const scenes = useMemo(
-    () => [
-      { id: 'off', src: '/Curtains-Closed-Lights-Off.png', alt: 'Lights Off' },
-      { id: 'on',  src: '/Curtains-Closed-Lights-On.png',  alt: 'Lights On'  },
-    ],
-    []
-  );
-
+// Home Interface Mockup
+function HomeInterface() {
   return (
-    <section className="section">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 md:grid-cols-2">
-        {/* Text */}
-        <div>
-          <div className="kicker">Perfect Light</div>
-          <h2 className="h1">Every room. Every moment.</h2>
-          <p className="sub">Exactly as you want it.</p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <button
-              className={`btn btn-dark ${active === 'off' ? 'ring-2 ring-neutral-400' : ''}`}
-              onClick={() => setActive('off')}
-            >
-              Lights Off
-            </button>
-            <button
-              className={`btn btn-light ${active === 'on' ? 'ring-2 ring-neutral-400' : ''}`}
-              onClick={() => setActive('on')}
-            >
-              Lights On
-            </button>
-          </div>
-        </div>
-
-        {/* iPhone with images */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.6 }}
-          className="flex justify-center"
-        >
-          <IphoneShell>
-            <div className="absolute inset-0">
-              <AnimatePresence mode="wait">
-                {scenes.map(s => (
-                  s.id === active && (
-                    <motion.div
-                      key={s.id}
-                      className="absolute inset-0"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.5, ease: 'easeInOut' }}
-                    >
-                      {/* IMPORTANT to avoid blur: quality=100, eager load, and a bigger 'sizes' */}
-                      <Image
-                        src={s.src}
-                        alt={s.alt}
-                        fill
-                        priority
-                        // Make Next.js generate a high-res rendition inside the iPhone frame
-                        sizes="(max-width: 768px) 480px, (max-width: 1280px) 640px, 780px"
-                        quality={100}
-                        style={{ objectFit: 'cover' }}
-                      />
-                    </motion.div>
-                  )
-                ))}
-              </AnimatePresence>
+    <div className="w-full h-full bg-gradient-to-br from-blue-600 to-blue-800 text-white p-4 overflow-hidden">
+      {/* Header */}
+      <h1 className="text-2xl font-semibold mb-4">Home</h1>
+      
+      {/* Status Cards */}
+      <div className="flex space-x-2 mb-4">
+        <div className="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
+          <div className="flex items-center text-xs">
+            <span className="text-blue-200 mr-1">❄️</span>
+            <div>
+              <div className="font-medium">Climate</div>
+              <div className="text-blue-200">20.0—24.5°</div>
             </div>
-          </IphoneShell>
+          </div>
+        </div>
+        <div className="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
+          <div className="flex items-center text-xs">
+            <span className="text-yellow-300 mr-1">💡</span>
+            <div>
+              <div className="font-medium">Lights</div>
+              <div className="text-blue-200">2 On</div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
+          <div className="flex items-center text-xs">
+            <span className="text-green-300 mr-1">🔒</span>
+            <div>
+              <div className="font-medium">Security</div>
+              <div className="text-blue-200">Disarmed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Scenes */}
+      <div className="mb-4">
+        <h2 className="text-lg font-medium mb-2 flex items-center">
+          Scenes <span className="ml-1 text-sm">›</span>
+        </h2>
+        <div className="bg-white/20 backdrop-blur rounded-xl p-3">
+          <div className="flex items-center text-sm">
+            <span className="mr-2">🍿</span>
+            <span>Movie Night</span>
+          </div>
+        </div>
+      </div>
+      
+      {/* Upstairs Living Room */}
+      <div>
+        <h2 className="text-lg font-medium mb-2 flex items-center">
+          Upstairs Living Room <span className="ml-1 text-sm">›</span>
+        </h2>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="bg-white/20 backdrop-blur rounded-xl p-2">
+            <div className="text-xs mb-1">📺</div>
+            <div className="text-xs font-medium">Apple TV</div>
+            <div className="text-xs text-blue-200">Not Playing</div>
+          </div>
+          <div className="bg-white/20 backdrop-blur rounded-xl p-2">
+            <div className="text-xs mb-1">🪟</div>
+            <div className="text-xs font-medium">Blackout Cur...</div>
+            <div className="text-xs text-blue-200">Closed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Hero Section
+function HeroSection() {
+  return (
+    <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-6">
+      <div className="max-w-6xl mx-auto text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+        >
+          <h1 className="text-5xl md:text-7xl font-thin text-gray-900 mb-6 tracking-tight">
+            HomiFi
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-600 font-light mb-12 max-w-3xl mx-auto">
+            Your home. Intelligently connected.
+          </p>
+          
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex justify-center"
+          >
+            <IPhoneFrame>
+              <HomeInterface />
+            </IPhoneFrame>
+          </motion.div>
         </motion.div>
       </div>
     </section>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Curtains (dual videos) – reliable & natural
-// ---------------------------------------------------------------------------
-function CurtainsSection() {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [isOpen, setIsOpen] = useState(true);           // logical state
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [target, setTarget] = useState<'open' | 'closed'>('open'); // where we want to end up
-  const [videoSrc, setVideoSrc] = useState<string>(''); // current playing file
-
-  // Play a video reliably by: set src -> load() -> onloadeddata -> play()
-  const playCurtain = (direction: 'open' | 'close') => {
-    if (!videoRef.current || isAnimating) return;
-    const v = videoRef.current;
-
-    const src = direction === 'open'
-      ? '/curtains-opening.mp4'
-      : '/curtains-closing.mp4';
-
-    setIsAnimating(true);
-    setTarget(direction === 'open' ? 'open' : 'closed');
-    setVideoSrc(src);
-
-    // Let the effect below handle load() + play after src updates
-  };
-
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v || !videoSrc) return;
-
-    let canceled = false;
-
-    const handleLoaded = () => {
-      if (canceled) return;
-      try {
-        v.currentTime = 0;
-        const p = v.play();
-        if (p && typeof p.then === 'function') {
-          p.catch(() => {
-            // In case browser blocks autoplay (shouldn't, because user clicked & muted)
-          });
-        }
-      } catch {
-        // no-op
-      }
-    };
-
-    const handleEnded = () => {
-      // Pause and hold on the last frame to "freeze" the final state
-      v.pause();
-      // Safari sometimes seeks ~1 frame before end; snap to end
-      try {
-        if (v.duration && !isNaN(v.duration)) {
-          v.currentTime = Math.max(v.duration - 0.01, 0);
-        }
-      } catch { /* ignore */ }
-
-      // Commit logical state only after animation completes
-      setIsOpen(target === 'open');
-      setIsAnimating(false);
-    };
-
-    v.addEventListener('loadeddata', handleLoaded);
-    v.addEventListener('ended', handleEnded);
-
-    // Trigger an explicit load to avoid "stuck" states on iOS/Safari
-    try { v.load(); } catch { /* ignore */ }
-
-    return () => {
-      v.removeEventListener('loadeddata', handleLoaded);
-      v.removeEventListener('ended', handleEnded);
-      canceled = true;
-    };
-  }, [videoSrc, target]);
-
+// Lights Section with Scroll Animation
+function LightsSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"]
+  });
+  
+  const opacity = useTransform(scrollYProgress, [0.2, 0.6], [0, 1]);
+  
   return (
-    <section className="section">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 md:grid-cols-2 md:[&>*:first-child]:order-2">
-        {/* Text */}
-        <div>
-          <div className="kicker">Perfect Privacy</div>
-          <h2 className="h1">Comfort and control.</h2>
-          <p className="sub">Exactly when you need it.</p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <button
-              className="btn btn-dark"
-              disabled={isAnimating || !isOpen}
-              onClick={() => playCurtain('close')}
-            >
-              Close Curtains
-            </button>
-            <button
-              className="btn btn-light"
-              disabled={isAnimating || isOpen}
-              onClick={() => playCurtain('open')}
-            >
-              Open Curtains
-            </button>
-          </div>
-          {/* Small state helper */}
-          <div className="mt-3 text-xs text-neutral-500">
-            State: <b>{isOpen ? 'Open' : 'Closed'}</b>{isAnimating ? ' • animating…' : ''}
-          </div>
-        </div>
-
-        {/* iPhone with video */}
+    <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-white">
+      <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        {/* Text Content */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+          viewport={{ once: true }}
+        >
+          <div className="text-sm uppercase tracking-wider text-blue-600 font-medium mb-3">
+            Perfect Light
+          </div>
+          <h2 className="text-4xl md:text-5xl font-thin text-gray-900 mb-4 leading-tight">
+            Every room.<br />
+            Every moment.
+          </h2>
+          <p className="text-lg text-gray-600 font-light">
+            Exactly as you want it.
+          </p>
+        </motion.div>
+        
+        {/* iPhone with Room Animation */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+          viewport={{ once: true }}
           className="flex justify-center"
         >
-          <IphoneShell>
-            <video
-              ref={videoRef}
-              // When src changes, the effect calls load() then plays
-              src={videoSrc}
-              className="absolute inset-0 h-full w-full"
-              style={{ objectFit: 'cover', objectPosition: '50% 50%' }}
-              muted
-              playsInline
-              preload="auto"
-              disablePictureInPicture
-              controls={false}
-              controlsList="nodownload noplaybackrate noremoteplayback"
-              // On first paint, hold a clean frame (no auto-play)
-              onLoadedMetadata={(e) => {
-                const v = e.currentTarget;
-                v.pause();
-                v.currentTime = 0;
-              }}
-            />
-          </IphoneShell>
+          <IPhoneFrame>
+            <div className="relative w-full h-full">
+              {/* Base Image - Lights Off */}
+              <Image
+                src="/Curtains-Closed-Lights-Off.png"
+                alt="Room with lights off"
+                fill
+                className="object-cover"
+                quality={100}
+                priority
+              />
+              
+              {/* Overlay Image - Lights On */}
+              <motion.div
+                className="absolute inset-0"
+                style={{ opacity }}
+              >
+                <Image
+                  src="/Curtains-Closed-Lights-On.png"
+                  alt="Room with lights on"
+                  fill
+                  className="object-cover"
+                  quality={100}
+                />
+              </motion.div>
+            </div>
+          </IPhoneFrame>
         </motion.div>
       </div>
     </section>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
-export default function Page() {
+// Curtains Section with Video Animation
+function CurtainsSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoPlayed, setVideoPlayed] = useState(false);
+  const isInView = useInView(containerRef, { once: true, amount: 0.3 });
+  
+  useEffect(() => {
+    if (isInView && !videoPlayed && videoRef.current) {
+      const video = videoRef.current;
+      video.currentTime = 0;
+      video.play().catch(() => {
+        // Handle autoplay restrictions
+      });
+      setVideoPlayed(true);
+    }
+  }, [isInView, videoPlayed]);
+  
   return (
-    <main className="[--pad:clamp(16px,4vw,48px)]">
-      <Head>
-        {/* Preload assets so images are crisp & video starts instantly */}
-        <link rel="preload" as="image" href="/Curtains-Closed-Lights-Off.png" />
-        <link rel="preload" as="image" href="/Curtains-Closed-Lights-On.png" />
-        <link rel="preload" as="video" href="/curtains-opening.mp4" type="video/mp4" />
-        <link rel="preload" as="video" href="/curtains-closing.mp4" type="video/mp4" />
-      </Head>
-
-      {/* HERO */}
-      <section className="section pt-28 md:pt-40">
-        <div className="mx-auto max-w-6xl px-6 text-center">
-          <h1 className="h1">Your home. Simplified.</h1>
-          <p className="sub mx-auto max-w-2xl">
-            Control everything, beautifully. The iPhone becomes your stage—
-            every effect happens right on screen.
-          </p>
-          <div className="mt-12 flex justify-center">
-            <IphoneShell>
-              <div className="absolute inset-0" />
-            </IphoneShell>
+    <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-gray-50">
+      <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        {/* iPhone with Video Animation */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+          viewport={{ once: true }}
+          className="flex justify-center order-2 md:order-1"
+        >
+          <IPhoneFrame>
+            <div className="relative w-full h-full overflow-hidden">
+              <video
+                ref={videoRef}
+                src="/curtains-closing.mp4"
+                className="w-full h-full object-cover"
+                muted
+                playsInline
+                preload="auto"
+                onEnded={() => {
+                  if (videoRef.current) {
+                    videoRef.current.pause();
+                  }
+                }}
+              />
+            </div>
+          </IPhoneFrame>
+        </motion.div>
+        
+        {/* Text Content */}
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+          viewport={{ once: true }}
+          className="order-1 md:order-2"
+        >
+          <div className="text-sm uppercase tracking-wider text-blue-600 font-medium mb-3">
+            Perfect Privacy
           </div>
-        </div>
-      </section>
+          <h2 className="text-4xl md:text-5xl font-thin text-gray-900 mb-4 leading-tight">
+            Comfort<br />
+            and control.
+          </h2>
+          <p className="text-lg text-gray-600 font-light">
+            Exactly when you need it.
+          </p>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
-      {/* LIGHTS (crisp images + smooth fade) */}
-      <LightsSection />
-
-      {/* CURTAINS (two videos, natural & reliable) */}
-      <CurtainsSection />
-
-      {/* FOOTER */}
-      <footer className="py-16 text-center text-sm text-neutral-500">
+// Footer
+function Footer() {
+  return (
+    <footer className="py-16 text-center bg-white">
+      <p className="text-sm text-gray-500 font-light">
         Designed in Dubai. Built for your home.
-      </footer>
+      </p>
+    </footer>
+  );
+}
+
+// Main Page Component
+export default function HomePage() {
+  return (
+    <main className="overflow-x-hidden">
+      <HeroSection />
+      <LightsSection />
+      <CurtainsSection />
+      <Footer />
     </main>
   );
 }
