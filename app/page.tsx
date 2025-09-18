@@ -207,8 +207,8 @@ function LightsSection() {
         >
           <IPhoneFrame>
             <div className="relative w-full h-full overflow-hidden">
-              {/* Lights Off Image */}
-              <div className="absolute inset-0">
+              {/* Lights Off Image - Ensure no white space */}
+              <div className="absolute inset-0 bg-black">
                 <Image
                   src="/Curtains-Closed-Lights-Off.png"
                   alt="Room with lights off"
@@ -216,7 +216,12 @@ function LightsSection() {
                   quality={100}
                   priority
                   className="object-cover"
-                  style={{ objectPosition: '60% center' }}
+                  style={{ 
+                    objectFit: 'cover',
+                    objectPosition: '60% center',
+                    width: '100%',
+                    height: '100%'
+                  }}
                 />
               </div>
               
@@ -232,7 +237,12 @@ function LightsSection() {
                   fill
                   quality={100}
                   className="object-cover"
-                  style={{ objectPosition: '60% center' }}
+                  style={{ 
+                    objectFit: 'cover',
+                    objectPosition: '60% center',
+                    width: '100%',
+                    height: '100%'
+                  }}
                 />
               </motion.div>
             </div>
@@ -243,57 +253,80 @@ function LightsSection() {
   );
 }
 
-// Curtains Section - Simple Video Only
+// Curtains Section - Video with Proper Initial State
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [curtainsState, setCurtainsState] = useState<'open' | 'closed'>('open');
   const [isAnimating, setIsAnimating] = useState(false);
   const [manualControl, setManualControl] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
   
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
   
+  // Initialize video with first frame
+  useEffect(() => {
+    if (videoRef.current) {
+      const video = videoRef.current;
+      video.src = '/curtains-closing.mp4';
+      
+      video.addEventListener('loadeddata', () => {
+        video.currentTime = 0; // Show first frame (curtains open)
+        video.pause();
+        setVideoLoaded(true);
+      });
+      
+      video.load();
+    }
+  }, []);
+  
   // Auto-play curtains closing on scroll
   useEffect(() => {
-    if (isInView && !manualControl && curtainsState === 'open') {
+    if (isInView && !manualControl && curtainsState === 'open' && videoLoaded) {
       const timer = setTimeout(() => {
         playCurtainVideo('closing');
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [isInView, manualControl, curtainsState]);
+  }, [isInView, manualControl, curtainsState, videoLoaded]);
   
   const playCurtainVideo = (action: 'opening' | 'closing') => {
-    if (!videoRef.current || isAnimating) return;
+    if (!videoRef.current || isAnimating || !videoLoaded) return;
     
     setIsAnimating(true);
     const video = videoRef.current;
     const newSrc = action === 'opening' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
     
-    // Simple preload to reduce flash
-    const preloadVideo = document.createElement('video');
-    preloadVideo.src = newSrc;
-    preloadVideo.muted = true;
-    preloadVideo.playsInline = true;
-    preloadVideo.preload = 'auto';
-    
-    preloadVideo.addEventListener('canplay', () => {
-      video.src = newSrc;
+    // Only change source if different
+    if (video.src.includes(newSrc.replace('/', ''))) {
+      // Same video, just replay
       video.currentTime = 0;
       video.play().catch(() => {});
-    });
+    } else {
+      // Different video, change source
+      video.src = newSrc;
+      video.addEventListener('loadeddata', () => {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      }, { once: true });
+      video.load();
+    }
     
     video.onended = () => {
       video.pause();
+      // Keep video at last frame
+      if (action === 'closing') {
+        video.currentTime = video.duration;
+      } else {
+        video.currentTime = 0;
+      }
       setCurtainsState(action === 'opening' ? 'open' : 'closed');
       setIsAnimating(false);
     };
-    
-    preloadVideo.load();
   };
   
   const handleManualToggle = (action: 'opening' | 'closing') => {
-    if (isAnimating) return;
+    if (isAnimating || !videoLoaded) return;
     setManualControl(true);
     playCurtainVideo(action);
   };
@@ -310,11 +343,18 @@ function CurtainsSection() {
           className="flex justify-center order-2 md:order-1"
         >
           <IPhoneFrame>
-            <div className="relative w-full h-full overflow-hidden bg-gray-100">
-              {/* Video - positioned to match your preference */}
+            <div className="relative w-full h-full overflow-hidden bg-black">
+              {/* Loading placeholder - only shows until video loads */}
+              {!videoLoaded && (
+                <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
+                  <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              )}
+              
+              {/* Video - starts with first frame visible */}
               <video
                 ref={videoRef}
-                className="w-full h-full object-cover"
+                className={`w-full h-full object-cover transition-opacity duration-300 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
                 style={{ objectPosition: '60% center' }}
                 muted
                 playsInline
@@ -327,7 +367,7 @@ function CurtainsSection() {
         {/* Text Content */}
         <motion.div
           initial={{ opacity: 0, x: 30 }}
-          whileInView={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
           viewport={{ once: true }}
           className="order-1 md:order-2"
