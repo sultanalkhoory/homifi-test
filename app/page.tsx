@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
-// iPhone 15/16 Frame Component with Dynamic Island
+// iPhone 15/16 Frame Component with Accurate Dynamic Island
 function IPhoneFrame({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative">
@@ -12,31 +12,24 @@ function IPhoneFrame({ children }: { children: React.ReactNode }) {
       <div className="relative w-[280px] h-[560px] bg-black rounded-[45px] p-2 shadow-[0_0_0_2px_#1a1a1a,0_0_60px_rgba(0,0,0,0.4)]">
         {/* Screen */}
         <div className="relative w-full h-full bg-white rounded-[37px] overflow-hidden">
-          {/* Dynamic Island */}
-          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-[100px] h-[25px] bg-black rounded-full z-20">
-            <div className="flex items-center justify-center h-full">
-              <div className="w-2 h-2 bg-gray-800 rounded-full mr-2"></div>
-              <div className="w-1 h-1 bg-gray-700 rounded-full"></div>
+          {/* Content fills entire screen */}
+          <div className="absolute inset-0">
+            {children}
+          </div>
+          
+          {/* Dynamic Island Overlay - smaller and more accurate */}
+          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-[85px] h-[22px] bg-black rounded-full z-30">
+            <div className="flex items-center justify-center h-full relative">
+              {/* Front camera */}
+              <div className="absolute left-3 w-1.5 h-1.5 bg-gray-900 rounded-full"></div>
+              {/* Speaker/sensor */}
+              <div className="absolute right-3 w-3 h-0.5 bg-gray-900 rounded-full"></div>
             </div>
           </div>
           
-          {/* Status Bar Elements */}
-          <div className="absolute top-1 left-4 text-black text-xs font-medium z-10">9:41</div>
-          <div className="absolute top-1 right-4 flex items-center space-x-1 text-black z-10">
-            <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor">
-              <rect x="0" y="4" width="4" height="4" rx="1"/>
-              <rect x="5" y="2" width="4" height="8" rx="1"/>
-              <rect x="10" y="1" width="4" height="10" rx="1"/>
-              <rect x="15" y="0" width="3" height="12" rx="1"/>
-            </svg>
-            <svg width="16" height="10" viewBox="0 0 16 10" fill="currentColor">
-              <path d="M1 2h14a1 1 0 011 1v4a1 1 0 01-1 1H1a1 1 0 01-1-1V3a1 1 0 011-1zm13 2v2h1V4h-1z"/>
-            </svg>
-          </div>
-          
-          {/* Content */}
-          <div className="absolute inset-0 pt-8">
-            {children}
+          {/* Time Overlay - properly centered */}
+          <div className="absolute top-2 left-4 text-white text-sm font-medium z-20 drop-shadow-sm">
+            9:41
           </div>
         </div>
       </div>
@@ -44,73 +37,164 @@ function IPhoneFrame({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Home Interface Mockup
-function HomeInterface() {
+// Apple Home Interface - More Accurate
+function AppleHomeInterface() {
   return (
-    <div className="w-full h-full bg-gradient-to-br from-blue-600 to-blue-800 text-white p-4 overflow-hidden">
-      {/* Header */}
-      <h1 className="text-2xl font-semibold mb-4">Home</h1>
+    <div className="w-full h-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 text-white relative">
+      {/* Background with subtle pattern */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.3),transparent_50%)] opacity-50"></div>
       
-      {/* Status Cards */}
-      <div className="flex space-x-2 mb-4">
-        <div className="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
-          <div className="flex items-center text-xs">
-            <span className="text-blue-200 mr-1">❄️</span>
-            <div>
-              <div className="font-medium">Climate</div>
-              <div className="text-blue-200">20.0—24.5°</div>
+      <div className="relative z-10 p-4 pt-10">
+        {/* Header */}
+        <h1 className="text-2xl font-semibold mb-6">Home</h1>
+        
+        {/* Status Cards Row */}
+        <div className="grid grid-cols-3 gap-2 mb-6">
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-2.5">
+            <div className="flex items-center">
+              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-2">
+                <svg width="12" height="12" fill="white" viewBox="0 0 24 24">
+                  <path d="M12 2L2 7v10c0 5.55 3.84 9.64 9 11 5.16-1.36 9-5.45 9-11V7l-10-5z"/>
+                </svg>
+              </div>
+              <div>
+                <div className="text-xs font-medium">Climate</div>
+                <div className="text-xs text-white/70">20.0—24.5°</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-2.5">
+            <div className="flex items-center">
+              <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center mr-2">
+                <div className="w-2 h-2 bg-white rounded-full"></div>
+              </div>
+              <div>
+                <div className="text-xs font-medium">Lights</div>
+                <div className="text-xs text-white/70">2 On</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-2.5">
+            <div className="flex items-center">
+              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-2">
+                <svg width="10" height="12" fill="white" viewBox="0 0 24 24">
+                  <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/>
+                </svg>
+              </div>
+              <div>
+                <div className="text-xs font-medium">Security</div>
+                <div className="text-xs text-white/70">Disarmed</div>
+              </div>
             </div>
           </div>
         </div>
-        <div className="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
-          <div className="flex items-center text-xs">
-            <span className="text-yellow-300 mr-1">💡</span>
-            <div>
-              <div className="font-medium">Lights</div>
-              <div className="text-blue-200">2 On</div>
+        
+        {/* Scenes Section */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-medium">Scenes</h2>
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+            </svg>
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mr-3">
+                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                  <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+                </svg>
+              </div>
+              <span className="font-medium">Movie Night</span>
             </div>
           </div>
         </div>
-        <div className="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
-          <div className="flex items-center text-xs">
-            <span className="text-green-300 mr-1">🔒</span>
-            <div>
-              <div className="font-medium">Security</div>
-              <div className="text-blue-200">Disarmed</div>
+        
+        {/* Favorites Grid */}
+        <div className="mb-6">
+          <h2 className="text-base font-medium mb-3">Favorites</h2>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3">
+              <div className="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center mb-2">
+                <svg width="14" height="14" fill="white" viewBox="0 0 24 24">
+                  <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2v-7h-2v7z"/>
+                </svg>
+              </div>
+              <div className="text-xs font-medium mb-0.5">Main Entrance</div>
+              <div className="text-xs font-medium mb-0.5">Door</div>
+              <div className="text-xs text-white/70">Locked</div>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3">
+              <div className="w-6 h-6 bg-gray-500 rounded-lg flex items-center justify-center mb-2">
+                <svg width="14" height="14" fill="white" viewBox="0 0 24 24">
+                  <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2v-7h-2v7z"/>
+                </svg>
+              </div>
+              <div className="text-xs font-medium mb-0.5">Garage</div>
+              <div className="text-xs font-medium mb-0.5">Gate</div>
+              <div className="text-xs text-white/70">Closed</div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Room Section */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-medium">Upstairs Living Room</h2>
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+            </svg>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3">
+              <div className="w-6 h-6 bg-yellow-500 rounded-lg flex items-center justify-center mb-2">
+                <div className="w-2 h-2 bg-white rounded-full"></div>
+              </div>
+              <div className="text-xs font-medium mb-0.5">Cove Light</div>
+              <div className="text-xs text-white/70">Off</div>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3">
+              <div className="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center mb-2">
+                <svg width="12" height="12" fill="white" viewBox="0 0 24 24">
+                  <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5l-1 1v2h8v-2l-1-1h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+                </svg>
+              </div>
+              <div className="text-xs font-medium mb-0.5">Sheer Curtain</div>
+              <div className="text-xs text-white/70">Closed</div>
             </div>
           </div>
         </div>
       </div>
       
-      {/* Scenes */}
-      <div className="mb-4">
-        <h2 className="text-lg font-medium mb-2 flex items-center">
-          Scenes <span className="ml-1 text-sm">›</span>
-        </h2>
-        <div className="bg-white/20 backdrop-blur rounded-xl p-3">
-          <div className="flex items-center text-sm">
-            <span className="mr-2">🍿</span>
-            <span>Movie Night</span>
+      {/* Bottom Navigation */}
+      <div className="absolute bottom-0 left-0 right-0 bg-black/20 backdrop-blur-sm border-t border-white/10">
+        <div className="flex justify-around py-2">
+          <div className="flex flex-col items-center py-1">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            <span className="text-xs mt-1">Home</span>
+          </div>
+          <div className="flex flex-col items-center py-1 opacity-60">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <span className="text-xs mt-1">Automation</span>
+          </div>
+          <div className="flex flex-col items-center py-1 opacity-60">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <span className="text-xs mt-1">Discover</span>
           </div>
         </div>
-      </div>
-      
-      {/* Upstairs Living Room */}
-      <div>
-        <h2 className="text-lg font-medium mb-2 flex items-center">
-          Upstairs Living Room <span className="ml-1 text-sm">›</span>
-        </h2>
-        <div className="grid grid-cols-2 gap-2">
-          <div className="bg-white/20 backdrop-blur rounded-xl p-2">
-            <div className="text-xs mb-1">📺</div>
-            <div className="text-xs font-medium">Apple TV</div>
-            <div className="text-xs text-blue-200">Not Playing</div>
-          </div>
-          <div className="bg-white/20 backdrop-blur rounded-xl p-2">
-            <div className="text-xs mb-1">🪟</div>
-            <div className="text-xs font-medium">Blackout Cur...</div>
-            <div className="text-xs text-blue-200">Closed</div>
-          </div>
+        
+        {/* Home Indicator */}
+        <div className="flex justify-center pb-1">
+          <div className="w-32 h-1 bg-white rounded-full opacity-60"></div>
         </div>
       </div>
     </div>
@@ -141,7 +225,7 @@ function HeroSection() {
             className="flex justify-center"
           >
             <IPhoneFrame>
-              <HomeInterface />
+              <AppleHomeInterface />
             </IPhoneFrame>
           </motion.div>
         </motion.div>
@@ -153,12 +237,17 @@ function HeroSection() {
 // Lights Section with Scroll Animation
 function LightsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"]
-  });
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const isInView = useInView(containerRef, { once: true, amount: 0.4 });
   
-  const opacity = useTransform(scrollYProgress, [0.2, 0.6], [0, 1]);
+  useEffect(() => {
+    if (isInView && !hasAnimated) {
+      const timer = setTimeout(() => {
+        setHasAnimated(true);
+      }, 600); // Apple-like delay
+      return () => clearTimeout(timer);
+    }
+  }, [isInView, hasAnimated]);
   
   return (
     <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-white">
@@ -202,10 +291,15 @@ function LightsSection() {
                 priority
               />
               
-              {/* Overlay Image - Lights On */}
+              {/* Overlay Image - Lights On with smooth transition */}
               <motion.div
                 className="absolute inset-0"
-                style={{ opacity }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: hasAnimated ? 1 : 0 }}
+                transition={{ 
+                  duration: 1.2, 
+                  ease: [0.25, 0.46, 0.45, 0.94] // Apple's easeOutQuart
+                }}
               >
                 <Image
                   src="/Curtains-Closed-Lights-On.png"
@@ -232,12 +326,17 @@ function CurtainsSection() {
   
   useEffect(() => {
     if (isInView && !videoPlayed && videoRef.current) {
-      const video = videoRef.current;
-      video.currentTime = 0;
-      video.play().catch(() => {
-        // Handle autoplay restrictions
-      });
-      setVideoPlayed(true);
+      const timer = setTimeout(() => {
+        const video = videoRef.current;
+        if (video) {
+          video.currentTime = 0;
+          video.play().catch(() => {
+            // Handle autoplay restrictions
+          });
+          setVideoPlayed(true);
+        }
+      }, 800); // Apple-like delay
+      return () => clearTimeout(timer);
     }
   }, [isInView, videoPlayed]);
   
