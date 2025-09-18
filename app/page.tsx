@@ -137,29 +137,22 @@ function HeroSection() {
   );
 }
 
-// Enhanced Lights Section with Smooth Scroll Control
+// Enhanced Lights Section with Timer-Based Animation
 function LightsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [manualControl, setManualControl] = useState(false);
   const [lightsState, setLightsState] = useState<'off' | 'on'>('off');
+  const isInView = useInView(containerRef, { once: true, amount: 0.4 });
   
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['0.7 1', '0.3 0']
-  });
-  
-  const lightsOpacity = useTransform(scrollYProgress, [0, 1], [0, 1]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1.02, 1]);
-  
-  // Handle scroll-driven animation
+  // Timer-based animation when section comes into view
   useEffect(() => {
-    if (!manualControl) {
-      const unsubscribe = lightsOpacity.onChange((value) => {
-        setLightsState(value > 0.5 ? 'on' : 'off');
-      });
-      return unsubscribe;
+    if (isInView && !manualControl && lightsState === 'off') {
+      const timer = setTimeout(() => {
+        setLightsState('on');
+      }, 400); // Faster timing - lights turn on at 400ms
+      return () => clearTimeout(timer);
     }
-  }, [lightsOpacity, manualControl]);
+  }, [isInView, manualControl, lightsState]);
   
   const handleManualToggle = (state: 'off' | 'on') => {
     setManualControl(true);
@@ -211,7 +204,6 @@ function LightsSection() {
           transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
           viewport={{ once: true }}
           className="flex justify-center"
-          style={{ scale }}
         >
           <IPhoneFrame>
             <div className="relative w-full h-full overflow-hidden">
@@ -228,15 +220,11 @@ function LightsSection() {
                 />
               </div>
               
-              {/* Lights On Image - Controlled by scroll or manual */}
+              {/* Lights On Image - Controlled by timer or manual */}
               <motion.div
                 className="absolute inset-0"
-                style={{ 
-                  opacity: manualControl 
-                    ? (lightsState === 'on' ? 1 : 0)
-                    : lightsOpacity
-                }}
-                transition={{ duration: 0.6, ease: 'easeInOut' }}
+                animate={{ opacity: lightsState === 'on' ? 1 : 0 }}
+                transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
                 <Image
                   src="/Curtains-Closed-Lights-On.png"
@@ -255,82 +243,25 @@ function LightsSection() {
   );
 }
 
-// Enhanced Curtains Section with Video Frame Extraction
+// Curtains Section - Simple Video Only
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const openFrameRef = useRef<HTMLCanvasElement>(null);
-  const closedFrameRef = useRef<HTMLCanvasElement>(null);
   const [curtainsState, setCurtainsState] = useState<'open' | 'closed'>('open');
   const [isAnimating, setIsAnimating] = useState(false);
   const [manualControl, setManualControl] = useState(false);
-  const [framesExtracted, setFramesExtracted] = useState(false);
   
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
   
-  // Extract first and last frames from videos
-  useEffect(() => {
-    if (!framesExtracted) {
-      extractVideoFrames();
-    }
-  }, [framesExtracted]);
-  
-  const extractVideoFrames = async () => {
-    if (!videoRef.current || !openFrameRef.current || !closedFrameRef.current) return;
-    
-    const video = videoRef.current;
-    const openCanvas = openFrameRef.current;
-    const closedCanvas = closedFrameRef.current;
-    const openCtx = openCanvas.getContext('2d');
-    const closedCtx = closedCanvas.getContext('2d');
-    
-    if (!openCtx || !closedCtx) return;
-    
-    // Set canvas dimensions
-    openCanvas.width = 280;
-    openCanvas.height = 560;
-    closedCanvas.width = 280;
-    closedCanvas.height = 560;
-    
-    try {
-      // Extract open frame (first frame of closing video = curtains open)
-      video.src = '/curtains-closing.mp4';
-      await new Promise((resolve) => {
-        video.onloadeddata = () => {
-          video.currentTime = 0;
-          video.onseeked = () => {
-            openCtx.drawImage(video, 0, 0, openCanvas.width, openCanvas.height);
-            resolve(null);
-          };
-        };
-        video.load();
-      });
-      
-      // Extract closed frame (last frame of closing video = curtains closed)
-      await new Promise((resolve) => {
-        video.currentTime = video.duration - 0.1;
-        video.onseeked = () => {
-          closedCtx.drawImage(video, 0, 0, closedCanvas.width, closedCanvas.height);
-          resolve(null);
-        };
-      });
-      
-      setFramesExtracted(true);
-    } catch (error) {
-      console.log('Frame extraction failed, using fallback');
-      setFramesExtracted(true);
-    }
-  };
-  
   // Auto-play curtains closing on scroll
   useEffect(() => {
-    if (isInView && !manualControl && curtainsState === 'open' && framesExtracted) {
+    if (isInView && !manualControl && curtainsState === 'open') {
       const timer = setTimeout(() => {
         playCurtainVideo('closing');
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [isInView, manualControl, curtainsState, framesExtracted]);
+  }, [isInView, manualControl, curtainsState]);
   
   const playCurtainVideo = (action: 'opening' | 'closing') => {
     if (!videoRef.current || isAnimating) return;
@@ -339,26 +270,18 @@ function CurtainsSection() {
     const video = videoRef.current;
     const newSrc = action === 'opening' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
     
-    // Create invisible preload video to avoid flash
+    // Simple preload to reduce flash
     const preloadVideo = document.createElement('video');
     preloadVideo.src = newSrc;
     preloadVideo.muted = true;
     preloadVideo.playsInline = true;
-    preloadVideo.style.position = 'absolute';
-    preloadVideo.style.opacity = '0';
-    preloadVideo.style.pointerEvents = 'none';
-    document.body.appendChild(preloadVideo);
+    preloadVideo.preload = 'auto';
     
-    preloadVideo.onloadeddata = () => {
-      // Seamlessly switch
+    preloadVideo.addEventListener('canplay', () => {
       video.src = newSrc;
       video.currentTime = 0;
-      video.onloadeddata = () => {
-        video.play().catch(() => {});
-        document.body.removeChild(preloadVideo);
-      };
-      video.load();
-    };
+      video.play().catch(() => {});
+    });
     
     video.onended = () => {
       video.pause();
@@ -387,36 +310,15 @@ function CurtainsSection() {
           className="flex justify-center order-2 md:order-1"
         >
           <IPhoneFrame>
-            <div className="relative w-full h-full overflow-hidden">
-              {/* Canvas frames - extracted from actual video */}
-              <canvas
-                ref={openFrameRef}
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ 
-                  objectPosition: '60% center',
-                  opacity: curtainsState === 'open' && !isAnimating ? 1 : 0
-                }}
-              />
-              <canvas
-                ref={closedFrameRef}
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ 
-                  objectPosition: '60% center',
-                  opacity: curtainsState === 'closed' && !isAnimating ? 1 : 0
-                }}
-              />
-              
-              {/* Video Layer - Only visible during animation */}
+            <div className="relative w-full h-full overflow-hidden bg-gray-100">
+              {/* Video - positioned to match your preference */}
               <video
                 ref={videoRef}
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ 
-                  objectPosition: '60% center',
-                  opacity: isAnimating ? 1 : 0
-                }}
+                className="w-full h-full object-cover"
+                style={{ objectPosition: '60% center' }}
                 muted
                 playsInline
-                preload="metadata"
+                preload="auto"
               />
             </div>
           </IPhoneFrame>
