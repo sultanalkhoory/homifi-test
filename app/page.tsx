@@ -225,7 +225,17 @@ function HeroSection() {
             className="flex justify-center"
           >
             <IPhoneFrame>
-              <AppleHomeInterface />
+              <div className="relative w-full h-full">
+                <Image
+                  src="/Curtains-Open-Lights-On.png"
+                  alt="Beautiful home interior"
+                  fill
+                  className="object-cover"
+                  style={{ objectPosition: 'center center' }}
+                  quality={100}
+                  priority
+                />
+              </div>
             </IPhoneFrame>
           </motion.div>
         </motion.div>
@@ -281,12 +291,13 @@ function LightsSection() {
         >
           <IPhoneFrame>
             <div className="relative w-full h-full">
-              {/* Base Image - Lights Off */}
+              {/* Base Image - Lights Off - positioned to show left side (lamp area) */}
               <Image
                 src="/Curtains-Closed-Lights-Off.png"
                 alt="Room with lights off"
                 fill
                 className="object-cover"
+                style={{ objectPosition: 'left center' }}
                 quality={100}
                 priority
               />
@@ -306,6 +317,7 @@ function LightsSection() {
                   alt="Room with lights on"
                   fill
                   className="object-cover"
+                  style={{ objectPosition: 'left center' }}
                   quality={100}
                 />
               </motion.div>
@@ -357,6 +369,7 @@ function CurtainsSection() {
                 ref={videoRef}
                 src="/curtains-closing.mp4"
                 className="w-full h-full object-cover"
+                style={{ objectPosition: '60% center' }}
                 muted
                 playsInline
                 preload="auto"
