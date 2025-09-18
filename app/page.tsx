@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
-// iPhone 15/16 Frame Component with Accurate Dynamic Island
+// iPhone 15/16 Frame Component with Screen Glare
 function IPhoneFrame({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative">
@@ -17,17 +17,31 @@ function IPhoneFrame({ children }: { children: React.ReactNode }) {
             {children}
           </div>
           
-          {/* Dynamic Island Overlay - smaller and more accurate */}
+          {/* Screen Glare Effect - Very Subtle */}
+          <div 
+            className="absolute inset-0 pointer-events-none rounded-[37px]"
+            style={{
+              background: `
+                linear-gradient(135deg, 
+                  rgba(255,255,255,0.1) 0%, 
+                  rgba(255,255,255,0.05) 25%, 
+                  transparent 50%,
+                  transparent 75%,
+                  rgba(255,255,255,0.02) 100%
+                )
+              `
+            }}
+          />
+          
+          {/* Dynamic Island Overlay */}
           <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-[85px] h-[22px] bg-black rounded-full z-30">
             <div className="flex items-center justify-center h-full relative">
-              {/* Front camera */}
               <div className="absolute left-3 w-1.5 h-1.5 bg-gray-900 rounded-full"></div>
-              {/* Speaker/sensor */}
               <div className="absolute right-3 w-3 h-0.5 bg-gray-900 rounded-full"></div>
             </div>
           </div>
           
-          {/* Time Overlay - properly centered */}
+          {/* Time Overlay */}
           <div className="absolute top-2 left-4 text-white text-sm font-medium z-20 drop-shadow-sm">
             9:41
           </div>
@@ -37,167 +51,50 @@ function IPhoneFrame({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Apple Home Interface - More Accurate
-function AppleHomeInterface() {
+// iOS 18 Glass Button Component
+function GlassButton({ 
+  children, 
+  active = false, 
+  onClick, 
+  disabled = false 
+}: { 
+  children: React.ReactNode;
+  active?: boolean;
+  onClick?: () => void;
+  disabled?: boolean;
+}) {
   return (
-    <div className="w-full h-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 text-white relative">
-      {/* Background with subtle pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.3),transparent_50%)] opacity-50"></div>
+    <motion.button
+      onClick={onClick}
+      disabled={disabled}
+      whileHover={{ scale: disabled ? 1 : 1.02 }}
+      whileTap={{ scale: disabled ? 1 : 0.98 }}
+      className={`
+        relative px-4 py-2.5 rounded-full text-sm font-medium
+        backdrop-blur-xl border border-white/20
+        transition-all duration-300
+        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+        ${active 
+          ? 'bg-white/25 text-gray-800 shadow-lg' 
+          : 'bg-white/10 text-gray-700 hover:bg-white/20'
+        }
+      `}
+      style={{
+        background: active 
+          ? 'linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.15) 100%)'
+          : 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)'
+      }}
+    >
+      {children}
       
-      <div className="relative z-10 p-4 pt-10">
-        {/* Header */}
-        <h1 className="text-2xl font-semibold mb-6">Home</h1>
-        
-        {/* Status Cards Row */}
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-2.5">
-            <div className="flex items-center">
-              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-2">
-                <svg width="12" height="12" fill="white" viewBox="0 0 24 24">
-                  <path d="M12 2L2 7v10c0 5.55 3.84 9.64 9 11 5.16-1.36 9-5.45 9-11V7l-10-5z"/>
-                </svg>
-              </div>
-              <div>
-                <div className="text-xs font-medium">Climate</div>
-                <div className="text-xs text-white/70">20.0—24.5°</div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-2.5">
-            <div className="flex items-center">
-              <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center mr-2">
-                <div className="w-2 h-2 bg-white rounded-full"></div>
-              </div>
-              <div>
-                <div className="text-xs font-medium">Lights</div>
-                <div className="text-xs text-white/70">2 On</div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-2.5">
-            <div className="flex items-center">
-              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-2">
-                <svg width="10" height="12" fill="white" viewBox="0 0 24 24">
-                  <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/>
-                </svg>
-              </div>
-              <div>
-                <div className="text-xs font-medium">Security</div>
-                <div className="text-xs text-white/70">Disarmed</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Scenes Section */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-medium">Scenes</h2>
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-            </svg>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mr-3">
-                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
-                  <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
-                </svg>
-              </div>
-              <span className="font-medium">Movie Night</span>
-            </div>
-          </div>
-        </div>
-        
-        {/* Favorites Grid */}
-        <div className="mb-6">
-          <h2 className="text-base font-medium mb-3">Favorites</h2>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3">
-              <div className="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center mb-2">
-                <svg width="14" height="14" fill="white" viewBox="0 0 24 24">
-                  <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2v-7h-2v7z"/>
-                </svg>
-              </div>
-              <div className="text-xs font-medium mb-0.5">Main Entrance</div>
-              <div className="text-xs font-medium mb-0.5">Door</div>
-              <div className="text-xs text-white/70">Locked</div>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3">
-              <div className="w-6 h-6 bg-gray-500 rounded-lg flex items-center justify-center mb-2">
-                <svg width="14" height="14" fill="white" viewBox="0 0 24 24">
-                  <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2v-7h-2v7z"/>
-                </svg>
-              </div>
-              <div className="text-xs font-medium mb-0.5">Garage</div>
-              <div className="text-xs font-medium mb-0.5">Gate</div>
-              <div className="text-xs text-white/70">Closed</div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Room Section */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-medium">Upstairs Living Room</h2>
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-            </svg>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3">
-              <div className="w-6 h-6 bg-yellow-500 rounded-lg flex items-center justify-center mb-2">
-                <div className="w-2 h-2 bg-white rounded-full"></div>
-              </div>
-              <div className="text-xs font-medium mb-0.5">Cove Light</div>
-              <div className="text-xs text-white/70">Off</div>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3">
-              <div className="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center mb-2">
-                <svg width="12" height="12" fill="white" viewBox="0 0 24 24">
-                  <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5l-1 1v2h8v-2l-1-1h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
-                </svg>
-              </div>
-              <div className="text-xs font-medium mb-0.5">Sheer Curtain</div>
-              <div className="text-xs text-white/70">Closed</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Bottom Navigation */}
-      <div className="absolute bottom-0 left-0 right-0 bg-black/20 backdrop-blur-sm border-t border-white/10">
-        <div className="flex justify-around py-2">
-          <div className="flex flex-col items-center py-1">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-            </svg>
-            <span className="text-xs mt-1">Home</span>
-          </div>
-          <div className="flex flex-col items-center py-1 opacity-60">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
-            <span className="text-xs mt-1">Automation</span>
-          </div>
-          <div className="flex flex-col items-center py-1 opacity-60">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
-            <span className="text-xs mt-1">Discover</span>
-          </div>
-        </div>
-        
-        {/* Home Indicator */}
-        <div className="flex justify-center pb-1">
-          <div className="w-32 h-1 bg-white rounded-full opacity-60"></div>
-        </div>
-      </div>
-    </div>
+      {/* Glass shine effect */}
+      <div 
+        className="absolute inset-0 rounded-full pointer-events-none"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%)'
+        }}
+      />
+    </motion.button>
   );
 }
 
@@ -244,20 +141,34 @@ function HeroSection() {
   );
 }
 
-// Lights Section with Scroll Animation
+// Enhanced Lights Section with Smooth Scroll Control
 function LightsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const isInView = useInView(containerRef, { once: true, amount: 0.4 });
+  const [manualControl, setManualControl] = useState(false);
+  const [lightsState, setLightsState] = useState<'off' | 'on'>('off');
   
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['0.3 1', '0.7 0']
+  });
+  
+  const lightsOpacity = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1.02, 1]);
+  
+  // Handle scroll-driven animation
   useEffect(() => {
-    if (isInView && !hasAnimated) {
-      const timer = setTimeout(() => {
-        setHasAnimated(true);
-      }, 600); // Apple-like delay
-      return () => clearTimeout(timer);
+    if (!manualControl) {
+      const unsubscribe = lightsOpacity.onChange((value) => {
+        setLightsState(value > 0.5 ? 'on' : 'off');
+      });
+      return unsubscribe;
     }
-  }, [isInView, hasAnimated]);
+  }, [lightsOpacity, manualControl]);
+  
+  const handleManualToggle = (state: 'off' | 'on') => {
+    setManualControl(true);
+    setLightsState(state);
+  };
   
   return (
     <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-white">
@@ -276,9 +187,25 @@ function LightsSection() {
             Every room.<br />
             Every moment.
           </h2>
-          <p className="text-lg text-gray-600 font-light">
+          <p className="text-lg text-gray-600 font-light mb-8">
             Exactly as you want it.
           </p>
+          
+          {/* iOS 18 Glass Controls */}
+          <div className="flex gap-3">
+            <GlassButton 
+              active={lightsState === 'off'}
+              onClick={() => handleManualToggle('off')}
+            >
+              Lights Off
+            </GlassButton>
+            <GlassButton 
+              active={lightsState === 'on'}
+              onClick={() => handleManualToggle('on')}
+            >
+              Lights On
+            </GlassButton>
+          </div>
         </motion.div>
         
         {/* iPhone with Room Animation */}
@@ -288,37 +215,40 @@ function LightsSection() {
           transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
           viewport={{ once: true }}
           className="flex justify-center"
+          style={{ scale }}
         >
           <IPhoneFrame>
-            <div className="relative w-full h-full">
-              {/* Base Image - Lights Off - positioned so lamp is at edge */}
-              <Image
-                src="/Curtains-Closed-Lights-Off.png"
-                alt="Room with lights off"
-                fill
-                className="object-cover object-left"
-                style={{ objectPosition: '5% center' }}
-                quality={100}
-                priority
-              />
+            <div className="relative w-full h-full overflow-hidden">
+              {/* Lights Off Image */}
+              <div className="absolute inset-0">
+                <Image
+                  src="/Curtains-Closed-Lights-Off.png"
+                  alt="Room with lights off"
+                  fill
+                  quality={100}
+                  priority
+                  className="object-cover"
+                  style={{ objectPosition: '60% center' }}
+                />
+              </div>
               
-              {/* Overlay Image - Lights On with smooth transition */}
+              {/* Lights On Image - Controlled by scroll or manual */}
               <motion.div
                 className="absolute inset-0"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: hasAnimated ? 1 : 0 }}
-                transition={{ 
-                  duration: 1.2, 
-                  ease: [0.25, 0.46, 0.45, 0.94] // Apple's easeOutQuart
+                style={{ 
+                  opacity: manualControl 
+                    ? (lightsState === 'on' ? 1 : 0)
+                    : lightsOpacity
                 }}
+                transition={{ duration: 0.6, ease: 'easeInOut' }}
               >
                 <Image
                   src="/Curtains-Closed-Lights-On.png"
                   alt="Room with lights on"
                   fill
-                  className="object-cover object-left"
-                  style={{ objectPosition: '5% center' }}
                   quality={100}
+                  className="object-cover"
+                  style={{ objectPosition: '60% center' }}
                 />
               </motion.div>
             </div>
@@ -329,28 +259,53 @@ function LightsSection() {
   );
 }
 
-// Curtains Section with Video Animation
+// Enhanced Curtains Section with Still Frame Fallback
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoPlayed, setVideoPlayed] = useState(false);
+  const [curtainsState, setCurtainsState] = useState<'open' | 'closed'>('open');
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [manualControl, setManualControl] = useState(false);
+  
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
   
+  // Auto-play curtains closing on scroll
   useEffect(() => {
-    if (isInView && !videoPlayed && videoRef.current) {
+    if (isInView && !manualControl && curtainsState === 'open') {
       const timer = setTimeout(() => {
-        const video = videoRef.current;
-        if (video) {
-          video.currentTime = 0;
-          video.play().catch(() => {
-            // Handle autoplay restrictions
-          });
-          setVideoPlayed(true);
-        }
-      }, 800); // Apple-like delay
+        playCurtainVideo('closing');
+      }, 800);
       return () => clearTimeout(timer);
     }
-  }, [isInView, videoPlayed]);
+  }, [isInView, manualControl, curtainsState]);
+  
+  const playCurtainVideo = (action: 'opening' | 'closing') => {
+    if (!videoRef.current || isAnimating) return;
+    
+    setIsAnimating(true);
+    const video = videoRef.current;
+    const videoSrc = action === 'opening' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
+    
+    video.src = videoSrc;
+    video.currentTime = 0;
+    
+    video.onloadeddata = () => {
+      video.play().catch(() => {});
+    };
+    
+    video.onended = () => {
+      video.pause();
+      setCurtainsState(action === 'opening' ? 'open' : 'closed');
+      setIsAnimating(false);
+    };
+    
+    video.load();
+  };
+  
+  const handleManualToggle = (action: 'opening' | 'closing') => {
+    setManualControl(true);
+    playCurtainVideo(action);
+  };
   
   return (
     <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-gray-50">
@@ -365,19 +320,43 @@ function CurtainsSection() {
         >
           <IPhoneFrame>
             <div className="relative w-full h-full overflow-hidden">
+              {/* Still Frame Fallback - Show when video not loaded */}
+              <div className="absolute inset-0">
+                <Image
+                  src="/Curtains-Open-Lights-On.png"
+                  alt="Curtains open"
+                  fill
+                  quality={100}
+                  className="object-cover"
+                  style={{ 
+                    objectPosition: '60% center',
+                    opacity: curtainsState === 'open' && !isAnimating ? 1 : 0
+                  }}
+                />
+                <Image
+                  src="/Curtains-Closed-Lights-On.png"
+                  alt="Curtains closed"
+                  fill
+                  quality={100}
+                  className="object-cover"
+                  style={{ 
+                    objectPosition: '60% center',
+                    opacity: curtainsState === 'closed' && !isAnimating ? 1 : 0
+                  }}
+                />
+              </div>
+              
+              {/* Video Layer */}
               <video
                 ref={videoRef}
-                src="/curtains-closing.mp4"
-                className="w-full h-full object-cover"
-                style={{ objectPosition: '60% center' }}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ 
+                  objectPosition: '60% center',
+                  opacity: isAnimating ? 1 : 0
+                }}
                 muted
                 playsInline
                 preload="auto"
-                onEnded={() => {
-                  if (videoRef.current) {
-                    videoRef.current.pause();
-                  }
-                }}
               />
             </div>
           </IPhoneFrame>
@@ -398,9 +377,27 @@ function CurtainsSection() {
             Comfort<br />
             and control.
           </h2>
-          <p className="text-lg text-gray-600 font-light">
+          <p className="text-lg text-gray-600 font-light mb-8">
             Exactly when you need it.
           </p>
+          
+          {/* iOS 18 Glass Controls */}
+          <div className="flex gap-3">
+            <GlassButton 
+              active={curtainsState === 'closed'}
+              onClick={() => handleManualToggle('closing')}
+              disabled={isAnimating}
+            >
+              Close Curtains
+            </GlassButton>
+            <GlassButton 
+              active={curtainsState === 'open'}
+              onClick={() => handleManualToggle('opening')}
+              disabled={isAnimating}
+            >
+              Open Curtains
+            </GlassButton>
+          </div>
         </motion.div>
       </div>
     </section>
