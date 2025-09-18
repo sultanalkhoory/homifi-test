@@ -297,7 +297,7 @@ function LightsSection() {
                 alt="Room with lights off"
                 fill
                 className="object-cover"
-                style={{ objectPosition: 'left center' }}
+                style={{ objectPosition: '25% center' }}
                 quality={100}
                 priority
               />
@@ -317,7 +317,7 @@ function LightsSection() {
                   alt="Room with lights on"
                   fill
                   className="object-cover"
-                  style={{ objectPosition: 'left center' }}
+                  style={{ objectPosition: '25% center' }}
                   quality={100}
                 />
               </motion.div>
