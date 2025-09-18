@@ -55,25 +55,21 @@ function IPhoneFrame({ children }: { children: React.ReactNode }) {
 function GlassButton({ 
   children, 
   active = false, 
-  onClick, 
-  disabled = false 
+  onClick
 }: { 
   children: React.ReactNode;
   active?: boolean;
   onClick?: () => void;
-  disabled?: boolean;
 }) {
   return (
     <motion.button
       onClick={onClick}
-      disabled={disabled}
-      whileHover={{ scale: disabled ? 1 : 1.02 }}
-      whileTap={{ scale: disabled ? 1 : 0.98 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       className={`
         relative px-4 py-2.5 rounded-full text-sm font-medium
         backdrop-blur-xl border border-white/20
-        transition-all duration-300
-        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+        transition-all duration-300 cursor-pointer
         ${active 
           ? 'bg-white/25 text-gray-800 shadow-lg' 
           : 'bg-white/10 text-gray-700 hover:bg-white/20'
@@ -149,7 +145,7 @@ function LightsSection() {
   
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['0.5 1', '0.5 0']
+    offset: ['0.7 1', '0.3 0']
   });
   
   const lightsOpacity = useTransform(scrollYProgress, [0, 1], [0, 1]);
@@ -259,68 +255,122 @@ function LightsSection() {
   );
 }
 
-// Enhanced Curtains Section with Still Frame Fallback
+// Enhanced Curtains Section with Video Frame Extraction
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const openFrameRef = useRef<HTMLCanvasElement>(null);
+  const closedFrameRef = useRef<HTMLCanvasElement>(null);
   const [curtainsState, setCurtainsState] = useState<'open' | 'closed'>('open');
   const [isAnimating, setIsAnimating] = useState(false);
   const [manualControl, setManualControl] = useState(false);
+  const [framesExtracted, setFramesExtracted] = useState(false);
   
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
   
+  // Extract first and last frames from videos
+  useEffect(() => {
+    if (!framesExtracted) {
+      extractVideoFrames();
+    }
+  }, [framesExtracted]);
+  
+  const extractVideoFrames = async () => {
+    if (!videoRef.current || !openFrameRef.current || !closedFrameRef.current) return;
+    
+    const video = videoRef.current;
+    const openCanvas = openFrameRef.current;
+    const closedCanvas = closedFrameRef.current;
+    const openCtx = openCanvas.getContext('2d');
+    const closedCtx = closedCanvas.getContext('2d');
+    
+    if (!openCtx || !closedCtx) return;
+    
+    // Set canvas dimensions
+    openCanvas.width = 280;
+    openCanvas.height = 560;
+    closedCanvas.width = 280;
+    closedCanvas.height = 560;
+    
+    try {
+      // Extract open frame (first frame of closing video = curtains open)
+      video.src = '/curtains-closing.mp4';
+      await new Promise((resolve) => {
+        video.onloadeddata = () => {
+          video.currentTime = 0;
+          video.onseeked = () => {
+            openCtx.drawImage(video, 0, 0, openCanvas.width, openCanvas.height);
+            resolve(null);
+          };
+        };
+        video.load();
+      });
+      
+      // Extract closed frame (last frame of closing video = curtains closed)
+      await new Promise((resolve) => {
+        video.currentTime = video.duration - 0.1;
+        video.onseeked = () => {
+          closedCtx.drawImage(video, 0, 0, closedCanvas.width, closedCanvas.height);
+          resolve(null);
+        };
+      });
+      
+      setFramesExtracted(true);
+    } catch (error) {
+      console.log('Frame extraction failed, using fallback');
+      setFramesExtracted(true);
+    }
+  };
+  
   // Auto-play curtains closing on scroll
   useEffect(() => {
-    if (isInView && !manualControl && curtainsState === 'open') {
+    if (isInView && !manualControl && curtainsState === 'open' && framesExtracted) {
       const timer = setTimeout(() => {
         playCurtainVideo('closing');
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [isInView, manualControl, curtainsState]);
+  }, [isInView, manualControl, curtainsState, framesExtracted]);
   
   const playCurtainVideo = (action: 'opening' | 'closing') => {
     if (!videoRef.current || isAnimating) return;
     
+    setIsAnimating(true);
     const video = videoRef.current;
     const newSrc = action === 'opening' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
     
-    // Only change src if it's different to avoid white flash
-    if (video.src !== newSrc) {
-      setIsAnimating(true);
-      
-      // Preload the video before switching
-      const tempVideo = document.createElement('video');
-      tempVideo.src = newSrc;
-      tempVideo.muted = true;
-      tempVideo.playsInline = true;
-      
-      tempVideo.onloadeddata = () => {
-        // Now switch to the preloaded video
-        video.src = newSrc;
-        video.currentTime = 0;
-        video.play().catch(() => {});
-      };
-      
-      tempVideo.load();
-    } else {
-      // Same video, just restart
-      setIsAnimating(true);
+    // Create invisible preload video to avoid flash
+    const preloadVideo = document.createElement('video');
+    preloadVideo.src = newSrc;
+    preloadVideo.muted = true;
+    preloadVideo.playsInline = true;
+    preloadVideo.style.position = 'absolute';
+    preloadVideo.style.opacity = '0';
+    preloadVideo.style.pointerEvents = 'none';
+    document.body.appendChild(preloadVideo);
+    
+    preloadVideo.onloadeddata = () => {
+      // Seamlessly switch
+      video.src = newSrc;
       video.currentTime = 0;
-      video.play().catch(() => {});
-    }
+      video.onloadeddata = () => {
+        video.play().catch(() => {});
+        document.body.removeChild(preloadVideo);
+      };
+      video.load();
+    };
     
     video.onended = () => {
       video.pause();
       setCurtainsState(action === 'opening' ? 'open' : 'closed');
       setIsAnimating(false);
     };
+    
+    preloadVideo.load();
   };
   
   const handleManualToggle = (action: 'opening' | 'closing') => {
-    // Only respond if not currently animating
     if (isAnimating) return;
-    
     setManualControl(true);
     playCurtainVideo(action);
   };
@@ -338,46 +388,36 @@ function CurtainsSection() {
         >
           <IPhoneFrame>
             <div className="relative w-full h-full overflow-hidden">
-              {/* Still Frame Fallback - Show when video not loaded */}
-              <div className="absolute inset-0">
-                <Image
-                  src="/Curtains-Open-Lights-On.png"
-                  alt="Curtains open"
-                  fill
-                  quality={100}
-                  className="object-cover"
-                  style={{ 
-                    objectPosition: '60% center',
-                    opacity: curtainsState === 'open' && !isAnimating ? 1 : 0
-                  }}
-                />
-                <Image
-                  src="/Curtains-Closed-Lights-On.png"
-                  alt="Curtains closed"
-                  fill
-                  quality={100}
-                  className="object-cover"
-                  style={{ 
-                    objectPosition: '60% center',
-                    opacity: curtainsState === 'closed' && !isAnimating ? 1 : 0
-                  }}
-                />
-              </div>
+              {/* Canvas frames - extracted from actual video */}
+              <canvas
+                ref={openFrameRef}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ 
+                  objectPosition: '60% center',
+                  opacity: curtainsState === 'open' && !isAnimating ? 1 : 0
+                }}
+              />
+              <canvas
+                ref={closedFrameRef}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ 
+                  objectPosition: '60% center',
+                  opacity: curtainsState === 'closed' && !isAnimating ? 1 : 0
+                }}
+              />
               
-              {/* Video Layer - Always visible during animation */}
-              <div 
-                className="absolute inset-0"
-                style={{ opacity: isAnimating ? 1 : 0 }}
-              >
-                <video
-                  ref={videoRef}
-                  className="w-full h-full object-cover"
-                  style={{ objectPosition: '60% center' }}
-                  muted
-                  playsInline
-                  preload="metadata"
-                />
-              </div>
+              {/* Video Layer - Only visible during animation */}
+              <video
+                ref={videoRef}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ 
+                  objectPosition: '60% center',
+                  opacity: isAnimating ? 1 : 0
+                }}
+                muted
+                playsInline
+                preload="metadata"
+              />
             </div>
           </IPhoneFrame>
         </motion.div>
@@ -406,14 +446,12 @@ function CurtainsSection() {
             <GlassButton 
               active={curtainsState === 'closed'}
               onClick={() => handleManualToggle('closing')}
-              disabled={isAnimating}
             >
               Close Curtains
             </GlassButton>
             <GlassButton 
               active={curtainsState === 'open'}
               onClick={() => handleManualToggle('opening')}
-              disabled={isAnimating}
             >
               Open Curtains
             </GlassButton>
