@@ -149,7 +149,7 @@ function LightsSection() {
   
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['0.3 1', '0.7 0']
+    offset: ['0.5 1', '0.5 0']
   });
   
   const lightsOpacity = useTransform(scrollYProgress, [0, 1], [0, 1]);
@@ -282,27 +282,45 @@ function CurtainsSection() {
   const playCurtainVideo = (action: 'opening' | 'closing') => {
     if (!videoRef.current || isAnimating) return;
     
-    setIsAnimating(true);
     const video = videoRef.current;
-    const videoSrc = action === 'opening' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
+    const newSrc = action === 'opening' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
     
-    video.src = videoSrc;
-    video.currentTime = 0;
-    
-    video.onloadeddata = () => {
+    // Only change src if it's different to avoid white flash
+    if (video.src !== newSrc) {
+      setIsAnimating(true);
+      
+      // Preload the video before switching
+      const tempVideo = document.createElement('video');
+      tempVideo.src = newSrc;
+      tempVideo.muted = true;
+      tempVideo.playsInline = true;
+      
+      tempVideo.onloadeddata = () => {
+        // Now switch to the preloaded video
+        video.src = newSrc;
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      };
+      
+      tempVideo.load();
+    } else {
+      // Same video, just restart
+      setIsAnimating(true);
+      video.currentTime = 0;
       video.play().catch(() => {});
-    };
+    }
     
     video.onended = () => {
       video.pause();
       setCurtainsState(action === 'opening' ? 'open' : 'closed');
       setIsAnimating(false);
     };
-    
-    video.load();
   };
   
   const handleManualToggle = (action: 'opening' | 'closing') => {
+    // Only respond if not currently animating
+    if (isAnimating) return;
+    
     setManualControl(true);
     playCurtainVideo(action);
   };
@@ -346,18 +364,20 @@ function CurtainsSection() {
                 />
               </div>
               
-              {/* Video Layer */}
-              <video
-                ref={videoRef}
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ 
-                  objectPosition: '60% center',
-                  opacity: isAnimating ? 1 : 0
-                }}
-                muted
-                playsInline
-                preload="auto"
-              />
+              {/* Video Layer - Always visible during animation */}
+              <div 
+                className="absolute inset-0"
+                style={{ opacity: isAnimating ? 1 : 0 }}
+              >
+                <video
+                  ref={videoRef}
+                  className="w-full h-full object-cover"
+                  style={{ objectPosition: '60% center' }}
+                  muted
+                  playsInline
+                  preload="metadata"
+                />
+              </div>
             </div>
           </IPhoneFrame>
         </motion.div>
