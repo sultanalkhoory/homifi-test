@@ -446,93 +446,219 @@ function ClimateSection() {
   };
   
   return (
-    <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-gradient-to-br from-blue-50 to-cyan-50">
-      <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        {/* Text Content */}
-        <motion.div
-          initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-          viewport={{ once: true }}
-        >
-          <div className="text-sm uppercase tracking-wider text-blue-600 font-medium mb-3">
-            Perfect Climate
-          </div>
-          <h2 className="text-4xl md:text-5xl font-thin text-gray-900 mb-4 leading-tight">
-            Always<br />
-            comfortable.
-          </h2>
-          <p className="text-lg text-gray-600 font-light mb-8">
-            The perfect temperature, automatically.
-          </p>
-          
-          <div className="space-y-4">
-            <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-              <span className="text-gray-700 font-medium">Temperature</span>
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => handleTempChange(Math.max(16, temperature - 1))}
-                  className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600 font-bold transition-colors"
-                >
-                  −
-                </button>
-                <span className={`text-2xl font-light text-gray-800 min-w-[60px] text-center transition-all duration-500 ${isActive ? 'text-blue-600' : ''}`}>
-                  {temperature}°C
-                </span>
-                <button
-                  onClick={() => handleTempChange(Math.min(30, temperature + 1))}
-                  className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600 font-bold transition-colors"
-                >
-                  +
-                </button>
+    <>
+      <style jsx global>{`
+        @keyframes airFlow {
+          0% {
+            transform: translateX(-80px) translateY(5px) scale(0.8);
+            opacity: 0;
+          }
+          15% {
+            opacity: 0.8;
+          }
+          85% {
+            opacity: 0.8;
+          }
+          100% {
+            transform: translateX(300px) translateY(-15px) scale(1.1);
+            opacity: 0;
+          }
+        }
+        @keyframes particleFloat {
+          0% {
+            transform: translateX(-20px) translateY(10px);
+            opacity: 0;
+          }
+          50% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(200px) translateY(-20px);
+            opacity: 0;
+          }
+        }
+      `}</style>
+      
+      <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-gradient-to-br from-blue-50 to-cyan-50">
+        <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          {/* Text Content */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+            viewport={{ once: true }}
+          >
+            <div className="text-sm uppercase tracking-wider text-blue-600 font-medium mb-3">
+              Perfect Climate
+            </div>
+            <h2 className="text-4xl md:text-5xl font-thin text-gray-900 mb-4 leading-tight">
+              Always<br />
+              comfortable.
+            </h2>
+            <p className="text-lg text-gray-600 font-light mb-8">
+              The perfect temperature, automatically.
+            </p>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <span className="text-gray-700 font-medium">Temperature</span>
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => handleTempChange(Math.max(16, temperature - 1))}
+                    className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600 font-bold transition-colors"
+                  >
+                    −
+                  </button>
+                  <span className={`text-2xl font-light text-gray-800 min-w-[60px] text-center transition-all duration-500 ${isActive ? 'text-blue-600' : ''}`}>
+                    {temperature}°C
+                  </span>
+                  <button
+                    onClick={() => handleTempChange(Math.min(30, temperature + 1))}
+                    className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600 font-bold transition-colors"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex gap-2">
+                <GlassButton active={temperature === 18} onClick={() => handleTempChange(18)}>Cool</GlassButton>
+                <GlassButton active={temperature === 22} onClick={() => handleTempChange(22)}>Comfort</GlassButton>
+                <GlassButton active={temperature === 26} onClick={() => handleTempChange(26)}>Warm</GlassButton>
               </div>
             </div>
-            
-            <div className="flex gap-2">
-              <GlassButton active={temperature === 18} onClick={() => handleTempChange(18)}>Cool</GlassButton>
-              <GlassButton active={temperature === 22} onClick={() => handleTempChange(22)}>Comfort</GlassButton>
-              <GlassButton active={temperature === 26} onClick={() => handleTempChange(26)}>Warm</GlassButton>
-            </div>
-          </div>
-        </motion.div>
-        
-        {/* iPhone with Climate Visualization */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-          viewport={{ once: true }}
-          className="flex justify-center"
-        >
-          <IPhoneFrame>
-            <div className="relative w-full h-full overflow-hidden">
-              <Image
-                src="/Curtains-Open-Lights-On.png"
-                alt="Room with climate control"
-                fill
-                quality={100}
-                className="object-cover"
-                style={{ objectPosition: '45% center' }}
-              />
-              
-              {/* Simple climate indicator */}
-              <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
-                <div className={`bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20 transition-all duration-500 ${isActive ? 'shadow-lg scale-105' : 'shadow-md'}`}>
-                  <div className="text-center">
-                    <div className={`text-2xl font-light transition-all duration-500 ${isActive ? 'text-blue-600' : 'text-gray-600'}`}>
-                      {temperature}°C
-                    </div>
-                    <div className="text-xs text-gray-500 uppercase tracking-wide">
-                      {temperature < 20 ? 'Cooling' : temperature > 24 ? 'Warming' : 'Perfect'}
+          </motion.div>
+          
+          {/* iPhone with Climate Visualization */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+            viewport={{ once: true }}
+            className="flex justify-center"
+          >
+            <IPhoneFrame>
+              <div className="relative w-full h-full overflow-hidden">
+                {/* Room Image */}
+                <Image
+                  src="/Curtains-Open-Lights-On.png"
+                  alt="Room with climate control"
+                  fill
+                  quality={100}
+                  className="object-cover"
+                  style={{ objectPosition: '45% center' }}
+                />
+                
+                {/* AC Unit Overlay */}
+                <div className="absolute top-16 left-1/2 transform -translate-x-1/2 w-28 h-7 bg-white/95 rounded-lg shadow-md border border-gray-200/50">
+                  <div className="w-full h-full bg-gradient-to-r from-gray-100 via-white to-gray-100 rounded-lg flex items-center justify-center relative">
+                    <div className={`w-2 h-2 rounded-full transition-all duration-500 ${
+                      isActive ? 'bg-blue-500 shadow-blue-500/50 shadow-lg animate-pulse' : 'bg-gray-400'
+                    }`} />
+                    {/* AC vents */}
+                    <div className="absolute left-2 top-1/2 transform -translate-y-1/2 flex space-x-0.5">
+                      {[...Array(4)].map((_, i) => (
+                        <div key={i} className="w-0.5 h-3 bg-gray-300 rounded-full"></div>
+                      ))}
                     </div>
                   </div>
                 </div>
+                
+                {/* Animated Air Streams */}
+                {isActive && (
+                  <>
+                    {/* Main air streams */}
+                    {[...Array(5)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="absolute pointer-events-none"
+                        style={{
+                          top: `${20 + i * 8}%`,
+                          left: '-10%',
+                          width: '300px',
+                          height: '2px',
+                          background: 'linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent)',
+                          borderRadius: '2px',
+                          filter: 'blur(1px)',
+                          animation: `airFlow ${3 + i * 0.3}s ease-in-out infinite ${i * 0.4}s`,
+                          transform: `rotate(-${5 + i * 2}deg)`
+                        }}
+                      />
+                    ))}
+                    
+                    {/* Floating particles */}
+                    {[...Array(12)].map((_, i) => (
+                      <div
+                        key={`particle-${i}`}
+                        className="absolute w-1 h-1 bg-blue-300 rounded-full opacity-70"
+                        style={{
+                          left: `${10 + (i % 4) * 15}%`,
+                          top: `${25 + (i % 3) * 12}%`,
+                          animation: `particleFloat ${2.5 + (i * 0.2)}s ease-in-out infinite ${i * 0.3}s`
+                        }}
+                      />
+                    ))}
+                    
+                    {/* Subtle wave effect */}
+                    <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: `
+                          radial-gradient(ellipse 200px 100px at 50% 30%, 
+                            rgba(59, 130, 246, 0.1) 0%, 
+                            transparent 50%
+                          )
+                        `,
+                        animation: 'pulse 4s ease-in-out infinite'
+                      }}
+                    />
+                  </>
+                )}
+                
+                {/* Temperature Display */}
+                <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
+                  <motion.div 
+                    className={`bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20 transition-all duration-500 ${
+                      isActive ? 'shadow-lg scale-105 shadow-blue-500/20' : 'shadow-md'
+                    }`}
+                    animate={isActive ? { 
+                      boxShadow: [
+                        '0 10px 25px rgba(59, 130, 246, 0.2)',
+                        '0 10px 35px rgba(59, 130, 246, 0.3)',
+                        '0 10px 25px rgba(59, 130, 246, 0.2)'
+                      ]
+                    } : {}}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <div className="text-center">
+                      <div className={`text-2xl font-light transition-all duration-500 ${
+                        isActive ? 'text-blue-600' : 'text-gray-600'
+                      }`}>
+                        {temperature}°C
+                      </div>
+                      <div className="text-xs text-gray-500 uppercase tracking-wide">
+                        {temperature < 20 ? 'Cooling' : temperature > 24 ? 'Warming' : 'Perfect'}
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+                
+                {/* Cooling effect overlay */}
+                {isActive && temperature < 22 && (
+                  <div 
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(180deg, rgba(59, 130, 246, 0.05) 0%, transparent 70%)',
+                      animation: 'pulse 3s ease-in-out infinite'
+                    }}
+                  />
+                )}
               </div>
-            </div>
-          </IPhoneFrame>
-        </motion.div>
-      </div>
-    </section>
+            </IPhoneFrame>
+          </motion.div>
+        </div>
+      </section>
+    </>
   );
 }
 
