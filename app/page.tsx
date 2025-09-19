@@ -253,106 +253,33 @@ function LightsSection() {
   );
 }
 
-// Simple Curtains Section
+// Simplified Curtains Section - Mobile-Friendly
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [curtainsState, setCurtainsState] = useState<'open' | 'closed'>('open');
-  const [isAnimating, setIsAnimating] = useState(false);
   const [manualControl, setManualControl] = useState(false);
-  const [videoLoaded, setVideoLoaded] = useState(false);
   
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
   
-  // Initialize with curtains-closing video, paused at first frame
+  // Simple auto-close animation when scrolled into view
   useEffect(() => {
-    if (videoRef.current) {
-      const video = videoRef.current;
-      video.src = '/curtains-closing.mp4';
-      
-      video.addEventListener('loadeddata', () => {
-        video.currentTime = 0;
-        video.pause();
-        setVideoLoaded(true);
-      });
-      
-      video.load();
-    }
-  }, []);
-  
-  // Auto-close curtains when scrolled into view
-  useEffect(() => {
-    if (isInView && !manualControl && curtainsState === 'open' && videoLoaded && !isAnimating) {
+    if (isInView && !manualControl && curtainsState === 'open') {
       const timer = setTimeout(() => {
-        closeCurtains();
+        setCurtainsState('closed');
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [isInView, manualControl, curtainsState, videoLoaded, isAnimating]);
+  }, [isInView, manualControl, curtainsState]);
   
-  const closeCurtains = () => {
-    if (!videoRef.current || isAnimating) return;
-    
-    setIsAnimating(true);
-    const video = videoRef.current;
-    
-    video.src = '/curtains-closing.mp4';
-    
-    video.addEventListener('loadeddata', () => {
-      video.currentTime = 0;
-      video.play().catch(() => {});
-    }, { once: true });
-    
-    video.addEventListener('ended', () => {
-      video.pause();
-      setCurtainsState('closed');
-      setIsAnimating(false);
-    }, { once: true });
-    
-    video.load();
-  };
-  
-  const openCurtains = () => {
-    if (!videoRef.current || isAnimating) return;
-    
-    setIsAnimating(true);
-    const video = videoRef.current;
-    
-    video.src = '/curtains-opening.mp4';
-    
-    video.addEventListener('loadeddata', () => {
-      video.currentTime = 0;
-      video.play().catch(() => {});
-    }, { once: true });
-    
-    video.addEventListener('ended', () => {
-      video.pause();
-      setCurtainsState('open');
-      setIsAnimating(false);
-    }, { once: true });
-    
-    video.load();
-  };
-  
-  const handleManualToggle = (action: 'opening' | 'closing') => {
-    if (isAnimating || !videoLoaded) return;
-    
-    if (action === 'closing' && curtainsState === 'closed') return;
-    if (action === 'opening' && curtainsState === 'open') return;
-    
+  const handleManualToggle = (newState: 'open' | 'closed') => {
     setManualControl(true);
-    
-    if (action === 'closing') {
-      closeCurtains();
-    } else {
-      openCurtains();
-    }
+    setCurtainsState(newState);
   };
   
   return (
     <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-gray-50">
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        {/* iPhone with Video */}
+        {/* iPhone with Image Transition */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -361,20 +288,62 @@ function CurtainsSection() {
           className="flex justify-center order-2 md:order-1"
         >
           <IPhoneFrame>
-            <div className="relative w-full h-full overflow-hidden bg-black">
-              {!videoLoaded && (
-                <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
-                  <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              )}
+            <div className="relative w-full h-full overflow-hidden">
+              {/* Curtains Open Image */}
+              <div className="absolute inset-0">
+                <Image
+                  src="/Curtains-Open-Lights-On.png"
+                  alt="Room with curtains open"
+                  fill
+                  quality={100}
+                  className="object-cover"
+                  style={{ 
+                    objectFit: 'cover',
+                    objectPosition: '60% center'
+                  }}
+                />
+              </div>
               
-              <video
-                ref={videoRef}
-                className={`w-full h-full object-cover transition-opacity duration-300 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
-                style={{ objectPosition: '60% center' }}
-                muted
-                playsInline
-                preload="auto"
+              {/* Curtains Closed Image - Animated overlay */}
+              <motion.div
+                className="absolute inset-0"
+                initial={{ opacity: 0 }}
+                animate={{ 
+                  opacity: curtainsState === 'closed' ? 1 : 0
+                }}
+                transition={{ 
+                  duration: 1.5, 
+                  ease: [0.21, 0.47, 0.32, 0.98]
+                }}
+              >
+                <Image
+                  src="/Curtains-Closed-Lights-On.png"
+                  alt="Room with curtains closed"
+                  fill
+                  quality={100}
+                  className="object-cover"
+                  style={{ 
+                    objectFit: 'cover',
+                    objectPosition: '60% center'
+                  }}
+                />
+              </motion.div>
+              
+              {/* Optional: Animated curtain effect using CSS */}
+              <motion.div
+                className="absolute inset-0 pointer-events-none"
+                initial={{ scaleX: 0 }}
+                animate={{ 
+                  scaleX: curtainsState === 'closed' ? 1 : 0
+                }}
+                transition={{ 
+                  duration: 1.2,
+                  ease: [0.25, 0.46, 0.45, 0.94]
+                }}
+                style={{
+                  background: 'linear-gradient(90deg, rgba(139, 135, 130, 0.3) 0%, rgba(139, 135, 130, 0.1) 50%, rgba(139, 135, 130, 0.3) 100%)',
+                  transformOrigin: 'left center'
+                }}
               />
             </div>
           </IPhoneFrame>
@@ -402,13 +371,13 @@ function CurtainsSection() {
           <div className="flex gap-3">
             <GlassButton 
               active={curtainsState === 'closed'}
-              onClick={() => handleManualToggle('closing')}
+              onClick={() => handleManualToggle('closed')}
             >
               Close Curtains
             </GlassButton>
             <GlassButton 
               active={curtainsState === 'open'}
-              onClick={() => handleManualToggle('opening')}
+              onClick={() => handleManualToggle('open')}
             >
               Open Curtains
             </GlassButton>
