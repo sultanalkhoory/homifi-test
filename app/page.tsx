@@ -282,13 +282,13 @@ function CurtainsSection() {
   
   // Auto-close curtains when scrolled into view
   useEffect(() => {
-    if (isInView && !manualControl && curtainsState === 'open' && videoLoaded) {
+    if (isInView && !manualControl && curtainsState === 'open' && videoLoaded && !isAnimating) {
       const timer = setTimeout(() => {
         closeCurtains();
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [isInView, manualControl, curtainsState, videoLoaded]);
+  }, [isInView, manualControl, curtainsState, videoLoaded, isAnimating]);
   
   const closeCurtains = () => {
     if (!videoRef.current || isAnimating) return;
@@ -296,16 +296,23 @@ function CurtainsSection() {
     setIsAnimating(true);
     const video = videoRef.current;
     
-    // Play closing video from start
+    // Make sure we have the right video and play it
     video.src = '/curtains-closing.mp4';
-    video.currentTime = 0;
-    video.play().catch(() => {});
     
-    video.onended = () => {
+    video.addEventListener('loadeddata', () => {
+      video.currentTime = 0;
+      video.play().catch(() => {
+        console.log('Could not play video');
+      });
+    }, { once: true });
+    
+    video.addEventListener('ended', () => {
       video.pause();
       setCurtainsState('closed');
       setIsAnimating(false);
-    };
+    }, { once: true });
+    
+    video.load();
   };
   
   const openCurtains = () => {
@@ -316,14 +323,21 @@ function CurtainsSection() {
     
     // Play opening video from start
     video.src = '/curtains-opening.mp4';
-    video.currentTime = 0;
-    video.play().catch(() => {});
     
-    video.onended = () => {
+    video.addEventListener('loadeddata', () => {
+      video.currentTime = 0;
+      video.play().catch(() => {
+        console.log('Could not play video');
+      });
+    }, { once: true });
+    
+    video.addEventListener('ended', () => {
       video.pause();
       setCurtainsState('open');
       setIsAnimating(false);
-    };
+    }, { once: true });
+    
+    video.load();
   };
   
   const handleManualToggle = (action: 'opening' | 'closing') => {
