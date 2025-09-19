@@ -149,7 +149,7 @@ function LightsSection() {
     if (isInView && !manualControl && lightsState === 'off') {
       const timer = setTimeout(() => {
         setLightsState('on');
-      }, 400); // Faster timing - lights turn on at 400ms
+      }, 600); // Slower timing - lights turn on at 600ms
       return () => clearTimeout(timer);
     }
   }, [isInView, manualControl, lightsState]);
@@ -362,12 +362,14 @@ function CurtainsSection() {
     
     video.onended = () => {
       video.pause();
-      if (action === 'closing') {
-        video.currentTime = video.duration;
-      } else {
-        video.currentTime = 0;
-      }
+      // Set the correct end state based on action
       setCurtainsState(action === 'opening' ? 'open' : 'closed');
+      // Position video at appropriate frame
+      if (action === 'closing') {
+        video.currentTime = video.duration - 0.1; // Near end for closed state
+      } else {
+        video.currentTime = 0; // Beginning for open state
+      }
       setIsAnimating(false);
     };
   };
