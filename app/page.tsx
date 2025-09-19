@@ -297,24 +297,51 @@ function CurtainsSection() {
     const video = videoRef.current;
     const newSrc = action === 'opening' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
     
-    // Only change source if different
-    if (video.src.includes(newSrc.replace('/', ''))) {
-      // Same video, just replay
+    // Check if we need to change video source
+    const currentSrc = video.src.split('/').pop() || '';
+    const newSrcFile = newSrc.split('/').pop() || '';
+    
+    if (currentSrc === newSrcFile) {
+      // Same video, just replay from beginning
       video.currentTime = 0;
       video.play().catch(() => {});
     } else {
-      // Different video, change source
-      video.src = newSrc;
-      video.addEventListener('loadeddata', () => {
-        video.currentTime = 0;
-        video.play().catch(() => {});
+      // Different video - create invisible preload to avoid black flash
+      const preloadVideo = document.createElement('video');
+      preloadVideo.src = newSrc;
+      preloadVideo.muted = true;
+      preloadVideo.playsInline = true;
+      preloadVideo.preload = 'auto';
+      preloadVideo.style.position = 'absolute';
+      preloadVideo.style.top = '-9999px';
+      preloadVideo.style.left = '-9999px';
+      document.body.appendChild(preloadVideo);
+      
+      // Wait for preload to be ready, then do instant switch
+      preloadVideo.addEventListener('canplaythrough', () => {
+        // Pause current video at current frame to hold the image
+        video.pause();
+        
+        // Quick switch with minimal delay
+        setTimeout(() => {
+          video.src = newSrc;
+          video.currentTime = 0;
+          
+          video.addEventListener('loadeddata', () => {
+            video.play().catch(() => {});
+            document.body.removeChild(preloadVideo);
+          }, { once: true });
+          
+          video.load();
+        }, 50); // Minimal delay to ensure smooth transition
       }, { once: true });
-      video.load();
+      
+      preloadVideo.load();
     }
     
     video.onended = () => {
       video.pause();
-      // Keep video at last frame
+      // Keep video at appropriate frame
       if (action === 'closing') {
         video.currentTime = video.duration;
       } else {
