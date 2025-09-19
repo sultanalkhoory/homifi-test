@@ -261,8 +261,20 @@ function CurtainsSection() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [manualControl, setManualControl] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
+  
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Initialize with curtains-closing video, paused at first frame
   useEffect(() => {
@@ -270,13 +282,20 @@ function CurtainsSection() {
       const video = videoRef.current;
       video.src = '/curtains-closing.mp4';
       
-      video.addEventListener('loadeddata', () => {
+      const handleLoad = () => {
         video.currentTime = 0;
         video.pause();
         setVideoLoaded(true);
-      });
+      };
       
+      video.addEventListener('loadeddata', handleLoad);
+      video.addEventListener('loadedmetadata', handleLoad);
       video.load();
+      
+      return () => {
+        video.removeEventListener('loadeddata', handleLoad);
+        video.removeEventListener('loadedmetadata', handleLoad);
+      };
     }
   }, []);
   
@@ -285,10 +304,10 @@ function CurtainsSection() {
     if (isInView && !manualControl && curtainsState === 'open' && videoLoaded && !isAnimating) {
       const timer = setTimeout(() => {
         closeCurtains();
-      }, 800);
+      }, isMobile ? 1200 : 800); // Longer delay on mobile
       return () => clearTimeout(timer);
     }
-  }, [isInView, manualControl, curtainsState, videoLoaded, isAnimating]);
+  }, [isInView, manualControl, curtainsState, videoLoaded, isAnimating, isMobile]);
   
   const closeCurtains = () => {
     if (!videoRef.current || isAnimating) return;
@@ -296,20 +315,51 @@ function CurtainsSection() {
     setIsAnimating(true);
     const video = videoRef.current;
     
+    // For mobile, ensure video is ready
+    if (isMobile) {
+      video.load();
+    }
+    
     video.src = '/curtains-closing.mp4';
     
-    video.addEventListener('loadeddata', () => {
+    const playVideo = () => {
       video.currentTime = 0;
-      video.play().catch(() => {});
-    }, { once: true });
+      const playPromise = video.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            // Video started successfully
+          })
+          .catch(() => {
+            // Autoplay failed, but continue
+            setIsAnimating(false);
+            setCurtainsState('closed');
+          });
+      }
+    };
     
-    video.addEventListener('ended', () => {
+    if (video.readyState >= 2) {
+      // Video is already loaded
+      playVideo();
+    } else {
+      // Wait for video to load
+      const handleLoaded = () => {
+        playVideo();
+        video.removeEventListener('loadeddata', handleLoaded);
+        video.removeEventListener('canplay', handleLoaded);
+      };
+      
+      video.addEventListener('loadeddata', handleLoaded);
+      video.addEventListener('canplay', handleLoaded);
+      video.load();
+    }
+    
+    video.onended = () => {
       video.pause();
       setCurtainsState('closed');
       setIsAnimating(false);
-    }, { once: true });
-    
-    video.load();
+    };
   };
   
   const openCurtains = () => {
@@ -318,20 +368,48 @@ function CurtainsSection() {
     setIsAnimating(true);
     const video = videoRef.current;
     
+    if (isMobile) {
+      video.load();
+    }
+    
     video.src = '/curtains-opening.mp4';
     
-    video.addEventListener('loadeddata', () => {
+    const playVideo = () => {
       video.currentTime = 0;
-      video.play().catch(() => {});
-    }, { once: true });
+      const playPromise = video.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            // Video started successfully
+          })
+          .catch(() => {
+            // Autoplay failed
+            setIsAnimating(false);
+            setCurtainsState('open');
+          });
+      }
+    };
     
-    video.addEventListener('ended', () => {
+    if (video.readyState >= 2) {
+      playVideo();
+    } else {
+      const handleLoaded = () => {
+        playVideo();
+        video.removeEventListener('loadeddata', handleLoaded);
+        video.removeEventListener('canplay', handleLoaded);
+      };
+      
+      video.addEventListener('loadeddata', handleLoaded);
+      video.addEventListener('canplay', handleLoaded);
+      video.load();
+    }
+    
+    video.onended = () => {
       video.pause();
       setCurtainsState('open');
       setIsAnimating(false);
-    }, { once: true });
-    
-    video.load();
+    };
   };
   
   const handleManualToggle = (action: 'opening' | 'closing') => {
@@ -374,7 +452,10 @@ function CurtainsSection() {
                 style={{ objectPosition: '60% center' }}
                 muted
                 playsInline
-                preload="auto"
+                preload={isMobile ? 'metadata' : 'auto'}
+                webkit-playsinline="true"
+                x5-playsinline="true"
+                disablePictureInPicture
               />
             </div>
           </IPhoneFrame>
