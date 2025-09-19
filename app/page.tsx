@@ -262,13 +262,17 @@ function CurtainsSection() {
   const [manualControl, setManualControl] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [useFallback, setUseFallback] = useState(false);
   
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
   
   // Detect mobile device
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+      const mobile = window.innerWidth < 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(mobile);
+      // Use fallback immediately on mobile
+      setUseFallback(mobile);
     };
     
     checkMobile();
@@ -276,38 +280,24 @@ function CurtainsSection() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
   
-  // Initialize with curtains-closing video, paused at first frame
-  useEffect(() => {
-    if (videoRef.current) {
-      const video = videoRef.current;
-      video.src = '/curtains-closing.mp4';
-      
-      const handleLoad = () => {
-        video.currentTime = 0;
-        video.pause();
-        setVideoLoaded(true);
-      };
-      
-      video.addEventListener('loadeddata', handleLoad);
-      video.addEventListener('loadedmetadata', handleLoad);
-      video.load();
-      
-      return () => {
-        video.removeEventListener('loadeddata', handleLoad);
-        video.removeEventListener('loadedmetadata', handleLoad);
-      };
-    }
-  }, []);
-  
   // Auto-close curtains when scrolled into view
   useEffect(() => {
-    if (isInView && !manualControl && curtainsState === 'open' && videoLoaded && !isAnimating) {
+    if (isInView && !manualControl && curtainsState === 'open' && !isAnimating) {
       const timer = setTimeout(() => {
-        closeCurtains();
-      }, isMobile ? 1200 : 800); // Longer delay on mobile
+        if (useFallback) {
+          // Simple state change for mobile
+          setIsAnimating(true);
+          setTimeout(() => {
+            setCurtainsState('closed');
+            setIsAnimating(false);
+          }, 800);
+        } else {
+          closeCurtains();
+        }
+      }, 800);
       return () => clearTimeout(timer);
     }
-  }, [isInView, manualControl, curtainsState, videoLoaded, isAnimating, isMobile]);
+  }, [isInView, manualControl, curtainsState, isAnimating, useFallback]);
   
   const closeCurtains = () => {
     if (!videoRef.current || isAnimating) return;
@@ -315,44 +305,15 @@ function CurtainsSection() {
     setIsAnimating(true);
     const video = videoRef.current;
     
-    // For mobile, ensure video is ready
-    if (isMobile) {
-      video.load();
-    }
-    
     video.src = '/curtains-closing.mp4';
+    video.currentTime = 0;
     
-    const playVideo = () => {
-      video.currentTime = 0;
-      const playPromise = video.play();
-      
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            // Video started successfully
-          })
-          .catch(() => {
-            // Autoplay failed, but continue
-            setIsAnimating(false);
-            setCurtainsState('closed');
-          });
-      }
-    };
-    
-    if (video.readyState >= 2) {
-      // Video is already loaded
-      playVideo();
-    } else {
-      // Wait for video to load
-      const handleLoaded = () => {
-        playVideo();
-        video.removeEventListener('loadeddata', handleLoaded);
-        video.removeEventListener('canplay', handleLoaded);
-      };
-      
-      video.addEventListener('loadeddata', handleLoaded);
-      video.addEventListener('canplay', handleLoaded);
-      video.load();
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        setCurtainsState('closed');
+        setIsAnimating(false);
+      });
     }
     
     video.onended = () => {
@@ -368,41 +329,15 @@ function CurtainsSection() {
     setIsAnimating(true);
     const video = videoRef.current;
     
-    if (isMobile) {
-      video.load();
-    }
-    
     video.src = '/curtains-opening.mp4';
+    video.currentTime = 0;
     
-    const playVideo = () => {
-      video.currentTime = 0;
-      const playPromise = video.play();
-      
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            // Video started successfully
-          })
-          .catch(() => {
-            // Autoplay failed
-            setIsAnimating(false);
-            setCurtainsState('open');
-          });
-      }
-    };
-    
-    if (video.readyState >= 2) {
-      playVideo();
-    } else {
-      const handleLoaded = () => {
-        playVideo();
-        video.removeEventListener('loadeddata', handleLoaded);
-        video.removeEventListener('canplay', handleLoaded);
-      };
-      
-      video.addEventListener('loadeddata', handleLoaded);
-      video.addEventListener('canplay', handleLoaded);
-      video.load();
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        setCurtainsState('open');
+        setIsAnimating(false);
+      });
     }
     
     video.onended = () => {
@@ -413,24 +348,33 @@ function CurtainsSection() {
   };
   
   const handleManualToggle = (action: 'opening' | 'closing') => {
-    if (isAnimating || !videoLoaded) return;
+    if (isAnimating) return;
     
     if (action === 'closing' && curtainsState === 'closed') return;
     if (action === 'opening' && curtainsState === 'open') return;
     
     setManualControl(true);
     
-    if (action === 'closing') {
-      closeCurtains();
+    if (useFallback) {
+      // Simple state change for mobile
+      setIsAnimating(true);
+      setTimeout(() => {
+        setCurtainsState(action === 'opening' ? 'open' : 'closed');
+        setIsAnimating(false);
+      }, 500);
     } else {
-      openCurtains();
+      if (action === 'closing') {
+        closeCurtains();
+      } else {
+        openCurtains();
+      }
     }
   };
   
   return (
     <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-gray-50">
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        {/* iPhone with Video */}
+        {/* iPhone with Video or Static Images */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -440,23 +384,63 @@ function CurtainsSection() {
         >
           <IPhoneFrame>
             <div className="relative w-full h-full overflow-hidden bg-black">
-              {!videoLoaded && (
-                <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
-                  <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                </div>
+              {useFallback ? (
+                // Mobile fallback - static images
+                <>
+                  <div className="absolute inset-0">
+                    <Image
+                      src="/Curtains-Open-Lights-On.png"
+                      alt="Curtains open"
+                      fill
+                      quality={100}
+                      className="object-cover"
+                      style={{ 
+                        objectPosition: '60% center',
+                        opacity: curtainsState === 'open' ? 1 : 0
+                      }}
+                    />
+                  </div>
+                  <motion.div 
+                    className="absolute inset-0"
+                    animate={{ opacity: curtainsState === 'closed' ? 1 : 0 }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                  >
+                    <Image
+                      src="/Curtains-Closed-Lights-On.png"
+                      alt="Curtains closed"
+                      fill
+                      quality={100}
+                      className="object-cover"
+                      style={{ objectPosition: '60% center' }}
+                    />
+                  </motion.div>
+                  
+                  {isAnimating && (
+                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                      <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                // Desktop - video
+                <>
+                  {!videoLoaded && (
+                    <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
+                      <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  )}
+                  
+                  <video
+                    ref={videoRef}
+                    className={`w-full h-full object-cover transition-opacity duration-300 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
+                    style={{ objectPosition: '60% center' }}
+                    muted
+                    playsInline
+                    preload="auto"
+                    onLoadedData={() => setVideoLoaded(true)}
+                  />
+                </>
               )}
-              
-              <video
-                ref={videoRef}
-                className={`w-full h-full object-cover transition-opacity duration-300 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
-                style={{ objectPosition: '60% center' }}
-                muted
-                playsInline
-                preload={isMobile ? 'metadata' : 'auto'}
-                webkit-playsinline="true"
-                x5-playsinline="true"
-                disablePictureInPicture
-              />
             </div>
           </IPhoneFrame>
         </motion.div>
