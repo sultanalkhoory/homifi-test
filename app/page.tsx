@@ -253,27 +253,25 @@ function LightsSection() {
   );
 }
 
-// Curtains Section - Video with Proper Frame Holding
+// Curtains Section - Simple and Clean
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [curtainsState, setCurtainsState] = useState<'open' | 'closed'>('open');
   const [isAnimating, setIsAnimating] = useState(false);
   const [manualControl, setManualControl] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
-  const [showCanvas, setShowCanvas] = useState(false);
   
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
   
-  // Initialize video with first frame
+  // Initialize with curtains-closing video, paused at first frame (open state)
   useEffect(() => {
     if (videoRef.current) {
       const video = videoRef.current;
       video.src = '/curtains-closing.mp4';
       
       video.addEventListener('loadeddata', () => {
-        video.currentTime = 0;
+        video.currentTime = 0; // First frame = curtains open
         video.pause();
         setVideoLoaded(true);
       });
@@ -282,109 +280,48 @@ function CurtainsSection() {
     }
   }, []);
   
-  // Auto-play curtains closing on scroll
+  // Auto-close curtains when scrolled into view
   useEffect(() => {
     if (isInView && !manualControl && curtainsState === 'open' && videoLoaded) {
       const timer = setTimeout(() => {
-        playCurtainVideo('closing');
+        closeCurtains();
       }, 800);
       return () => clearTimeout(timer);
     }
   }, [isInView, manualControl, curtainsState, videoLoaded]);
   
-  // Capture current frame to canvas
-  const captureCurrentFrame = () => {
-    if (!videoRef.current || !canvasRef.current) return;
-    
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    
-    if (!ctx) return;
-    
-    canvas.width = video.videoWidth || 280;
-    canvas.height = video.videoHeight || 560;
-    
-    try {
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      setShowCanvas(true);
-    } catch (error) {
-      console.log('Could not capture frame');
-    }
-  };
-  
-  const playCurtainVideo = (action: 'opening' | 'closing') => {
-    if (!videoRef.current || isAnimating || !videoLoaded) return;
+  const closeCurtains = () => {
+    if (!videoRef.current || isAnimating) return;
     
     setIsAnimating(true);
     const video = videoRef.current;
-    const newSrc = action === 'opening' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
     
-    const currentSrc = video.src.split('/').pop() || '';
-    const newSrcFile = newSrc.split('/').pop() || '';
-    
-    if (currentSrc === newSrcFile) {
-      // Same video, just replay from beginning
-      setShowCanvas(false);
-      video.currentTime = 0;
-      video.play().catch(() => {});
-    } else {
-      // Different video - need to switch source
-      // Only capture frame if we're currently showing video (not already on canvas)
-      if (!showCanvas) {
-        captureCurrentFrame();
-      }
-      
-      // Create preload video
-      const preloadVideo = document.createElement('video');
-      preloadVideo.src = newSrc;
-      preloadVideo.muted = true;
-      preloadVideo.playsInline = true;
-      preloadVideo.preload = 'auto';
-      preloadVideo.style.position = 'absolute';
-      preloadVideo.style.top = '-9999px';
-      preloadVideo.style.left = '-9999px';
-      document.body.appendChild(preloadVideo);
-      
-      preloadVideo.addEventListener('canplaythrough', () => {
-        // Switch video source
-        video.src = newSrc;
-        
-        // Set appropriate starting frame based on action
-        video.addEventListener('loadeddata', () => {
-          if (action === 'opening') {
-            // Opening video should start from end (closed state) and play to beginning (open state)
-            video.currentTime = video.duration - 0.1;
-            // Wait a moment for the frame to load, then start playing
-            setTimeout(() => {
-              setShowCanvas(false); // Hide canvas, show video
-              video.play().catch(() => {});
-            }, 100);
-          } else {
-            // Closing video starts from beginning (open state)
-            video.currentTime = 0;
-            setShowCanvas(false); // Hide canvas, show video  
-            video.play().catch(() => {});
-          }
-          document.body.removeChild(preloadVideo);
-        }, { once: true });
-        
-        video.load();
-      }, { once: true });
-      
-      preloadVideo.load();
-    }
+    // Play closing video from start
+    video.src = '/curtains-closing.mp4';
+    video.currentTime = 0;
+    video.play().catch(() => {});
     
     video.onended = () => {
       video.pause();
-      // Set the correct end state based on action
-      setCurtainsState(action === 'opening' ? 'open' : 'closed');
-      // Position video at appropriate frame
-      if (action === 'closing') {
-        video.currentTime = video.duration - 0.1; // Near end for closed state
-      } else {
-        video.currentTime = 0; // Beginning for open state
-      }
+      setCurtainsState('closed');
+      setIsAnimating(false);
+    };
+  };
+  
+  const openCurtains = () => {
+    if (!videoRef.current || isAnimating) return;
+    
+    setIsAnimating(true);
+    const video = videoRef.current;
+    
+    // Play opening video from start
+    video.src = '/curtains-opening.mp4';
+    video.currentTime = 0;
+    video.play().catch(() => {});
+    
+    video.onended = () => {
+      video.pause();
+      setCurtainsState('open');
       setIsAnimating(false);
     };
   };
@@ -397,13 +334,18 @@ function CurtainsSection() {
     if (action === 'opening' && curtainsState === 'open') return;
     
     setManualControl(true);
-    playCurtainVideo(action);
+    
+    if (action === 'closing') {
+      closeCurtains();
+    } else {
+      openCurtains();
+    }
   };
   
   return (
     <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-gray-50">
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        {/* iPhone with Video Animation */}
+        {/* iPhone with Video */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -413,24 +355,17 @@ function CurtainsSection() {
         >
           <IPhoneFrame>
             <div className="relative w-full h-full overflow-hidden bg-black">
-              {/* Loading placeholder */}
+              {/* Loading spinner */}
               {!videoLoaded && (
                 <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
                   <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                 </div>
               )}
               
-              {/* Canvas for holding current frame */}
-              <canvas
-                ref={canvasRef}
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-100 ${showCanvas ? 'opacity-100 z-20' : 'opacity-0 z-10'}`}
-                style={{ objectPosition: '60% center' }}
-              />
-              
               {/* Video */}
               <video
                 ref={videoRef}
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${videoLoaded ? 'opacity-100' : 'opacity-0'} ${showCanvas ? 'z-10' : 'z-20'}`}
+                className={`w-full h-full object-cover transition-opacity duration-300 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
                 style={{ objectPosition: '60% center' }}
                 muted
                 playsInline
@@ -459,7 +394,7 @@ function CurtainsSection() {
             Exactly when you need it.
           </p>
           
-          {/* iOS 18 Glass Controls */}
+          {/* Controls */}
           <div className="flex gap-3">
             <GlassButton 
               active={curtainsState === 'closed'}
