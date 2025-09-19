@@ -454,10 +454,10 @@ function ClimateSection() {
             opacity: 0;
           }
           15% {
-            opacity: 0.8;
+            opacity: 0.4;
           }
           85% {
-            opacity: 0.8;
+            opacity: 0.4;
           }
           100% {
             transform: translateX(300px) translateY(-15px) scale(1.1);
@@ -470,7 +470,7 @@ function ClimateSection() {
             opacity: 0;
           }
           50% {
-            opacity: 1;
+            opacity: 0.6;
           }
           100% {
             transform: translateX(200px) translateY(-20px);
@@ -549,52 +549,46 @@ function ClimateSection() {
                   style={{ objectPosition: '45% center' }}
                 />
                 
-                {/* AC Unit Overlay */}
-                <div className="absolute top-16 left-1/2 transform -translate-x-1/2 w-28 h-7 bg-white/95 rounded-lg shadow-md border border-gray-200/50">
-                  <div className="w-full h-full bg-gradient-to-r from-gray-100 via-white to-gray-100 rounded-lg flex items-center justify-center relative">
-                    <div className={`w-2 h-2 rounded-full transition-all duration-500 ${
-                      isActive ? 'bg-blue-500 shadow-blue-500/50 shadow-lg animate-pulse' : 'bg-gray-400'
-                    }`} />
-                    {/* AC vents */}
-                    <div className="absolute left-2 top-1/2 transform -translate-y-1/2 flex space-x-0.5">
-                      {[...Array(4)].map((_, i) => (
-                        <div key={i} className="w-0.5 h-3 bg-gray-300 rounded-full"></div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Animated Air Streams */}
+                {/* Animated Air Streams - Wavy and Subtle */}
                 {isActive && (
                   <>
-                    {/* Main air streams */}
-                    {[...Array(5)].map((_, i) => (
+                    {/* Wavy air streams */}
+                    {[...Array(3)].map((_, i) => (
                       <div
                         key={i}
                         className="absolute pointer-events-none"
                         style={{
-                          top: `${20 + i * 8}%`,
+                          top: `${25 + i * 15}%`,
                           left: '-10%',
-                          width: '300px',
-                          height: '2px',
-                          background: 'linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent)',
-                          borderRadius: '2px',
-                          filter: 'blur(1px)',
-                          animation: `airFlow ${3 + i * 0.3}s ease-in-out infinite ${i * 0.4}s`,
-                          transform: `rotate(-${5 + i * 2}deg)`
+                          width: '280px',
+                          height: '20px',
+                          animation: `airFlow ${4 + i * 0.5}s ease-in-out infinite ${i * 0.8}s`
                         }}
-                      />
+                      >
+                        <svg width="280" height="20" viewBox="0 0 280 20" className="w-full h-full">
+                          <path
+                            d={`M 0,10 Q 70,${5 + i * 2} 140,10 T 280,10`}
+                            stroke="rgba(59, 130, 246, 0.3)"
+                            strokeWidth="2"
+                            fill="none"
+                            style={{
+                              filter: 'blur(1px)',
+                              strokeLinecap: 'round'
+                            }}
+                          />
+                        </svg>
+                      </div>
                     ))}
                     
-                    {/* Floating particles */}
-                    {[...Array(12)].map((_, i) => (
+                    {/* Floating particles - Reduced */}
+                    {[...Array(6)].map((_, i) => (
                       <div
                         key={`particle-${i}`}
-                        className="absolute w-1 h-1 bg-blue-300 rounded-full opacity-70"
+                        className="absolute w-1 h-1 bg-blue-300 rounded-full opacity-50"
                         style={{
-                          left: `${10 + (i % 4) * 15}%`,
-                          top: `${25 + (i % 3) * 12}%`,
-                          animation: `particleFloat ${2.5 + (i * 0.2)}s ease-in-out infinite ${i * 0.3}s`
+                          left: `${15 + (i % 3) * 20}%`,
+                          top: `${30 + (i % 2) * 15}%`,
+                          animation: `particleFloat ${3 + (i * 0.3)}s ease-in-out infinite ${i * 0.5}s`
                         }}
                       />
                     ))}
@@ -604,12 +598,12 @@ function ClimateSection() {
                       className="absolute inset-0 pointer-events-none"
                       style={{
                         background: `
-                          radial-gradient(ellipse 200px 100px at 50% 30%, 
-                            rgba(59, 130, 246, 0.1) 0%, 
-                            transparent 50%
+                          radial-gradient(ellipse 180px 80px at 50% 35%, 
+                            rgba(59, 130, 246, 0.08) 0%, 
+                            transparent 60%
                           )
                         `,
-                        animation: 'pulse 4s ease-in-out infinite'
+                        animation: 'pulse 5s ease-in-out infinite'
                       }}
                     />
                   </>
