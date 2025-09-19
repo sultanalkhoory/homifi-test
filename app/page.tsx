@@ -253,14 +253,16 @@ function LightsSection() {
   );
 }
 
-// Curtains Section - Video with Proper Initial State
+// Curtains Section - Video with Proper Frame Holding
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [curtainsState, setCurtainsState] = useState<'open' | 'closed'>('open');
   const [isAnimating, setIsAnimating] = useState(false);
   const [manualControl, setManualControl] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [showCanvas, setShowCanvas] = useState(false);
   
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
   
@@ -271,7 +273,7 @@ function CurtainsSection() {
       video.src = '/curtains-closing.mp4';
       
       video.addEventListener('loadeddata', () => {
-        video.currentTime = 0; // Show first frame (curtains open)
+        video.currentTime = 0;
         video.pause();
         setVideoLoaded(true);
       });
@@ -290,6 +292,27 @@ function CurtainsSection() {
     }
   }, [isInView, manualControl, curtainsState, videoLoaded]);
   
+  // Capture current frame to canvas
+  const captureCurrentFrame = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    
+    if (!ctx) return;
+    
+    canvas.width = video.videoWidth || 280;
+    canvas.height = video.videoHeight || 560;
+    
+    try {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      setShowCanvas(true);
+    } catch (error) {
+      console.log('Could not capture frame');
+    }
+  };
+  
   const playCurtainVideo = (action: 'opening' | 'closing') => {
     if (!videoRef.current || isAnimating || !videoLoaded) return;
     
@@ -297,16 +320,19 @@ function CurtainsSection() {
     const video = videoRef.current;
     const newSrc = action === 'opening' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
     
-    // Check if we need to change video source
     const currentSrc = video.src.split('/').pop() || '';
     const newSrcFile = newSrc.split('/').pop() || '';
     
     if (currentSrc === newSrcFile) {
       // Same video, just replay from beginning
+      setShowCanvas(false);
       video.currentTime = 0;
       video.play().catch(() => {});
     } else {
-      // Different video - create invisible preload to avoid black flash
+      // Different video - capture current frame first
+      captureCurrentFrame();
+      
+      // Create preload video
       const preloadVideo = document.createElement('video');
       preloadVideo.src = newSrc;
       preloadVideo.muted = true;
@@ -317,23 +343,18 @@ function CurtainsSection() {
       preloadVideo.style.left = '-9999px';
       document.body.appendChild(preloadVideo);
       
-      // Wait for preload to be ready, then do instant switch
       preloadVideo.addEventListener('canplaythrough', () => {
-        // Pause current video at current frame to hold the image
-        video.pause();
+        // Switch video source
+        video.src = newSrc;
+        video.currentTime = 0;
         
-        // Quick switch with minimal delay
-        setTimeout(() => {
-          video.src = newSrc;
-          video.currentTime = 0;
-          
-          video.addEventListener('loadeddata', () => {
-            video.play().catch(() => {});
-            document.body.removeChild(preloadVideo);
-          }, { once: true });
-          
-          video.load();
-        }, 50); // Minimal delay to ensure smooth transition
+        video.addEventListener('loadeddata', () => {
+          setShowCanvas(false); // Hide canvas, show video
+          video.play().catch(() => {});
+          document.body.removeChild(preloadVideo);
+        }, { once: true });
+        
+        video.load();
       }, { once: true });
       
       preloadVideo.load();
@@ -341,7 +362,6 @@ function CurtainsSection() {
     
     video.onended = () => {
       video.pause();
-      // Keep video at appropriate frame
       if (action === 'closing') {
         video.currentTime = video.duration;
       } else {
@@ -354,6 +374,11 @@ function CurtainsSection() {
   
   const handleManualToggle = (action: 'opening' | 'closing') => {
     if (isAnimating || !videoLoaded) return;
+    
+    // Don't do anything if already in desired state
+    if (action === 'closing' && curtainsState === 'closed') return;
+    if (action === 'opening' && curtainsState === 'open') return;
+    
     setManualControl(true);
     playCurtainVideo(action);
   };
@@ -371,17 +396,24 @@ function CurtainsSection() {
         >
           <IPhoneFrame>
             <div className="relative w-full h-full overflow-hidden bg-black">
-              {/* Loading placeholder - only shows until video loads */}
+              {/* Loading placeholder */}
               {!videoLoaded && (
                 <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
                   <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                 </div>
               )}
               
-              {/* Video - starts with first frame visible */}
+              {/* Canvas for holding current frame */}
+              <canvas
+                ref={canvasRef}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-100 ${showCanvas ? 'opacity-100 z-20' : 'opacity-0 z-10'}`}
+                style={{ objectPosition: '60% center' }}
+              />
+              
+              {/* Video */}
               <video
                 ref={videoRef}
-                className={`w-full h-full object-cover transition-opacity duration-300 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${videoLoaded ? 'opacity-100' : 'opacity-0'} ${showCanvas ? 'z-10' : 'z-20'}`}
                 style={{ objectPosition: '60% center' }}
                 muted
                 playsInline
@@ -394,7 +426,7 @@ function CurtainsSection() {
         {/* Text Content */}
         <motion.div
           initial={{ opacity: 0, x: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
           viewport={{ once: true }}
           className="order-1 md:order-2"
