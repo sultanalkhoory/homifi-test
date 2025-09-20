@@ -243,6 +243,9 @@ function LightsSection() {
                   />
                 </motion.button>
               </div>
+            </div>
+          </IPhoneFrame>
+        </motion.div>
       </div>
     </section>
   );
