@@ -253,72 +253,49 @@ function LightsSection() {
   );
 }
 
-// Fixed Video Curtains Section with Fallback Images
+// Fixed Video Curtains Section with Proper Video Loading
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [curtainsState, setCurtainsState] = useState<'open' | 'closed'>('open');
   const [manualControl, setManualControl] = useState(false);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-  const [showVideo, setShowVideo] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
   
-  // Initialize with opening video/image
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.src = '/curtains-opening.mp4';
-      videoRef.current.addEventListener('loadeddata', () => {
-        setVideoLoaded(true);
-        setShowVideo(true);
-      });
-      videoRef.current.load();
-    }
-  }, []);
-  
   // Auto-close curtains when scrolled into view
   useEffect(() => {
-    if (isInView && !manualControl && curtainsState === 'open' && videoLoaded) {
+    if (isInView && !manualControl && curtainsState === 'open') {
       const timer = setTimeout(() => {
         playClosingVideo();
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [isInView, manualControl, curtainsState, videoLoaded]);
+  }, [isInView, manualControl, curtainsState]);
   
   const playClosingVideo = () => {
-    if (videoRef.current && videoLoaded) {
+    if (videoRef.current) {
       const video = videoRef.current;
       video.src = '/curtains-closing.mp4';
-      video.addEventListener('loadeddata', () => {
-        if (videoRef.current) {
-          videoRef.current.currentTime = 0;
-          videoRef.current.play().then(() => {
-            setCurtainsState('closed');
-          }).catch(() => {
-            setCurtainsState('closed');
-          });
-        }
-      }, { once: true });
-      video.load();
+      video.currentTime = 0;
+      video.play().then(() => {
+        setCurtainsState('closed');
+      }).catch(() => {
+        setCurtainsState('closed');
+      });
     }
   };
   
   const playOpeningVideo = () => {
-    if (videoRef.current && videoLoaded) {
+    if (videoRef.current) {
       const video = videoRef.current;
       video.src = '/curtains-opening.mp4';
-      video.addEventListener('loadeddata', () => {
-        if (videoRef.current) {
-          videoRef.current.currentTime = 0;
-          videoRef.current.play().then(() => {
-            setCurtainsState('open');
-          }).catch(() => {
-            setCurtainsState('open');
-          });
-        }
-      }, { once: true });
-      video.load();
+      video.currentTime = 0;
+      video.play().then(() => {
+        setCurtainsState('open');
+      }).catch(() => {
+        setCurtainsState('open');
+      });
     }
   };
   
@@ -373,16 +350,15 @@ function CurtainsSection() {
               </motion.div>
               
               {/* Video Layer */}
-              {showVideo && (
-                <video
-                  ref={videoRef}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{ objectPosition: '60% center' }}
-                  muted
-                  playsInline
-                  preload="auto"
-                />
-              )}
+              <video
+                ref={videoRef}
+                className="absolute inset-0 w-full h-full object-cover z-10"
+                style={{ objectPosition: '60% center' }}
+                muted
+                playsInline
+                preload="auto"
+                onCanPlay={() => setVideoReady(true)}
+              />
             </div>
           </IPhoneFrame>
         </motion.div>
@@ -426,37 +402,31 @@ function CurtainsSection() {
   );
 }
 
-// Climate Section with Full Animations - Warm to Comfort to Cool
+// Climate Section with Gradual Temperature Progression
 function ClimateSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [temperature, setTemperature] = useState(26); // Start at warm
   const [isActive, setIsActive] = useState(false);
   const [manualControl, setManualControl] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   
   const isInView = useInView(containerRef, { once: true, amount: 0.4 });
   
-  // Auto temperature progression: Warm (26) → Comfort (22) → Cool (18)
+  // Gradual temperature progression: 26 → 25 → 24 → 23 → 22 → 21 → 20 → 19 → 18
   useEffect(() => {
-    if (isInView && !manualControl) {
-      // Start warm
+    if (isInView && !manualControl && !hasStarted) {
+      setHasStarted(true);
       setIsActive(true);
       
-      // Go to comfort after 2s
-      const comfortTimer = setTimeout(() => {
-        setTemperature(22);
-      }, 2000);
-      
-      // Go to cool after 4s  
-      const coolTimer = setTimeout(() => {
-        setTemperature(18);
-      }, 4000);
-      
-      return () => {
-        clearTimeout(comfortTimer);
-        clearTimeout(coolTimer);
-      };
+      // Gradually decrease temperature every 500ms
+      const temperatures = [25, 24, 23, 22, 21, 20, 19, 18];
+      temperatures.forEach((temp, index) => {
+        setTimeout(() => {
+          setTemperature(temp);
+        }, (index + 1) * 500); // 500ms intervals
+      });
     }
-  }, [isInView, manualControl]);
+  }, [isInView, manualControl, hasStarted]);
   
   const handleTempChange = (newTemp: number) => {
     setManualControl(true);
@@ -504,17 +474,17 @@ function ClimateSection() {
             opacity: 0;
           }
         }
-        @keyframes sunbeam {
+        @keyframes sunbeamSubtle {
           0% {
             opacity: 0;
-            transform: rotate(-5deg) translateY(20px);
+            transform: rotate(-3deg) translateY(10px);
           }
           50% {
-            opacity: 0.3;
+            opacity: 0.15;
           }
           100% {
             opacity: 0;
-            transform: rotate(5deg) translateY(-20px);
+            transform: rotate(3deg) translateY(-10px);
           }
         }
       `}</style>
@@ -541,6 +511,243 @@ function ClimateSection() {
             
             <div className="space-y-4">
               <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <span className="text-gray-700 font-medium">Temperature</span>
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => handleTempChange(Math.max(16, temperature - 1))}
+                    className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600 font-bold transition-colors"
+                  >
+                    −
+                  </button>
+                  <span className={`text-2xl font-light text-gray-800 min-w-[60px] text-center transition-all duration-500 ${
+                    mode === 'cool' ? 'text-blue-600' : mode === 'warm' ? 'text-orange-600' : 'text-gray-800'
+                  }`}>
+                    {temperature}°C
+                  </span>
+                  <button
+                    onClick={() => handleTempChange(Math.min(30, temperature + 1))}
+                    className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600 font-bold transition-colors"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex gap-2">
+                <GlassButton active={temperature === 18} onClick={() => handleTempChange(18)}>Cool</GlassButton>
+                <GlassButton active={temperature === 22} onClick={() => handleTempChange(22)}>Comfort</GlassButton>
+                <GlassButton active={temperature === 26} onClick={() => handleTempChange(26)}>Warm</GlassButton>
+              </div>
+            </div>
+          </motion.div>backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <span className="text-gray-700 font-medium">Temperature</span>
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => handleTempChange(Math.max(16, temperature - 1))}
+                    className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600 font-bold transition-colors"
+                  >
+                    −
+                  </button>
+                  <span className={`text-2xl font-light text-gray-800 min-w-[60px] text-center transition-all duration-500 ${
+                    mode === 'cool' ? 'text-blue-600' : mode === 'warm' ? 'text-orange-600' : 'text-gray-800'
+                  }`}>
+                    {temperature}°C
+                  </span>
+                  <button
+                    onClick={() => handleTempChange(Math.min(30, temperature + 1))}
+                    className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600 font-bold transition-colors"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex gap-2">
+                <GlassButton active={temperature === 18} onClick={() => handleTempChange(18)}>Cool</GlassButton>
+                <GlassButton active={temperature === 22} onClick={() => handleTempChange(22)}>Comfort</GlassButton>
+                <GlassButton active={temperature === 26} onClick={() => handleTempChange(26)}>Warm</GlassButton>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* iPhone with Climate Visualization */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+            viewport={{ once: true }}
+            className="flex justify-center"
+          >
+            <IPhoneFrame>
+              <div className="relative w-full h-full overflow-hidden">
+                {/* Room Image */}
+                <Image
+                  src="/Curtains-Open-Lights-On.png"
+                  alt="Room with climate control"
+                  fill
+                  quality={100}
+                  className="object-cover"
+                  style={{ objectPosition: '45% center' }}
+                />
+                
+                {/* Cool Mode - Animated Air Streams (EXACT original animations) */}
+                {mode === 'cool' && (
+                  <>
+                    {/* Wavy air streams */}
+                    {[...Array(3)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="absolute pointer-events-none"
+                        style={{
+                          top: `${25 + i * 15}%`,
+                          left: '-10%',
+                          width: '280px',
+                          height: '20px',
+                          animation: `airFlow ${4 + i * 0.5}s ease-in-out infinite ${i * 0.8}s`
+                        }}
+                      >
+                        <svg width="280" height="20" viewBox="0 0 280 20" className="w-full h-full">
+                          <path
+                            d={`M 0,10 Q 70,${5 + i * 2} 140,10 T 280,10`}
+                            stroke="rgba(59, 130, 246, 0.3)"
+                            strokeWidth="2"
+                            fill="none"
+                            style={{
+                              filter: 'blur(1px)',
+                              strokeLinecap: 'round'
+                            }}
+                          />
+                        </svg>
+                      </div>
+                    ))}
+                    
+                    {/* Floating particles - Reduced */}
+                    {[...Array(6)].map((_, i) => (
+                      <div
+                        key={`particle-${i}`}
+                        className="absolute w-1 h-1 bg-blue-300 rounded-full opacity-80"
+                        style={{
+                          left: `${15 + (i % 3) * 20}%`,
+                          top: `${30 + (i % 2) * 15}%`,
+                          animation: `particleFloat ${3 + (i * 0.3)}s ease-in-out infinite ${i * 0.5}s`
+                        }}
+                      />
+                    ))}
+                    
+                    {/* Subtle wave effect */}
+                    <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: `
+                          radial-gradient(ellipse 180px 80px at 50% 35%, 
+                            rgba(59, 130, 246, 0.08) 0%, 
+                            transparent 60%
+                          )
+                        `,
+                        animation: 'pulse 5s ease-in-out infinite'
+                      }}
+                    />
+                  </>
+                )}
+                
+                {/* Warm Mode - Subtle Sunlight Beams */}
+                {mode === 'warm' && (
+                  <>
+                    {/* More subtle sunlight beams */}
+                    {[...Array(4)].map((_, i) => (
+                      <div
+                        key={`sunbeam-${i}`}
+                        className="absolute pointer-events-none"
+                        style={{
+                          top: `${10 + i * 20}%`,
+                          right: '-20%',
+                          width: '300px',
+                          height: '4px',
+                          background: `linear-gradient(90deg, 
+                            transparent 0%, 
+                            rgba(255, 193, 7, 0.1) 30%, 
+                            rgba(255, 152, 0, 0.15) 70%, 
+                            transparent 100%
+                          )`,
+                          animation: `sunbeamSubtle ${8 + i * 0.8}s ease-in-out infinite ${i * 1.5}s`,
+                          filter: 'blur(2px)'
+                        }}
+                      />
+                    ))}
+                    
+                    {/* More subtle warm vignette */}
+                    <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: `
+                          radial-gradient(ellipse 300px 200px at 60% 40%, 
+                            rgba(255, 193, 7, 0.05) 0%, 
+                            rgba(255, 152, 0, 0.03) 40%,
+                            transparent 70%
+                          )
+                        `,
+                        animation: 'pulse 6s ease-in-out infinite'
+                      }}
+                    />
+                  </>
+                )}
+                
+                {/* Temperature Display */}
+                <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
+                  <motion.div 
+                    className={`bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20 transition-all duration-500 ${
+                      mode === 'cool' ? 'shadow-lg scale-105 shadow-blue-500/20' : 
+                      mode === 'warm' ? 'shadow-lg scale-105 shadow-orange-500/20' :
+                      'shadow-md'
+                    }`}
+                    animate={mode === 'cool' ? { 
+                      boxShadow: [
+                        '0 10px 25px rgba(59, 130, 246, 0.2)',
+                        '0 10px 35px rgba(59, 130, 246, 0.3)',
+                        '0 10px 25px rgba(59, 130, 246, 0.2)'
+                      ]
+                    } : mode === 'warm' ? {
+                      boxShadow: [
+                        '0 10px 25px rgba(255, 152, 0, 0.2)',
+                        '0 10px 35px rgba(255, 152, 0, 0.3)',
+                        '0 10px 25px rgba(255, 152, 0, 0.2)'
+                      ]
+                    } : {}}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <div className="text-center">
+                      <div className={`text-2xl font-light transition-all duration-500 ${
+                        mode === 'cool' ? 'text-blue-600' : 
+                        mode === 'warm' ? 'text-orange-600' :
+                        'text-gray-600'
+                      }`}>
+                        {temperature}°C
+                      </div>
+                      <div className="text-xs text-gray-500 uppercase tracking-wide">
+                        {mode === 'cool' ? 'Cooling' : mode === 'warm' ? 'Warming' : 'Perfect'}
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+                
+                {/* Cooling effect overlay */}
+                {mode === 'cool' && (
+                  <div 
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(180deg, rgba(59, 130, 246, 0.05) 0%, transparent 70%)',
+                      animation: 'pulse 3s ease-in-out infinite'
+                    }}
+                  />
+                )}
+              </div>
+            </IPhoneFrame>
+          </motion.div>
+        </div>
+      </section>
+    </>
+  );
+}backdrop-blur-sm rounded-2xl p-4 border border-white/20">
                 <span className="text-gray-700 font-medium">Temperature</span>
                 <div className="flex items-center space-x-3">
                   <button
