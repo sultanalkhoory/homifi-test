@@ -150,28 +150,6 @@ function LightsSection() {
           <p className="text-lg text-gray-600 font-light mb-8">
             Exactly as you want it.
           </p>
-          
-          {/* iOS 18 Glass Controls */}
-          <div className="flex gap-3">
-            <GlassButton
-              active={lightsState === 'off'}
-              onClick={() => {
-                setManualControl(true);
-                setLightsState('off');
-              }}
-            >
-              Lights Off
-            </GlassButton>
-            <GlassButton
-              active={lightsState === 'on'}
-              onClick={() => {
-                setManualControl(true);
-                setLightsState('on');
-              }}
-            >
-              Lights On
-            </GlassButton>
-          </div>
         </motion.div>
         
         {/* iPhone */}
@@ -206,6 +184,73 @@ function LightsSection() {
                   quality={100}
                 />
               </motion.div>
+              
+              {/* Liquid Glass Buttons Inside iPhone */}
+              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3 z-30">
+                <motion.button
+                  onClick={() => {
+                    setManualControl(true);
+                    setLightsState('off');
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`
+                    relative px-6 py-3 rounded-full text-sm font-medium
+                    backdrop-blur-xl border border-white/30
+                    transition-all duration-300 cursor-pointer text-white
+                    ${lightsState === 'off' 
+                      ? 'bg-white/20 shadow-lg' 
+                      : 'bg-white/10 hover:bg-white/15'
+                    }
+                  `}
+                  style={{
+                    background: lightsState === 'off' 
+                      ? 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 100%)'
+                      : 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)'
+                  }}
+                >
+                  Lights Off
+                  {/* Glass shine effect */}
+                  <div 
+                    className="absolute inset-0 rounded-full pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%)'
+                    }}
+                  />
+                </motion.button>
+                
+                <motion.button
+                  onClick={() => {
+                    setManualControl(true);
+                    setLightsState('on');
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`
+                    relative px-6 py-3 rounded-full text-sm font-medium
+                    backdrop-blur-xl border border-white/30
+                    transition-all duration-300 cursor-pointer text-white
+                    ${lightsState === 'on' 
+                      ? 'bg-white/20 shadow-lg' 
+                      : 'bg-white/10 hover:bg-white/15'
+                    }
+                  `}
+                  style={{
+                    background: lightsState === 'on' 
+                      ? 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 100%)'
+                      : 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)'
+                  }}
+                >
+                  Lights On
+                  {/* Glass shine effect */}
+                  <div 
+                    className="absolute inset-0 rounded-full pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%)'
+                    }}
+                  />
+                </motion.button>
+              </div>
             </div>
           </IPhoneFrame>
         </motion.div>
@@ -470,8 +515,8 @@ function ClimateSection() {
     if (temp >= 24) {
       // Warm colors (orange/amber)
       return {
-        primary: 'rgba(255, 193, 7, 0.22)',
-        secondary: 'rgba(255, 152, 0, 0.28)',
+        primary: 'rgba(255, 193, 7, 0.1)',
+        secondary: 'rgba(255, 152, 0, 0.15)',
         particle: 'bg-orange-200',
         vignette: 'rgba(255, 193, 7, 0.05), rgba(255, 152, 0, 0.03)'
       };
@@ -479,15 +524,15 @@ function ClimateSection() {
       // Cool colors (blue)
       return {
         primary: 'rgba(59, 130, 246, 0.18)',
-        secondary: 'rgba(96, 165, 250, 0.22)',
+        secondary: 'rgba(96, 165, 250, 0.25)',
         particle: 'bg-blue-200',
         vignette: 'rgba(59, 130, 246, 0.05), rgba(96, 165, 250, 0.03)'
       };
     } else {
       // Comfort/neutral colors (white/light gray)
       return {
-        primary: 'rgba(156, 163, 175, 0.22)',
-        secondary: 'rgba(209, 213, 219, 0.28)',
+        primary: 'rgba(156, 163, 175, 0.15)',
+        secondary: 'rgba(209, 213, 219, 0.2)',
         particle: 'bg-gray-200',
         vignette: 'rgba(156, 163, 175, 0.04), rgba(209, 213, 219, 0.02)'
       };
