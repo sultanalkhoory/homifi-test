@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
@@ -56,7 +56,7 @@ function GlassButton({
         transition-all duration-300 cursor-pointer
         ${
           active
-            ? 'bg-white/25 text-gray-800 shadow-lg'
+            ? 'bg-white/25 text-gray-800 shadow-lg ring-2 ring-white/40'
             : 'bg-white/10 text-gray-700 hover:bg-white/20'
         }
       `}
@@ -223,7 +223,7 @@ function LightsSection() {
   );
 }
 
-// Curtains Section with Single Cycling Button
+// Curtains Section with Animated Button Text
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -339,6 +339,14 @@ function CurtainsSection() {
     playCurtainVideo(curtainsState === "open" ? "closing" : "opening");
   };
 
+  const buttonLabel = isAnimating
+    ? curtainsState === "open"
+      ? "Curtains Closing..."
+      : "Curtains Opening..."
+    : curtainsState === "open"
+    ? "Close Curtains"
+    : "Open Curtains";
+
   return (
     <section
       ref={containerRef}
@@ -397,7 +405,17 @@ function CurtainsSection() {
                     "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)",
                 }}
               >
-                {curtainsState === "open" ? "Close Curtains" : "Open Curtains"}
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={buttonLabel}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {buttonLabel}
+                  </motion.span>
+                </AnimatePresence>
                 <div
                   className="absolute inset-0 rounded-full pointer-events-none"
                   style={{
@@ -434,8 +452,7 @@ function CurtainsSection() {
   );
 }
 
-
-// Climate Section with Glass Buttons + Tinted Temperature Bubble
+// Climate Section refined
 function ClimateSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [temperature, setTemperature] = useState(26);
@@ -481,13 +498,12 @@ function ClimateSection() {
   const mode =
     temperature <= 20 ? "cool" : temperature >= 24 ? "warm" : "comfort";
 
-  // Bubble tint colors
-  const bubbleStyles =
+  const textColor =
     mode === "cool"
-      ? "bg-blue-100/60 border-blue-200/50"
+      ? "text-blue-600"
       : mode === "warm"
-      ? "bg-amber-100/60 border-amber-200/50"
-      : "bg-white/70 border-white/30";
+      ? "text-amber-600"
+      : "text-gray-800";
 
   return (
     <section
@@ -511,28 +527,6 @@ function ClimateSection() {
           <p className="text-lg text-gray-600 font-light mb-8">
             The perfect temperature, automatically.
           </p>
-
-          {/* Direct Choice Buttons */}
-          <div className="flex gap-3">
-            <GlassButton
-              active={temperature === 18}
-              onClick={() => handleTempChange(18)}
-            >
-              Cool
-            </GlassButton>
-            <GlassButton
-              active={temperature === 22}
-              onClick={() => handleTempChange(22)}
-            >
-              Comfort
-            </GlassButton>
-            <GlassButton
-              active={temperature === 26}
-              onClick={() => handleTempChange(26)}
-            >
-              Warm
-            </GlassButton>
-          </div>
         </motion.div>
 
         {/* iPhone */}
@@ -554,31 +548,32 @@ function ClimateSection() {
               />
 
               {/* Temperature Display Bubble */}
-              <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30">
+              <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-30">
                 <motion.div
                   className={`
-                    relative px-6 py-3 rounded-full
-                    backdrop-blur-xl border transition-all duration-500 shadow-lg
-                    ${bubbleStyles}
+                    relative px-5 py-2.5 rounded-full
+                    backdrop-blur-xl border border-white/20
+                    bg-white/30 shadow-md
                   `}
                   animate={{
                     scale: mode === "comfort" ? 1 : 1.05,
                   }}
-                  transition={{ duration: 1.5, repeat: Infinity, repeatType: "mirror" }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    repeatType: "mirror",
+                  }}
                 >
-                  <div className="text-center">
-                    <div className="text-2xl font-light text-gray-800">
-                      {temperature}°C
-                    </div>
-                    <div className="text-xs text-gray-500 uppercase tracking-wide">
+                  <div className={`text-center ${textColor}`}>
+                    <div className="text-xl font-light">{temperature}°C</div>
+                    <div className="text-[10px] uppercase tracking-wide opacity-80">
                       {mode === "cool"
                         ? "Cooling"
                         : mode === "warm"
                         ? "Warming"
-                        : "Perfect"}
+                        : "Comfort"}
                     </div>
                   </div>
-                  {/* Shine effect */}
                   <div
                     className="absolute inset-0 rounded-full pointer-events-none"
                     style={{
@@ -588,6 +583,28 @@ function ClimateSection() {
                   />
                 </motion.div>
               </div>
+
+              {/* Climate Buttons */}
+              <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-3">
+                <GlassButton
+                  active={temperature === 18}
+                  onClick={() => handleTempChange(18)}
+                >
+                  Cool
+                </GlassButton>
+                <GlassButton
+                  active={temperature === 22}
+                  onClick={() => handleTempChange(22)}
+                >
+                  Comfort
+                </GlassButton>
+                <GlassButton
+                  active={temperature === 26}
+                  onClick={() => handleTempChange(26)}
+                >
+                  Warm
+                </GlassButton>
+              </div>
             </div>
           </IPhoneFrame>
         </motion.div>
@@ -595,7 +612,6 @@ function ClimateSection() {
     </section>
   );
 }
-
 
 // Footer
 function Footer() {
@@ -620,4 +636,3 @@ export default function HomePage() {
     </main>
   );
 }
-
