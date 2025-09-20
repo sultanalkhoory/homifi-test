@@ -288,31 +288,37 @@ function CurtainsSection() {
   
   const playClosingVideo = () => {
     if (videoRef.current && videoLoaded) {
-      videoRef.current.src = '/curtains-closing.mp4';
-      videoRef.current.addEventListener('loadeddata', () => {
-        videoRef.current.currentTime = 0;
-        videoRef.current.play().then(() => {
-          setCurtainsState('closed');
-        }).catch(() => {
-          setCurtainsState('closed');
-        });
+      const video = videoRef.current;
+      video.src = '/curtains-closing.mp4';
+      video.addEventListener('loadeddata', () => {
+        if (videoRef.current) {
+          videoRef.current.currentTime = 0;
+          videoRef.current.play().then(() => {
+            setCurtainsState('closed');
+          }).catch(() => {
+            setCurtainsState('closed');
+          });
+        }
       }, { once: true });
-      videoRef.current.load();
+      video.load();
     }
   };
   
   const playOpeningVideo = () => {
     if (videoRef.current && videoLoaded) {
-      videoRef.current.src = '/curtains-opening.mp4';
-      videoRef.current.addEventListener('loadeddata', () => {
-        videoRef.current.currentTime = 0;
-        videoRef.current.play().then(() => {
-          setCurtainsState('open');
-        }).catch(() => {
-          setCurtainsState('open');
-        });
+      const video = videoRef.current;
+      video.src = '/curtains-opening.mp4';
+      video.addEventListener('loadeddata', () => {
+        if (videoRef.current) {
+          videoRef.current.currentTime = 0;
+          videoRef.current.play().then(() => {
+            setCurtainsState('open');
+          }).catch(() => {
+            setCurtainsState('open');
+          });
+        }
       }, { once: true });
-      videoRef.current.load();
+      video.load();
     }
   };
   
