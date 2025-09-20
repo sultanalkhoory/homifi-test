@@ -641,37 +641,40 @@ function ClimateSection() {
                   ))}
                 </motion.div>
 
-                {/* Wall-mounted Smart Thermostat - positioned on left wall between panels */}
-                <div className="absolute top-1/2 left-6 z-30 -translate-y-1/2">
+                {/* Wall-mounted Smart Thermostat - liquid glass style, much smaller */}
+                <div className="absolute top-[45%] left-8 z-30">
                   <div className="relative">
-                    {/* Thermostat body - small, white, wall-mounted on actual wall */}
-                    <div className="w-16 h-16 bg-white rounded-full shadow-lg border border-gray-200">
-                      {/* Outer ring indicator */}
+                    {/* Thermostat body - liquid glass style, very small */}
+                    <div className="w-10 h-10 backdrop-blur-xl bg-white/20 rounded-full shadow-lg border border-white/30">
+                      {/* Outer ring indicator - subtle glow */}
                       <div 
-                        className="absolute inset-1 rounded-full border-2"
+                        className="absolute inset-0.5 rounded-full border"
                         style={{
-                          borderColor: mode === 'cool' ? '#3b82f6' : mode === 'warm' ? '#f59e0b' : '#6b7280'
+                          borderColor: mode === 'cool' ? 'rgba(59, 130, 246, 0.6)' : mode === 'warm' ? 'rgba(245, 158, 11, 0.6)' : 'rgba(107, 114, 128, 0.6)',
+                          boxShadow: mode === 'cool' ? '0 0 8px rgba(59, 130, 246, 0.3)' : mode === 'warm' ? '0 0 8px rgba(245, 158, 11, 0.3)' : '0 0 8px rgba(107, 114, 128, 0.2)'
                         }}
                       />
                       
                       {/* Center display */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <div 
-                          className="text-sm font-medium"
-                          style={{
-                            color: mode === 'cool' ? '#3b82f6' : mode === 'warm' ? '#f59e0b' : '#6b7280'
-                          }}
+                          className="text-xs font-medium text-white"
                         >
                           {temperature}°
                         </div>
-                        <div className="text-xs text-gray-400 uppercase tracking-wide">
-                          {mode === 'cool' ? 'Cool' : mode === 'warm' ? 'Heat' : 'Auto'}
-                        </div>
                       </div>
+                      
+                      {/* Glass shine effect */}
+                      <div
+                        className="absolute inset-0 rounded-full pointer-events-none"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%)',
+                        }}
+                      />
                     </div>
                     
-                    {/* Wall mount shadow effect */}
-                    <div className="absolute inset-0 bg-black/10 rounded-full blur-sm translate-x-0.5 translate-y-0.5 -z-10" />
+                    {/* Subtle wall mount shadow */}
+                    <div className="absolute inset-0 bg-black/5 rounded-full blur-sm translate-x-0.5 translate-y-0.5 -z-10" />
                   </div>
                 </div>
 
