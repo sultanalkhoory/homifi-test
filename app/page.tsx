@@ -185,7 +185,7 @@ function LightsSection() {
                 />
               </motion.div>
               
-              {/* Liquid Glass Buttons Inside iPhone */}
+              {/* Enhanced Liquid Glass Buttons Inside iPhone */}
               <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3 z-30">
                 <motion.button
                   onClick={() => {
@@ -196,25 +196,31 @@ function LightsSection() {
                   whileTap={{ scale: 0.98 }}
                   className={`
                     relative px-6 py-3 rounded-full text-sm font-medium
-                    backdrop-blur-xl border border-white/30
+                    backdrop-blur-md border border-white/40
                     transition-all duration-300 cursor-pointer text-white
+                    shadow-lg
                     ${lightsState === 'off' 
-                      ? 'bg-white/20 shadow-lg' 
-                      : 'bg-white/10 hover:bg-white/15'
+                      ? 'bg-white/15' 
+                      : 'bg-white/8 hover:bg-white/12'
                     }
                   `}
                   style={{
+                    backdropFilter: 'blur(20px) saturate(180%)',
                     background: lightsState === 'off' 
-                      ? 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 100%)'
-                      : 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)'
+                      ? 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 100%)'
+                      : 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.02) 100%)',
+                    boxShadow: lightsState === 'off' 
+                      ? '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4)'
+                      : '0 4px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.2)'
                   }}
                 >
                   Lights Off
-                  {/* Glass shine effect */}
+                  {/* Enhanced glass refraction effect */}
                   <div 
                     className="absolute inset-0 rounded-full pointer-events-none"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%)'
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 25%, transparent 50%, rgba(255,255,255,0.05) 100%)',
+                      filter: 'blur(0.5px)'
                     }}
                   />
                 </motion.button>
@@ -228,25 +234,31 @@ function LightsSection() {
                   whileTap={{ scale: 0.98 }}
                   className={`
                     relative px-6 py-3 rounded-full text-sm font-medium
-                    backdrop-blur-xl border border-white/30
+                    backdrop-blur-md border border-white/40
                     transition-all duration-300 cursor-pointer text-white
+                    shadow-lg
                     ${lightsState === 'on' 
-                      ? 'bg-white/20 shadow-lg' 
-                      : 'bg-white/10 hover:bg-white/15'
+                      ? 'bg-white/15' 
+                      : 'bg-white/8 hover:bg-white/12'
                     }
                   `}
                   style={{
+                    backdropFilter: 'blur(20px) saturate(180%)',
                     background: lightsState === 'on' 
-                      ? 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 100%)'
-                      : 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)'
+                      ? 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 100%)'
+                      : 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.02) 100%)',
+                    boxShadow: lightsState === 'on' 
+                      ? '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4)'
+                      : '0 4px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.2)'
                   }}
                 >
                   Lights On
-                  {/* Glass shine effect */}
+                  {/* Enhanced glass refraction effect */}
                   <div 
                     className="absolute inset-0 rounded-full pointer-events-none"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%)'
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 25%, transparent 50%, rgba(255,255,255,0.05) 100%)',
+                      filter: 'blur(0.5px)'
                     }}
                   />
                 </motion.button>
@@ -551,10 +563,10 @@ function ClimateSection() {
             opacity: 0;
           }
           15% {
-            opacity: 0.4;
+            opacity: 0.8;
           }
           85% {
-            opacity: 0.4;
+            opacity: 0.8;
           }
           100% {
             transform: translateX(300px) translateY(-15px) scale(1.1);
@@ -579,8 +591,11 @@ function ClimateSection() {
             opacity: 0;
             transform: rotate(-3deg) translateY(10px);
           }
-          50% {
-            opacity: 0.15;
+          15% {
+            opacity: 0.8;
+          }
+          85% {
+            opacity: 0.8;
           }
           100% {
             opacity: 0;
