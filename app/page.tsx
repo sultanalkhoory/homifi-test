@@ -483,8 +483,14 @@ function ClimateSection() {
                   className="object-cover"
                   style={{ objectPosition: '45% center' }}
                 />
+                {/* Cool Mode - Animated Air Streams with Smooth Fade-In */}
                 {mode === 'cool' && (
-                  <>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 1.5, ease: [0.21, 0.47, 0.32, 0.98] }}
+                    className="absolute inset-0"
+                  >
                     {/* Wavy air streams */}
                     {[...Array(3)].map((_, i) => (
                       <div
@@ -538,10 +544,15 @@ function ClimateSection() {
                         animation: 'pulse 5s ease-in-out infinite'
                       }}
                     />
-                  </>
+                  </motion.div>
                 )}
                 {mode === 'warm' && (
-                  <>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 1.5, ease: [0.21, 0.47, 0.32, 0.98] }}
+                    className="absolute inset-0"
+                  >
                     {/* Continuous subtle sunlight beams */}
                     {[...Array(4)].map((_, i) => (
                       <div
@@ -591,7 +602,7 @@ function ClimateSection() {
                         }}
                       />
                     ))}
-                  </>
+                  </motion.div>
                 )}
                 <div className="absolute bottom-20 left-1/2 -translate-x-1/2">
                   <motion.div 
