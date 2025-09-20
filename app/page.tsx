@@ -641,39 +641,50 @@ function ClimateSection() {
                   ))}
                 </motion.div>
 
-                {/* Controls INSIDE iPhone */}
-                <div className="absolute inset-x-0 bottom-0 z-30">
-                  <div className="flex flex-col items-center justify-end pb-8 px-4 gap-4">
-                    {/* Temperature Bubble - STATIC, NO BLUR/ANIMATIONS */}
-                    <div className="relative px-4 py-2 rounded-full bg-white/80 border border-white/40 shadow-md">
-                      <div className="text-center">
-                        <div className={`text-xl font-light ${
-                          mode === 'cool'
-                            ? 'text-blue-600'
-                            : mode === 'warm'
-                            ? 'text-orange-600'
-                            : 'text-gray-600'
-                        }`}>
-                          {temperature}°C
+                {/* Wall-mounted Smart Thermostat */}
+                <div className="absolute top-1/3 right-8 z-30">
+                  <div className="relative">
+                    {/* Thermostat body - small, white, wall-mounted style */}
+                    <div className="w-20 h-20 bg-white rounded-full shadow-lg border border-gray-200">
+                      {/* Outer ring indicator */}
+                      <div 
+                        className="absolute inset-1 rounded-full border-2"
+                        style={{
+                          borderColor: mode === 'cool' ? '#3b82f6' : mode === 'warm' ? '#f59e0b' : '#6b7280'
+                        }}
+                      />
+                      
+                      {/* Center display */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <div 
+                          className="text-lg font-medium"
+                          style={{
+                            color: mode === 'cool' ? '#3b82f6' : mode === 'warm' ? '#f59e0b' : '#6b7280'
+                          }}
+                        >
+                          {temperature}°
                         </div>
-                        <div className="text-xs text-gray-500 uppercase tracking-wide">
-                          {mode === 'cool'
-                            ? 'Cooling'
-                            : mode === 'warm'
-                            ? 'Warming'
-                            : 'Perfect'}
+                        <div className="text-xs text-gray-400 uppercase tracking-wide">
+                          {mode === 'cool' ? 'Cool' : mode === 'warm' ? 'Heat' : 'Auto'}
                         </div>
                       </div>
                     </div>
+                    
+                    {/* Wall mount shadow effect */}
+                    <div className="absolute inset-0 bg-black/10 rounded-full blur-sm translate-x-0.5 translate-y-0.5 -z-10" />
+                  </div>
+                </div>
 
-                    {/* Mode Buttons - BIGGER, INSIDE iPhone */}
+                {/* Mode Buttons - slightly smaller */}
+                <div className="absolute inset-x-0 bottom-0 z-30">
+                  <div className="flex justify-center pb-8 px-4">
                     <div className="flex gap-2">
                       <motion.button
                         onClick={() => handleTempChange(18)}
                         whileTap={{ scale: 0.92 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                         className={`
-                          relative px-5 py-2.5 rounded-full text-sm font-medium
+                          relative px-4 py-2 rounded-full text-sm font-medium
                           backdrop-blur-xl border border-white/20 text-white shadow-lg
                           transition-all duration-300 cursor-pointer
                           ${temperature === 18 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
@@ -693,7 +704,7 @@ function ClimateSection() {
                         whileTap={{ scale: 0.92 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                         className={`
-                          relative px-5 py-2.5 rounded-full text-sm font-medium
+                          relative px-4 py-2 rounded-full text-sm font-medium
                           backdrop-blur-xl border border-white/20 text-white shadow-lg
                           transition-all duration-300 cursor-pointer
                           ${temperature === 22 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
@@ -713,7 +724,7 @@ function ClimateSection() {
                         whileTap={{ scale: 0.92 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                         className={`
-                          relative px-5 py-2.5 rounded-full text-sm font-medium
+                          relative px-4 py-2 rounded-full text-sm font-medium
                           backdrop-blur-xl border border-white/20 text-white shadow-lg
                           transition-all duration-300 cursor-pointer
                           ${temperature === 26 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
