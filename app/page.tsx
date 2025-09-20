@@ -217,10 +217,10 @@ function CurtainsSection() {
   const [videoError, setVideoError] = useState(false);
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
 
-  // Initialize video with opening video to avoid white screen
+  // Initialize video with closing video to avoid white screen
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.src = '/curtains-opening.mp4';
+      videoRef.current.src = '/curtains-closing.mp4';
       videoRef.current.load();
     }
   }, []);
