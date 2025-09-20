@@ -569,8 +569,8 @@ function ClimateSection() {
                           height: '4px',
                           background: `linear-gradient(90deg, 
                             transparent 0%, 
-                            rgba(59, 130, 246, 0.1) 30%, 
-                            rgba(96, 165, 250, 0.15) 70%, 
+                            rgba(59, 130, 246, 0.18) 30%, 
+                            rgba(96, 165, 250, 0.25) 70%, 
                             transparent 100%
                           )`,
                           animation: `airFlow ${8 + i * 0.8}s ease-in-out infinite ${i * 1.5}s`,
