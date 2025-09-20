@@ -208,45 +208,58 @@ function LightsSection() {
   );
 }
 
-// Curtains Section - Mobile Video Fix
+// Curtains Section - Improved Video Control
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [state, setState] = useState<'open' | 'closed'>('open');
   const [manual, setManual] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
 
   // Initialize video with closing video to avoid white screen
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.src = '/curtains-closing.mp4';
-      videoRef.current.load();
+      const video = videoRef.current;
+      video.src = '/curtains-closing.mp4';
+      video.currentTime = 0;
+      video.load();
     }
   }, []);
 
   useEffect(() => {
-    if (isInView && !manual && state === 'open') {
+    if (isInView && !manual && state === 'open' && !isPlaying) {
       const timer = setTimeout(() => playVideo('close'), 800);
       return () => clearTimeout(timer);
     }
-  }, [isInView, manual, state]);
+  }, [isInView, manual, state, isPlaying]);
 
   const playVideo = (action: 'open' | 'close') => {
-    if (videoRef.current) {
+    if (videoRef.current && !isPlaying) {
       const video = videoRef.current;
-      video.src =
-        action === 'open' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
+      
+      // Don't do anything if already in the requested state
+      if ((action === 'close' && state === 'closed') || (action === 'open' && state === 'open')) {
+        return;
+      }
+      
+      setIsPlaying(true);
+      video.src = action === 'open' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
       video.currentTime = 0;
+      
+      video.addEventListener('ended', () => {
+        setIsPlaying(false);
+        setState(action === 'open' ? 'open' : 'closed');
+      }, { once: true });
       
       video.play().then(() => {
         setVideoError(false);
       }).catch(() => {
         setVideoError(true);
+        setIsPlaying(false);
         setState(action === 'open' ? 'open' : 'closed');
       });
-      
-      setState(action === 'open' ? 'open' : 'closed');
     }
   };
 
@@ -265,8 +278,8 @@ function CurtainsSection() {
           className="flex justify-center order-2 md:order-1"
         >
           <IPhoneFrame>
-            <div className="relative w-full h-full overflow-hidden bg-black">
-              {/* Fallback image for when video fails or on mobile */}
+            <div className="relative w-full h-full overflow-hidden">
+              {/* Fallback image for when video fails */}
               {videoError && (
                 <Image
                   src={state === 'closed' ? "/Curtains-Closed-Lights-On.png" : "/Curtains-Open-Lights-On.png"}
@@ -311,8 +324,10 @@ function CurtainsSection() {
             <GlassButton
               active={state === 'closed'}
               onClick={() => {
-                setManual(true);
-                playVideo('close');
+                if (!isPlaying) {
+                  setManual(true);
+                  playVideo('close');
+                }
               }}
             >
               Close Curtains
@@ -320,8 +335,10 @@ function CurtainsSection() {
             <GlassButton
               active={state === 'open'}
               onClick={() => {
-                setManual(true);
-                playVideo('open');
+                if (!isPlaying) {
+                  setManual(true);
+                  playVideo('open');
+                }
               }}
             >
               Open Curtains
