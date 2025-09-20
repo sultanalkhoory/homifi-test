@@ -4,14 +4,16 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
-// iPhone 15/16 Frame Component
+/* --------------------------------------------------
+   📱 iPhone 15/16 Frame Component
+   -------------------------------------------------- */
 function IPhoneFrame({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative">
       <div className="relative w-[280px] h-[560px] bg-black rounded-[45px] p-2 shadow-[0_0_0_2px_#1a1a1a,0_0_60px_rgba(0,0,0,0.4)]">
         <div className="relative w-full h-full bg-white rounded-[37px] overflow-hidden">
           <div className="absolute inset-0">{children}</div>
-          {/* Screen glare */}
+          {/* Screen glare overlay */}
           <div
             className="absolute inset-0 pointer-events-none rounded-[37px]"
             style={{
@@ -25,7 +27,7 @@ function IPhoneFrame({ children }: { children: React.ReactNode }) {
               <div className="absolute right-3 w-3 h-0.5 bg-gray-900 rounded-full"></div>
             </div>
           </div>
-          {/* Time */}
+          {/* Time (static Apple-style) */}
           <div className="absolute top-2 left-4 text-white text-sm font-medium z-20 drop-shadow-sm">
             9:41
           </div>
@@ -35,45 +37,72 @@ function IPhoneFrame({ children }: { children: React.ReactNode }) {
   );
 }
 
-// iOS Glass Button
+/* --------------------------------------------------
+   🟢 Reusable Glass Button
+   - Unified style across Lights / Curtains / Climate
+   - Includes haptic-like bounce + label animation
+   -------------------------------------------------- */
 function GlassButton({
-  children,
+  label,
   active = false,
   onClick,
+  disabled = false,
 }: {
-  children: React.ReactNode;
+  label: string;
   active?: boolean;
   onClick?: () => void;
+  disabled?: boolean;
 }) {
   return (
     <motion.button
       onClick={onClick}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      disabled={disabled}
+      whileTap={{ scale: 0.92 }} // haptic-like bounce
+      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
       className={`
-        relative px-4 py-2.5 rounded-full text-sm font-medium
+        relative px-6 py-3 rounded-full text-sm font-medium
         backdrop-blur-xl border border-white/20
         transition-all duration-300 cursor-pointer
+        text-white shadow-lg
         ${
           active
-            ? 'bg-white/25 text-gray-800 shadow-lg ring-2 ring-white/40'
-            : 'bg-white/10 text-gray-700 hover:bg-white/20'
+            ? 'bg-white/25 text-gray-800 ring-2 ring-white/40'
+            : 'bg-white/12 hover:bg-white/18'
         }
       `}
+      style={{
+        background:
+          'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)',
+      }}
     >
-      {children}
+      {/* Animated label for smooth text transitions */}
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={label}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ duration: 0.25 }}
+        >
+          {label}
+        </motion.span>
+      </AnimatePresence>
+
+      {/* Glass shine overlay */}
       <div
         className="absolute inset-0 rounded-full pointer-events-none"
         style={{
           background:
-            'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%)',
+            'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
         }}
       />
     </motion.button>
   );
 }
 
-// Hero Section
+/* --------------------------------------------------
+   ✨ Hero Section
+   -------------------------------------------------- */
 function HeroSection() {
   return (
     <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-6">
@@ -113,13 +142,16 @@ function HeroSection() {
   );
 }
 
-// Lights Section
+/* --------------------------------------------------
+   💡 Lights Section
+   -------------------------------------------------- */
 function LightsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [manualControl, setManualControl] = useState(false);
   const [lightsState, setLightsState] = useState<'off' | 'on'>('off');
   const isInView = useInView(containerRef, { once: true, amount: 0.4 });
 
+  // Auto-on animation when section scrolls into view
   useEffect(() => {
     if (isInView && !manualControl && lightsState === 'off') {
       const timer = setTimeout(() => setLightsState('on'), 600);
@@ -137,7 +169,7 @@ function LightsSection() {
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+          transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
           <div className="text-sm uppercase tracking-wider text-blue-600 font-medium mb-3">
@@ -152,11 +184,11 @@ function LightsSection() {
           </p>
         </motion.div>
 
-        {/* iPhone */}
+        {/* iPhone with Light States */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+          transition={{ duration: 0.8 }}
           viewport={{ once: true }}
           className="flex justify-center"
         >
@@ -173,7 +205,7 @@ function LightsSection() {
               <motion.div
                 className="absolute inset-0"
                 animate={{ opacity: lightsState === 'on' ? 1 : 0 }}
-                transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                transition={{ duration: 1.2 }}
               >
                 <Image
                   src="/Curtains-Closed-Lights-On.png"
@@ -185,35 +217,15 @@ function LightsSection() {
                 />
               </motion.div>
 
-              {/* Toggle Button */}
+              {/* Glass Button */}
               <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
-                <motion.button
+                <GlassButton
+                  label={lightsState === 'off' ? 'Lights Off' : 'Lights On'}
                   onClick={() => {
                     setManualControl(true);
                     setLightsState(lightsState === 'off' ? 'on' : 'off');
                   }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="
-                    relative px-6 py-3 rounded-full text-sm font-medium
-                    backdrop-blur-xl border border-white/20
-                    transition-all duration-300 cursor-pointer text-white
-                    bg-white/12 hover:bg-white/18 shadow-lg
-                  "
-                  style={{
-                    background:
-                      'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)',
-                  }}
-                >
-                  {lightsState === 'off' ? 'Lights Off' : 'Lights On'}
-                  <div
-                    className="absolute inset-0 rounded-full pointer-events-none"
-                    style={{
-                      background:
-                        'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
-                    }}
-                  />
-                </motion.button>
+                />
               </div>
             </div>
           </IPhoneFrame>
@@ -223,7 +235,11 @@ function LightsSection() {
   );
 }
 
-// Curtains Section with Animated Button Text
+/* --------------------------------------------------
+   🪟 Curtains Section
+   - Keeps video logic untouched
+   - Refined button: animated label + haptic feedback
+   -------------------------------------------------- */
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -236,6 +252,7 @@ function CurtainsSection() {
 
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
 
+  // preload curtain video on mount
   useEffect(() => {
     if (videoRef.current) {
       const video = videoRef.current;
@@ -249,6 +266,7 @@ function CurtainsSection() {
     }
   }, []);
 
+  // auto close once in view
   useEffect(() => {
     if (isInView && !manualControl && curtainsState === "open" && videoLoaded) {
       const timer = setTimeout(() => {
@@ -264,10 +282,8 @@ function CurtainsSection() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
     canvas.width = video.videoWidth || 280;
     canvas.height = video.videoHeight || 560;
-
     try {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       setShowCanvas(true);
@@ -278,7 +294,6 @@ function CurtainsSection() {
 
   const playCurtainVideo = (action: "opening" | "closing") => {
     if (!videoRef.current || isAnimating || !videoLoaded) return;
-
     setIsAnimating(true);
     const video = videoRef.current;
     const newSrc =
@@ -298,11 +313,7 @@ function CurtainsSection() {
       preloadVideo.muted = true;
       preloadVideo.playsInline = true;
       preloadVideo.preload = "auto";
-      preloadVideo.style.position = "absolute";
-      preloadVideo.style.top = "-9999px";
-      preloadVideo.style.left = "-9999px";
       document.body.appendChild(preloadVideo);
-
       preloadVideo.addEventListener(
         "canplaythrough",
         () => {
@@ -321,7 +332,6 @@ function CurtainsSection() {
         },
         { once: true }
       );
-
       preloadVideo.load();
     }
 
@@ -339,6 +349,7 @@ function CurtainsSection() {
     playCurtainVideo(curtainsState === "open" ? "closing" : "opening");
   };
 
+  // Button label logic with intermediate states
   const buttonLabel = isAnimating
     ? curtainsState === "open"
       ? "Curtains Closing..."
@@ -387,43 +398,13 @@ function CurtainsSection() {
               />
             </div>
 
-            {/* Single Cycling Liquid Glass Button */}
+            {/* Glass Button with animated label */}
             <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
-              <motion.button
+              <GlassButton
+                label={buttonLabel}
                 onClick={handleCycle}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
                 disabled={isAnimating}
-                className="
-                  relative px-6 py-3 rounded-full text-sm font-medium
-                  backdrop-blur-xl border border-white/20
-                  transition-all duration-300 cursor-pointer text-white
-                  bg-white/12 hover:bg-white/18 shadow-lg
-                "
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)",
-                }}
-              >
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={buttonLabel}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {buttonLabel}
-                  </motion.span>
-                </AnimatePresence>
-                <div
-                  className="absolute inset-0 rounded-full pointer-events-none"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)",
-                  }}
-                />
-              </motion.button>
+              />
             </div>
           </IPhoneFrame>
         </motion.div>
@@ -452,7 +433,12 @@ function CurtainsSection() {
   );
 }
 
-// Climate Section refined
+/* --------------------------------------------------
+   🌡️ Climate Section
+   - Balanced grouping: bubble + mode buttons
+   - Bubble neutral glass, only text color changes
+   - Same GlassButton + label animation + haptic
+   -------------------------------------------------- */
 function ClimateSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [temperature, setTemperature] = useState(26);
@@ -461,27 +447,25 @@ function ClimateSection() {
   const [isAnimating, setIsAnimating] = useState(false);
   const isInView = useInView(containerRef, { once: true, amount: 0.4 });
 
+  // auto transition when scrolled into view
   useEffect(() => {
     if (isInView && !manual && !started) {
       setStarted(true);
-      animateToTemperature(18); // auto transition to cool
+      animateToTemperature(18); // auto-cool
     }
   }, [isInView, manual, started]);
 
   const animateToTemperature = (targetTemp: number) => {
     if (isAnimating) return;
     setIsAnimating(true);
-
     const currentTemp = temperature;
     const steps = Math.abs(targetTemp - currentTemp);
     const direction = targetTemp > currentTemp ? 1 : -1;
-
     let step = 0;
     const interval = setInterval(() => {
       step++;
       const newTemp = currentTemp + direction * step;
       setTemperature(newTemp);
-
       if (step >= steps) {
         clearInterval(interval);
         setIsAnimating(false);
@@ -495,9 +479,11 @@ function ClimateSection() {
     animateToTemperature(newTemp);
   };
 
+  // determine climate mode
   const mode =
     temperature <= 20 ? "cool" : temperature >= 24 ? "warm" : "comfort";
 
+  // text color only (bubble stays neutral)
   const textColor =
     mode === "cool"
       ? "text-blue-600"
@@ -547,14 +533,11 @@ function ClimateSection() {
                 style={{ objectPosition: "45% center" }}
               />
 
-              {/* Temperature Display Bubble */}
-              <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-30">
+              {/* Group: bubble + buttons */}
+              <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-30">
+                {/* Bubble */}
                 <motion.div
-                  className={`
-                    relative px-5 py-2.5 rounded-full
-                    backdrop-blur-xl border border-white/20
-                    bg-white/30 shadow-md
-                  `}
+                  className="relative px-5 py-2.5 rounded-full backdrop-blur-xl border border-white/20 bg-white/30 shadow-md"
                   animate={{
                     scale: mode === "comfort" ? 1 : 1.05,
                   }}
@@ -582,28 +565,25 @@ function ClimateSection() {
                     }}
                   />
                 </motion.div>
-              </div>
 
-              {/* Climate Buttons */}
-              <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-3">
-                <GlassButton
-                  active={temperature === 18}
-                  onClick={() => handleTempChange(18)}
-                >
-                  Cool
-                </GlassButton>
-                <GlassButton
-                  active={temperature === 22}
-                  onClick={() => handleTempChange(22)}
-                >
-                  Comfort
-                </GlassButton>
-                <GlassButton
-                  active={temperature === 26}
-                  onClick={() => handleTempChange(26)}
-                >
-                  Warm
-                </GlassButton>
+                {/* Buttons */}
+                <div className="flex gap-3">
+                  <GlassButton
+                    label="Cool"
+                    active={temperature === 18}
+                    onClick={() => handleTempChange(18)}
+                  />
+                  <GlassButton
+                    label="Comfort"
+                    active={temperature === 22}
+                    onClick={() => handleTempChange(22)}
+                  />
+                  <GlassButton
+                    label="Warm"
+                    active={temperature === 26}
+                    onClick={() => handleTempChange(26)}
+                  />
+                </div>
               </div>
             </div>
           </IPhoneFrame>
@@ -613,7 +593,9 @@ function ClimateSection() {
   );
 }
 
-// Footer
+/* --------------------------------------------------
+   ⚪ Footer
+   -------------------------------------------------- */
 function Footer() {
   return (
     <footer className="py-16 text-center bg-white">
@@ -624,7 +606,9 @@ function Footer() {
   );
 }
 
-// Main
+/* --------------------------------------------------
+   🏠 Main
+   -------------------------------------------------- */
 export default function HomePage() {
   return (
     <main className="overflow-x-hidden">
@@ -636,3 +620,4 @@ export default function HomePage() {
     </main>
   );
 }
+
