@@ -5,33 +5,41 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 /* --------------------------------------------------
-   📱 iPhone 15/16 Frame Component with Parallax
+   📱 iPhone 15/16 Frame Component
+   - Parallax only on mobile (disabled on desktop)
    -------------------------------------------------- */
 function IPhoneFrame({
   children,
-  parallax = true,
 }: {
   children: React.ReactNode;
-  parallax?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start end', 'end start'],
   });
 
-  // Parallax transform (slight vertical shift)
+  // Parallax transform only if mobile
   const y = useTransform(scrollYProgress, [0, 1], ['-3%', '3%']);
 
   return (
     <div className="relative" ref={ref}>
       <motion.div
-        style={parallax ? { y } : {}}
+        style={isMobile ? { y } : {}}
         className="relative w-[280px] h-[560px] bg-black rounded-[45px] p-2 shadow-[0_0_0_2px_#1a1a1a,0_0_60px_rgba(0,0,0,0.4)]"
       >
         <div className="relative w-full h-full bg-white rounded-[37px] overflow-hidden">
           <div className="absolute inset-0">{children}</div>
-          {/* Screen glare overlay */}
+          {/* Screen glare */}
           <div
             className="absolute inset-0 pointer-events-none rounded-[37px]"
             style={{
@@ -57,9 +65,9 @@ function IPhoneFrame({
 
 /* --------------------------------------------------
    🟢 Reusable Glass Button
-   - Unified style across all sections
-   - Animated labels (fade/scale)
-   - Haptic bounce feedback
+   - Unified style across sections
+   - Subtle active glow
+   - Animated labels + haptic bounce
    -------------------------------------------------- */
 function GlassButton({
   label,
@@ -442,7 +450,7 @@ function CurtainsSection() {
 }
 
 /* --------------------------------------------------
-   🌡️ Climate Section (Airflow restored)
+   🌡️ Climate Section with Airflow
    -------------------------------------------------- */
 function ClimateSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -452,7 +460,6 @@ function ClimateSection() {
   const [isAnimating, setIsAnimating] = useState(false);
   const isInView = useInView(containerRef, { once: true, amount: 0.4 });
 
-  // auto transition when scrolled into view
   useEffect(() => {
     if (isInView && !manual && !started) {
       setStarted(true);
@@ -487,7 +494,6 @@ function ClimateSection() {
   const mode =
     temperature <= 20 ? "cool" : temperature >= 24 ? "warm" : "comfort";
 
-  // Colors for air streams + balls
   const colors =
     mode === "cool"
       ? ["from-blue-400/40 to-cyan-300/20", "bg-blue-400/40"]
@@ -517,28 +523,9 @@ function ClimateSection() {
           <p className="text-lg text-gray-600 font-light mb-8">
             The perfect temperature, automatically.
           </p>
-
-          {/* Mode buttons reverted to original placement */}
-          <div className="flex gap-3">
-            <GlassButton
-              label="Cool"
-              active={temperature === 18}
-              onClick={() => handleTempChange(18)}
-            />
-            <GlassButton
-              label="Comfort"
-              active={temperature === 22}
-              onClick={() => handleTempChange(22)}
-            />
-            <GlassButton
-              label="Warm"
-              active={temperature === 26}
-              onClick={() => handleTempChange(26)}
-            />
-          </div>
         </motion.div>
 
-        {/* iPhone with Airflow */}
+        {/* iPhone with Bubble + Buttons + Airflow */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -556,10 +543,10 @@ function ClimateSection() {
                 style={{ objectPosition: "45% center" }}
               />
 
-              {/* Airflow effect: streams + balls */}
+              {/* Airflow (streams + balls) */}
               <motion.div
-                className={`absolute inset-0 pointer-events-none`}
                 key={mode}
+                className="absolute inset-0 pointer-events-none"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -568,37 +555,34 @@ function ClimateSection() {
                 {/* Streams */}
                 <motion.div
                   className={`absolute left-1/3 top-0 w-1 h-full bg-gradient-to-b ${colors[0]} blur-2xl`}
-                  animate={{ y: ["0%", "-10%", "0%"] }}
-                  transition={{ duration: 6, repeat: Infinity }}
-                />
-                <motion.div
-                  className={`absolute right-1/3 top-0 w-1 h-full bg-gradient-to-b ${colors[0]} blur-2xl`}
                   animate={{ y: ["0%", "-15%", "0%"] }}
                   transition={{ duration: 7, repeat: Infinity }}
                 />
-
-                {/* Floating balls */}
+                <motion.div
+                  className={`absolute right-1/3 top-0 w-1 h-full bg-gradient-to-b ${colors[0]} blur-2xl`}
+                  animate={{ y: ["0%", "-20%", "0%"] }}
+                  transition={{ duration: 8, repeat: Infinity }}
+                />
+                {/* Balls */}
                 <motion.div
                   className={`absolute ${colors[1]} w-3 h-3 rounded-full blur-md`}
                   style={{ top: "70%", left: "40%" }}
                   animate={{ y: ["0%", "-40%", "0%"] }}
-                  transition={{ duration: 5, repeat: Infinity }}
+                  transition={{ duration: 6, repeat: Infinity }}
                 />
                 <motion.div
                   className={`absolute ${colors[1]} w-2 h-2 rounded-full blur-sm`}
                   style={{ top: "60%", left: "60%" }}
                   animate={{ y: ["0%", "-30%", "0%"] }}
-                  transition={{ duration: 6, repeat: Infinity }}
+                  transition={{ duration: 5, repeat: Infinity }}
                 />
               </motion.div>
 
-              {/* Temperature bubble */}
-              <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-30">
+              {/* Bubble */}
+              <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-30">
                 <motion.div
                   className="relative px-5 py-2.5 rounded-full backdrop-blur-xl border border-white/20 bg-white/30 shadow-md"
-                  animate={{
-                    scale: mode === "comfort" ? 1 : 1.05,
-                  }}
+                  animate={{ scale: mode === "comfort" ? 1 : 1.05 }}
                   transition={{
                     duration: 1.5,
                     repeat: Infinity,
@@ -631,6 +615,25 @@ function ClimateSection() {
                     }}
                   />
                 </motion.div>
+              </div>
+
+              {/* Buttons under bubble inside iPhone */}
+              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-3 z-30">
+                <GlassButton
+                  label="Cool"
+                  active={temperature === 18}
+                  onClick={() => handleTempChange(18)}
+                />
+                <GlassButton
+                  label="Comfort"
+                  active={temperature === 22}
+                  onClick={() => handleTempChange(22)}
+                />
+                <GlassButton
+                  label="Warm"
+                  active={temperature === 26}
+                  onClick={() => handleTempChange(26)}
+                />
               </div>
             </div>
           </IPhoneFrame>
