@@ -217,6 +217,14 @@ function CurtainsSection() {
   const [videoError, setVideoError] = useState(false);
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
 
+  // Initialize video with opening video to avoid white screen
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.src = '/curtains-opening.mp4';
+      videoRef.current.load();
+    }
+  }, []);
+
   useEffect(() => {
     if (isInView && !manual && state === 'open') {
       const timer = setTimeout(() => playVideo('close'), 800);
@@ -257,7 +265,7 @@ function CurtainsSection() {
           className="flex justify-center order-2 md:order-1"
         >
           <IPhoneFrame>
-            <div className="relative w-full h-full overflow-hidden">
+            <div className="relative w-full h-full overflow-hidden bg-black">
               {/* Fallback image for when video fails or on mobile */}
               {videoError && (
                 <Image
