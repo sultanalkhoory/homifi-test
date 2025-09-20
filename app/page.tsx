@@ -407,11 +407,7 @@ function CurtainsSection() {
 }
 
 /* --------------------------------------------------
-   🌡️ Climate Section - RESTORED WORKING FRAMER MOTION VERSION
-   - COMPLETELY REMOVED CSS keyframes approach
-   - RESTORED original Framer Motion airflow streams and balls
-   - REMOVED all temperature display glow/animations
-   - BIGGER buttons and temperature display
+   🌡️ Climate Section – Gradual Temp Transitions + Dynamic Effects
    -------------------------------------------------- */
 function ClimateSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -421,7 +417,7 @@ function ClimateSection() {
   const [isAnimating, setIsAnimating] = useState(false);
   const isInView = useInView(containerRef, { once: true, amount: 0.4 });
 
-  // Auto transition 26 -> 18 on first view
+  // Auto trigger once in view (26 -> 18)
   useEffect(() => {
     if (isInView && !manual && !started) {
       setStarted(true);
@@ -432,299 +428,266 @@ function ClimateSection() {
   const animateToTemperature = (targetTemp: number) => {
     if (isAnimating) return;
     setIsAnimating(true);
-    const from = temperature;
-    const steps = Math.abs(targetTemp - from);
-    const dir = targetTemp > from ? 1 : -1;
+
+    const current = temperature;
+    const steps = Math.abs(targetTemp - current);
+    const dir = targetTemp > current ? 1 : -1;
+
     let step = 0;
-    const timer = setInterval(() => {
+    const interval = setInterval(() => {
       step++;
-      setTemperature(from + dir * step);
+      const newTemp = current + dir * step;
+      setTemperature(newTemp);
+
       if (step >= steps) {
-        clearInterval(timer);
+        clearInterval(interval);
         setIsAnimating(false);
       }
     }, 400);
   };
 
   const handleTempChange = (t: number) => {
-    if (temperature === t || isAnimating) return;
+    if (t === temperature || isAnimating) return;
     setManual(true);
     animateToTemperature(t);
   };
 
-  // Mode & colors
+  // Mode + dynamic colors
+  const getEffectColors = (t: number) => {
+    if (t >= 24) {
+      return {
+        primary: 'rgba(255, 193, 7, 0.1)',
+        secondary: 'rgba(255, 152, 0, 0.15)',
+        particle: 'bg-orange-200',
+        vignette: 'rgba(255, 193, 7, 0.05), rgba(255, 152, 0, 0.03)',
+      };
+    } else if (t <= 20) {
+      return {
+        primary: 'rgba(59, 130, 246, 0.18)',
+        secondary: 'rgba(96, 165, 250, 0.25)',
+        particle: 'bg-blue-200',
+        vignette: 'rgba(59, 130, 246, 0.05), rgba(96, 165, 250, 0.03)',
+      };
+    } else {
+      return {
+        primary: 'rgba(156, 163, 175, 0.15)',
+        secondary: 'rgba(209, 213, 219, 0.2)',
+        particle: 'bg-gray-200',
+        vignette: 'rgba(156, 163, 175, 0.04), rgba(209, 213, 219, 0.02)',
+      };
+    }
+  };
+
+  const colors = getEffectColors(temperature);
   const mode = temperature <= 20 ? 'cool' : temperature >= 24 ? 'warm' : 'comfort';
-  const tempTextColor =
-    mode === 'cool' ? 'text-blue-600' : mode === 'warm' ? 'text-amber-600' : 'text-gray-800';
 
   return (
-    <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-gradient-to-br from-blue-50 to-cyan-50">
-      <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-        {/* Copy */}
-        <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
-          <div className="text-sm uppercase tracking-wider text-blue-600 mb-3">Perfect Climate</div>
-          <h2 className="text-4xl md:text-5xl font-thin text-gray-900 mb-4">Always comfortable.</h2>
-          <p className="text-lg text-gray-600 font-light mb-8">The perfect temperature, automatically.</p>
-        </motion.div>
+    <>
+      <style jsx global>{`
+        @keyframes airFlow {
+          0% {
+            transform: translateX(-80px) translateY(5px) scale(0.8);
+            opacity: 0;
+          }
+          15% {
+            opacity: 0.8;
+          }
+          85% {
+            opacity: 0.8;
+          }
+          100% {
+            transform: translateX(300px) translateY(-15px) scale(1.1);
+            opacity: 0;
+          }
+        }
+        @keyframes particleFloat {
+          0% {
+            transform: translateX(-20px) translateY(10px);
+            opacity: 0;
+          }
+          50% {
+            opacity: 0.6;
+          }
+          100% {
+            transform: translateX(200px) translateY(-20px);
+            opacity: 0;
+          }
+        }
+        @keyframes sunbeamSubtle {
+          0% {
+            opacity: 0;
+            transform: rotate(-3deg) translateY(10px);
+          }
+          15% {
+            opacity: 0.8;
+          }
+          85% {
+            opacity: 0.8;
+          }
+          100% {
+            opacity: 0;
+            transform: rotate(3deg) translateY(-10px);
+          }
+        }
+      `}</style>
 
-        {/* iPhone with RESTORED WORKING airflow + properly positioned controls */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="flex justify-center"
-        >
-          <IPhoneFrame>
-            <div className="relative w-full h-full overflow-hidden">
-              {/* Background */}
-              <Image
-                src="/Curtains-Open-Lights-On.png"
-                alt="Climate room"
-                fill
-                className="object-cover"
-                style={{ objectPosition: '45% center' }}
+      <section
+        ref={containerRef}
+        className="min-h-screen flex items-center py-20 bg-gradient-to-br from-blue-50 to-cyan-50"
+      >
+        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+          {/* Copy */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <div className="text-sm uppercase text-blue-600 mb-3">
+              Perfect Climate
+            </div>
+            <h2 className="text-4xl md:text-5xl font-thin text-gray-900 mb-4">
+              Always comfortable.
+            </h2>
+            <p className="text-lg text-gray-600 font-light mb-8">
+              The perfect temperature, automatically.
+            </p>
+
+            <div className="flex gap-3">
+              <GlassButton
+                label="Cool"
+                active={temperature === 18}
+                onClick={() => handleTempChange(18)}
               />
+              <GlassButton
+                label="Comfort"
+                active={temperature === 22}
+                onClick={() => handleTempChange(22)}
+              />
+              <GlassButton
+                label="Warm"
+                active={temperature === 26}
+                onClick={() => handleTempChange(26)}
+              />
+            </div>
+          </motion.div>
 
-              {/* RESTORED WORKING Airflow overlay - original Framer Motion approach */}
-              <AnimatePresence mode="wait">
+          {/* iPhone */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="flex justify-center"
+          >
+            <IPhoneFrame>
+              <div className="relative w-full h-full overflow-hidden">
+                <Image
+                  src="/Curtains-Open-Lights-On.png"
+                  alt="Climate room"
+                  fill
+                  className="object-cover"
+                  style={{ objectPosition: '45% center' }}
+                />
+
+                {/* Dynamic Effects */}
                 <motion.div
-                  key={mode}
-                  className="absolute inset-0 pointer-events-none z-20"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 1.2 }}
+                  transition={{ duration: 1.5 }}
+                  className="absolute inset-0"
                 >
-                  {/* Main airflow streams - ORIGINAL WORKING VERSION */}
-                  <motion.div
-                    className="absolute left-[25%] top-0 w-1 h-full blur-xl"
-                    style={{
-                      background: mode === 'cool' 
-                        ? 'linear-gradient(to bottom, rgba(59, 130, 246, 0.8), rgba(14, 165, 233, 0.4), transparent)'
-                        : mode === 'warm'
-                        ? 'linear-gradient(to bottom, rgba(245, 158, 11, 0.8), rgba(251, 146, 60, 0.4), transparent)'
-                        : 'linear-gradient(to bottom, rgba(156, 163, 175, 0.6), rgba(209, 213, 219, 0.3), transparent)'
-                    }}
-                    animate={{ 
-                      y: ['0%', '-15%', '0%'],
-                      opacity: [0.6, 1, 0.6]
-                    }}
-                    transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-                  />
-                  
-                  <motion.div
-                    className="absolute right-[25%] top-0 w-1 h-full blur-xl"
-                    style={{
-                      background: mode === 'cool' 
-                        ? 'linear-gradient(to bottom, rgba(59, 130, 246, 0.8), rgba(14, 165, 233, 0.4), transparent)'
-                        : mode === 'warm'
-                        ? 'linear-gradient(to bottom, rgba(245, 158, 11, 0.8), rgba(251, 146, 60, 0.4), transparent)'
-                        : 'linear-gradient(to bottom, rgba(156, 163, 175, 0.6), rgba(209, 213, 219, 0.3), transparent)'
-                    }}
-                    animate={{ 
-                      y: ['0%', '-20%', '0%'],
-                      opacity: [0.6, 1, 0.6]
-                    }}
-                    transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-                  />
-
-                  {/* Subtle side streams */}
-                  <motion.div
-                    className="absolute left-[40%] top-0 w-0.5 h-full blur-lg"
-                    style={{
-                      background: mode === 'cool' 
-                        ? 'linear-gradient(to bottom, rgba(59, 130, 246, 0.5), transparent)'
-                        : mode === 'warm'
-                        ? 'linear-gradient(to bottom, rgba(245, 158, 11, 0.5), transparent)'
-                        : 'linear-gradient(to bottom, rgba(156, 163, 175, 0.4), transparent)'
-                    }}
-                    animate={{ 
-                      y: ['0%', '-25%', '0%'],
-                      opacity: [0.3, 0.7, 0.3]
-                    }}
-                    transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-                  />
-
-                  <motion.div
-                    className="absolute right-[40%] top-0 w-0.5 h-full blur-lg"
-                    style={{
-                      background: mode === 'cool' 
-                        ? 'linear-gradient(to bottom, rgba(59, 130, 246, 0.5), transparent)'
-                        : mode === 'warm'
-                        ? 'linear-gradient(to bottom, rgba(245, 158, 11, 0.5), transparent)'
-                        : 'linear-gradient(to bottom, rgba(156, 163, 175, 0.4), transparent)'
-                    }}
-                    animate={{ 
-                      y: ['0%', '-18%', '0%'],
-                      opacity: [0.3, 0.7, 0.3]
-                    }}
-                    transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}
-                  />
-
-                  {/* ORIGINAL floating orbs with glow - THE WORKING VERSION */}
-                  <motion.div
-                    className="absolute w-4 h-4 rounded-full blur-sm"
-                    style={{ 
-                      top: '65%', 
-                      left: '35%',
-                      background: mode === 'cool' 
-                        ? 'radial-gradient(circle, rgba(59, 130, 246, 0.8), rgba(59, 130, 246, 0.3))'
-                        : mode === 'warm'
-                        ? 'radial-gradient(circle, rgba(245, 158, 11, 0.8), rgba(245, 158, 11, 0.3))'
-                        : 'radial-gradient(circle, rgba(156, 163, 175, 0.6), rgba(156, 163, 175, 0.2))',
-                      boxShadow: mode === 'cool' 
-                        ? '0 0 20px rgba(59, 130, 246, 0.4)'
-                        : mode === 'warm'
-                        ? '0 0 20px rgba(245, 158, 11, 0.4)'
-                        : '0 0 15px rgba(156, 163, 175, 0.3)'
-                    }}
-                    animate={{ 
-                      y: ['0%', '-40%', '0%'],
-                      opacity: [0.6, 1, 0.6],
-                      scale: [1, 1.2, 1]
-                    }}
-                    transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-                  />
-                  
-                  <motion.div
-                    className="absolute w-3 h-3 rounded-full blur-sm"
-                    style={{ 
-                      top: '70%', 
-                      left: '65%',
-                      background: mode === 'cool' 
-                        ? 'radial-gradient(circle, rgba(59, 130, 246, 0.7), rgba(59, 130, 246, 0.2))'
-                        : mode === 'warm'
-                        ? 'radial-gradient(circle, rgba(245, 158, 11, 0.7), rgba(245, 158, 11, 0.2))'
-                        : 'radial-gradient(circle, rgba(156, 163, 175, 0.5), rgba(156, 163, 175, 0.1))',
-                      boxShadow: mode === 'cool' 
-                        ? '0 0 15px rgba(59, 130, 246, 0.3)'
-                        : mode === 'warm'
-                        ? '0 0 15px rgba(245, 158, 11, 0.3)'
-                        : '0 0 10px rgba(156, 163, 175, 0.2)'
-                    }}
-                    animate={{ 
-                      y: ['0%', '-35%', '0%'],
-                      opacity: [0.5, 0.9, 0.5],
-                      scale: [1, 1.3, 1]
-                    }}
-                    transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}
-                  />
-
-                  <motion.div
-                    className="absolute w-2 h-2 rounded-full blur-sm"
-                    style={{ 
-                      top: '60%', 
-                      left: '50%',
-                      background: mode === 'cool' 
-                        ? 'radial-gradient(circle, rgba(59, 130, 246, 0.6), rgba(59, 130, 246, 0.1))'
-                        : mode === 'warm'
-                        ? 'radial-gradient(circle, rgba(245, 158, 11, 0.6), rgba(245, 158, 11, 0.1))'
-                        : 'radial-gradient(circle, rgba(156, 163, 175, 0.4), rgba(156, 163, 175, 0.05))',
-                      boxShadow: mode === 'cool' 
-                        ? '0 0 10px rgba(59, 130, 246, 0.2)'
-                        : mode === 'warm'
-                        ? '0 0 10px rgba(245, 158, 11, 0.2)'
-                        : '0 0 8px rgba(156, 163, 175, 0.15)'
-                    }}
-                    animate={{ 
-                      y: ['0%', '-30%', '0%'],
-                      opacity: [0.4, 0.8, 0.4],
-                      scale: [1, 1.1, 1]
-                    }}
-                    transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-                  />
-                </motion.div>
-              </AnimatePresence>
-
-              {/* Control group - positioned properly with BIGGER sizing */}
-              <div className="absolute inset-x-0 bottom-0 z-30">
-                <div className="flex flex-col items-center justify-end pb-8 px-4 gap-4">
-                  {/* Temperature Bubble - BIGGER, NO GLOW/ANIMATIONS */}
-                  <div className="relative px-4 py-2 rounded-full backdrop-blur-xl border border-white/20 bg-white/30 shadow-md">
-                    <div className={`text-center ${tempTextColor}`}>
-                      <div className="text-xl font-light">{temperature}°C</div>
-                      <div className="text-[10px] uppercase tracking-wide opacity-80">
-                        {mode === 'cool' ? 'Cooling' : mode === 'warm' ? 'Warming' : 'Comfort'}
-                      </div>
-                    </div>
+                  {/* Air streams */}
+                  {[...Array(4)].map((_, i) => (
                     <div
-                      className="absolute inset-0 rounded-full pointer-events-none"
+                      key={`airstream-${i}`}
+                      className="absolute pointer-events-none"
                       style={{
-                        background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
+                        top: `${15 + i * 18}%`,
+                        left: mode === 'cool' ? '-20%' : undefined,
+                        right: mode === 'warm' ? '-20%' : undefined,
+                        width: '300px',
+                        height: '4px',
+                        background: `linear-gradient(90deg,
+                          transparent 0%,
+                          ${colors.primary} 30%,
+                          ${colors.secondary} 70%,
+                          transparent 100%
+                        )`,
+                        animation: `${
+                          mode === 'cool' ? 'airFlow' : 'sunbeamSubtle'
+                        } ${8 + i * 0.8}s ease-in-out infinite ${i * 1.5}s`,
+                        filter: 'blur(2px)',
                       }}
                     />
-                  </div>
+                  ))}
 
-                  {/* Mode Buttons - smaller and positioned to NOT get cropped */}
-                  <div className="flex gap-1.5">
-                    <motion.button
-                      onClick={() => handleTempChange(18)}
-                      whileTap={{ scale: 0.92 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                      className={`
-                        relative px-3 py-1.5 rounded-full text-xs font-medium
-                        backdrop-blur-xl border border-white/20 text-white shadow-lg
-                        transition-all duration-300 cursor-pointer
-                        ${temperature === 18 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
-                      `}
-                    >
-                      Cool
+                  {/* Vignette */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: `
+                        radial-gradient(ellipse 300px 200px at ${
+                          mode === 'cool' ? '40%' : '60%'
+                        } 40%,
+                          ${colors.vignette.split(',')[0]} 0%,
+                          ${colors.vignette.split(',')[1]} 40%,
+                          transparent 70%
+                        )
+                      `,
+                      animation: 'pulse 6s ease-in-out infinite',
+                    }}
+                  />
+
+                  {/* Particles */}
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={`particle-${i}`}
+                      className={`absolute w-1 h-1 ${colors.particle} rounded-full opacity-40`}
+                      style={{
+                        left: `${20 + (i % 3) * 25}%`,
+                        top: `${25 + (i % 2) * 20}%`,
+                        animation: `particleFloat ${
+                          4 + i * 0.4
+                        }s ease-in-out infinite ${i * 0.7}s`,
+                      }}
+                    />
+                  ))}
+                </motion.div>
+
+                {/* Temperature Bubble */}
+                <div className="absolute bottom-20 left-1/2 -translate-x-1/2">
+                  <motion.div
+                    className={`bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20`}
+                  >
+                    <div className="text-center">
                       <div
-                        className="absolute inset-0 rounded-full pointer-events-none"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
-                        }}
-                      />
-                    </motion.button>
-                    
-                    <motion.button
-                      onClick={() => handleTempChange(22)}
-                      whileTap={{ scale: 0.92 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                      className={`
-                        relative px-3 py-1.5 rounded-full text-xs font-medium
-                        backdrop-blur-xl border border-white/20 text-white shadow-lg
-                        transition-all duration-300 cursor-pointer
-                        ${temperature === 22 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
-                      `}
-                    >
-                      Comfort
-                      <div
-                        className="absolute inset-0 rounded-full pointer-events-none"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
-                        }}
-                      />
-                    </motion.button>
-                    
-                    <motion.button
-                      onClick={() => handleTempChange(26)}
-                      whileTap={{ scale: 0.92 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                      className={`
-                        relative px-3 py-1.5 rounded-full text-xs font-medium
-                        backdrop-blur-xl border border-white/20 text-white shadow-lg
-                        transition-all duration-300 cursor-pointer
-                        ${temperature === 26 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
-                      `}
-                    >
-                      Warm
-                      <div
-                        className="absolute inset-0 rounded-full pointer-events-none"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
-                        }}
-                      />
-                    </motion.button>
-                  </div>
+                        className={`text-2xl font-light ${
+                          mode === 'cool'
+                            ? 'text-blue-600'
+                            : mode === 'warm'
+                            ? 'text-orange-600'
+                            : 'text-gray-600'
+                        }`}
+                      >
+                        {temperature}°C
+                      </div>
+                      <div className="text-xs text-gray-500 uppercase tracking-wide">
+                        {mode === 'cool'
+                          ? 'Cooling'
+                          : mode === 'warm'
+                          ? 'Warming'
+                          : 'Perfect'}
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
               </div>
-            </div>
-          </IPhoneFrame>
-        </motion.div>
-      </div>
-    </section>
+            </IPhoneFrame>
+          </motion.div>
+        </div>
+      </section>
+    </>
   );
 }
 
