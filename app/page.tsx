@@ -276,6 +276,7 @@ function CurtainsSection() {
                 muted
                 playsInline
                 preload="auto"
+                poster="/Curtains-Open-Lights-On.png"
                 onError={() => setVideoError(true)}
                 onLoadStart={() => setVideoError(false)}
               />
