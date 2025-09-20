@@ -407,10 +407,11 @@ function CurtainsSection() {
 }
 
 /* --------------------------------------------------
-   🌡️ Climate Section - FULLY FIXED
-   - Restored ORIGINAL working airflow (the enhanced version that was visible)
-   - Removed ALL animations from temperature display
-   - Fixed button positioning so they're not cropped
+   🌡️ Climate Section - RESTORED WORKING FRAMER MOTION VERSION
+   - COMPLETELY REMOVED CSS keyframes approach
+   - RESTORED original Framer Motion airflow streams and balls
+   - REMOVED all temperature display glow/animations
+   - BIGGER buttons and temperature display
    -------------------------------------------------- */
 function ClimateSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -466,7 +467,7 @@ function ClimateSection() {
           <p className="text-lg text-gray-600 font-light mb-8">The perfect temperature, automatically.</p>
         </motion.div>
 
-        {/* iPhone with WORKING airflow + properly positioned controls */}
+        {/* iPhone with RESTORED WORKING airflow + properly positioned controls */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -485,7 +486,7 @@ function ClimateSection() {
                 style={{ objectPosition: '45% center' }}
               />
 
-              {/* RESTORED WORKING Airflow overlay - the enhanced version that was actually visible */}
+              {/* RESTORED WORKING Airflow overlay - original Framer Motion approach */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={mode}
@@ -495,7 +496,7 @@ function ClimateSection() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 1.2 }}
                 >
-                  {/* Main airflow streams - ENHANCED VISIBILITY (the working version) */}
+                  {/* Main airflow streams - ORIGINAL WORKING VERSION */}
                   <motion.div
                     className="absolute left-[25%] top-0 w-1 h-full blur-xl"
                     style={{
@@ -561,7 +562,7 @@ function ClimateSection() {
                     transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}
                   />
 
-                  {/* Enhanced floating orbs with glow - THE WORKING VERSION */}
+                  {/* ORIGINAL floating orbs with glow - THE WORKING VERSION */}
                   <motion.div
                     className="absolute w-4 h-4 rounded-full blur-sm"
                     style={{ 
@@ -636,13 +637,96 @@ function ClimateSection() {
                 </motion.div>
               </AnimatePresence>
 
-              {/* FIXED Control group - positioned to NOT get cropped */}
+              {/* Control group - positioned properly with BIGGER sizing */}
               <div className="absolute inset-x-0 bottom-0 z-30">
-                <div className="flex flex-col items-center justify-end pb-8 px-4 gap-3">
-                  {/* Temperature Bubble - NO ANIMATIONS, smaller */}
-                  <div className="relative px-3 py-1.5 rounded-full backdrop-blur-xl border border-white/20 bg-white/30 shadow-md">
+                <div className="flex flex-col items-center justify-end pb-8 px-4 gap-4">
+                  {/* Temperature Bubble - BIGGER, NO GLOW/ANIMATIONS */}
+                  <div className="relative px-4 py-2 rounded-full backdrop-blur-xl border border-white/20 bg-white/30 shadow-md">
                     <div className={`text-center ${tempTextColor}`}>
-                      <div className="text-base font-light">{temperature}°C</div>
+                      <div className="text-xl font-light">{temperature}°C</div>
+                      <div className="text-[10px] uppercase tracking-wide opacity-80">
+                        {mode === 'cool' ? 'Cooling' : mode === 'warm' ? 'Warming' : 'Comfort'}
+                      </div>
+                    </div>
+                    <div
+                      className="absolute inset-0 rounded-full pointer-events-none"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
+                      }}
+                    />
+                  </div>
+
+                  {/* Mode Buttons - BIGGER */}
+                  <div className="flex gap-2">
+                    <motion.button
+                      onClick={() => handleTempChange(18)}
+                      whileTap={{ scale: 0.92 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                      className={`
+                        relative px-5 py-2.5 rounded-full text-sm font-medium
+                        backdrop-blur-xl border border-white/20 text-white shadow-lg
+                        transition-all duration-300 cursor-pointer
+                        ${temperature === 18 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
+                      `}
+                    >
+                      Cool
+                      <div
+                        className="absolute inset-0 rounded-full pointer-events-none"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
+                        }}
+                      />
+                    </motion.button>
+                    
+                    <motion.button
+                      onClick={() => handleTempChange(22)}
+                      whileTap={{ scale: 0.92 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                      className={`
+                        relative px-5 py-2.5 rounded-full text-sm font-medium
+                        backdrop-blur-xl border border-white/20 text-white shadow-lg
+                        transition-all duration-300 cursor-pointer
+                        ${temperature === 22 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
+                      `}
+                    >
+                      Comfort
+                      <div
+                        className="absolute inset-0 rounded-full pointer-events-none"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
+                        }}
+                      />
+                    </motion.button>
+                    
+                    <motion.button
+                      onClick={() => handleTempChange(26)}
+                      whileTap={{ scale: 0.92 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                      className={`
+                        relative px-5 py-2.5 rounded-full text-sm font-medium
+                        backdrop-blur-xl border border-white/20 text-white shadow-lg
+                        transition-all duration-300 cursor-pointer
+                        ${temperature === 26 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
+                      `}
+                    >
+                      Warm
+                      <div
+                        className="absolute inset-0 rounded-full pointer-events-none"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
+                        }}
+                      />
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </IPhoneFrame>
+        </motion.div>
+      </div>
+    </section>
+  );
+} font-light">{temperature}°C</div>
                       <div className="text-[8px] uppercase tracking-wide opacity-80">
                         {mode === 'cool' ? 'Cooling' : mode === 'warm' ? 'Warming' : 'Comfort'}
                       </div>
