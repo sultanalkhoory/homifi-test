@@ -329,11 +329,8 @@ function CurtainsSection() {
       video.currentTime = 0;
       video.play().catch(() => {});
     } else {
-      // Different video - need to switch source
-      // Only capture frame if we're currently showing video (not already on canvas)
-      if (!showCanvas) {
-        captureCurrentFrame();
-      }
+      // Different video - capture current frame first
+      captureCurrentFrame();
       
       // Create preload video
       const preloadVideo = document.createElement('video');
@@ -349,23 +346,11 @@ function CurtainsSection() {
       preloadVideo.addEventListener('canplaythrough', () => {
         // Switch video source
         video.src = newSrc;
+        video.currentTime = 0;
         
-        // Set appropriate starting frame based on action
         video.addEventListener('loadeddata', () => {
-          if (action === 'opening') {
-            // Opening video should start from end (closed state) and play to beginning (open state)
-            video.currentTime = video.duration - 0.1;
-            // Wait a moment for the frame to load, then start playing
-            setTimeout(() => {
-              setShowCanvas(false); // Hide canvas, show video
-              video.play().catch(() => {});
-            }, 100);
-          } else {
-            // Closing video starts from beginning (open state)
-            video.currentTime = 0;
-            setShowCanvas(false); // Hide canvas, show video  
-            video.play().catch(() => {});
-          }
+          setShowCanvas(false); // Hide canvas, show video
+          video.play().catch(() => {});
           document.body.removeChild(preloadVideo);
         }, { once: true });
         
