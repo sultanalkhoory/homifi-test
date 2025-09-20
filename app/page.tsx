@@ -208,12 +208,13 @@ function LightsSection() {
   );
 }
 
-// Curtains Section - No Placeholder Images
+// Curtains Section - Mobile Video Fix
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [state, setState] = useState<'open' | 'closed'>('open');
   const [manual, setManual] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
 
   useEffect(() => {
@@ -229,7 +230,14 @@ function CurtainsSection() {
       video.src =
         action === 'open' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
       video.currentTime = 0;
-      video.play().catch(() => {});
+      
+      video.play().then(() => {
+        setVideoError(false);
+      }).catch(() => {
+        setVideoError(true);
+        setState(action === 'open' ? 'open' : 'closed');
+      });
+      
       setState(action === 'open' ? 'open' : 'closed');
     }
   };
@@ -249,7 +257,18 @@ function CurtainsSection() {
           className="flex justify-center order-2 md:order-1"
         >
           <IPhoneFrame>
-            <div className="relative w-full h-full overflow-hidden bg-black">
+            <div className="relative w-full h-full overflow-hidden">
+              {/* Fallback image for when video fails or on mobile */}
+              {videoError && (
+                <Image
+                  src={state === 'closed' ? "/Curtains-Closed-Lights-On.png" : "/Curtains-Open-Lights-On.png"}
+                  alt={state === 'closed' ? "Curtains closed" : "Curtains open"}
+                  fill
+                  className="object-cover"
+                  style={{ objectPosition: '60% center' }}
+                />
+              )}
+              
               <video
                 ref={videoRef}
                 className="absolute inset-0 w-full h-full object-cover"
@@ -257,6 +276,8 @@ function CurtainsSection() {
                 muted
                 playsInline
                 preload="auto"
+                onError={() => setVideoError(true)}
+                onLoadStart={() => setVideoError(false)}
               />
             </div>
           </IPhoneFrame>
