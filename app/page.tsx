@@ -642,7 +642,7 @@ function ClimateSection() {
                 </motion.div>
 
                 {/* Wall-mounted Smart Thermostat - liquid glass style, much smaller */}
-                <div className="absolute top-[40%] left-12 z-30">
+                <div className="absolute top-[40%] left-14 z-30">
                   <div className="relative">
                     {/* Thermostat body - liquid glass style, very small */}
                     <div className="w-8 h-8 backdrop-blur-xl bg-white/20 rounded-full shadow-lg border border-white/30">
