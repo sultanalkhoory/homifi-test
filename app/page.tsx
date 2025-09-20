@@ -179,7 +179,7 @@ function LightsSection() {
           className="flex justify-center"
         >
           <IPhoneFrame>
-            <div className="relative w-full h-full overflow-hidden">
+            <div className="relative w-full h-full overflow-hidden bg-black">
               <Image
                 src="/Curtains-Closed-Lights-Off.png"
                 alt="Room lights off"
