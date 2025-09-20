@@ -132,23 +132,26 @@ function LightsSection() {
       ref={containerRef}
       className="min-h-screen flex items-center py-20 bg-white"
     >
-      <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+      <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         {/* Text */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
           viewport={{ once: true }}
         >
-          <div className="text-sm uppercase text-blue-600 mb-3">
+          <div className="text-sm uppercase tracking-wider text-blue-600 font-medium mb-3">
             Perfect Light
           </div>
-          <h2 className="text-4xl md:text-5xl font-thin text-gray-900 mb-4">
-            Every room. Every moment.
+          <h2 className="text-4xl md:text-5xl font-thin text-gray-900 mb-4 leading-tight">
+            Every room.<br />
+            Every moment.
           </h2>
           <p className="text-lg text-gray-600 font-light mb-8">
             Exactly as you want it.
           </p>
+          
+          {/* iOS 18 Glass Controls */}
           <div className="flex gap-3">
             <GlassButton
               active={lightsState === 'off'}
@@ -170,11 +173,12 @@ function LightsSection() {
             </GlassButton>
           </div>
         </motion.div>
+        
         {/* iPhone */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
           viewport={{ once: true }}
           className="flex justify-center"
         >
@@ -186,11 +190,12 @@ function LightsSection() {
                 fill
                 className="object-cover"
                 style={{ objectPosition: '60% center' }}
+                quality={100}
               />
               <motion.div
                 className="absolute inset-0"
                 animate={{ opacity: lightsState === 'on' ? 1 : 0 }}
-                transition={{ duration: 1.2 }}
+                transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
                 <Image
                   src="/Curtains-Closed-Lights-On.png"
@@ -198,6 +203,7 @@ function LightsSection() {
                   fill
                   className="object-cover"
                   style={{ objectPosition: '60% center' }}
+                  quality={100}
                 />
               </motion.div>
             </div>
@@ -416,31 +422,80 @@ function CurtainsSection() {
   );
 }
 
-// Climate Section with Toggle Buttons
+// Climate Section with Gradual Temperature Transitions
 function ClimateSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [temperature, setTemperature] = useState(26);
   const [manual, setManual] = useState(false);
   const [started, setStarted] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const isInView = useInView(containerRef, { once: true, amount: 0.4 });
 
   useEffect(() => {
     if (isInView && !manual && !started) {
       setStarted(true);
-      const temps = [25, 24, 23, 22, 21, 20, 19, 18];
-      temps.forEach((t, i) =>
-        setTimeout(() => setTemperature(t), (i + 1) * 500)
-      );
+      animateToTemperature(18);
     }
   }, [isInView, manual, started]);
 
-  const handleTempChange = (newTemp: number) => {
-    setManual(true);
-    setTemperature(newTemp);
+  const animateToTemperature = (targetTemp: number) => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    
+    const currentTemp = temperature;
+    const steps = Math.abs(targetTemp - currentTemp);
+    const direction = targetTemp > currentTemp ? 1 : -1;
+    
+    let step = 0;
+    const interval = setInterval(() => {
+      step++;
+      const newTemp = currentTemp + (direction * step);
+      setTemperature(newTemp);
+      
+      if (step >= steps) {
+        clearInterval(interval);
+        setIsAnimating(false);
+      }
+    }, 400);
   };
 
-  const mode =
-    temperature <= 20 ? 'cool' : temperature >= 24 ? 'warm' : 'comfort';
+  const handleTempChange = (newTemp: number) => {
+    if (temperature === newTemp || isAnimating) return;
+    setManual(true);
+    animateToTemperature(newTemp);
+  };
+
+  // Dynamic color calculation based on temperature
+  const getEffectColors = (temp: number) => {
+    if (temp >= 24) {
+      // Warm colors (orange/amber)
+      return {
+        primary: 'rgba(255, 193, 7, 0.1)',
+        secondary: 'rgba(255, 152, 0, 0.15)',
+        particle: 'bg-orange-200',
+        vignette: 'rgba(255, 193, 7, 0.05), rgba(255, 152, 0, 0.03)'
+      };
+    } else if (temp <= 20) {
+      // Cool colors (blue)
+      return {
+        primary: 'rgba(59, 130, 246, 0.18)',
+        secondary: 'rgba(96, 165, 250, 0.25)',
+        particle: 'bg-blue-200',
+        vignette: 'rgba(59, 130, 246, 0.05), rgba(96, 165, 250, 0.03)'
+      };
+    } else {
+      // Comfort/neutral colors (white/light gray)
+      return {
+        primary: 'rgba(156, 163, 175, 0.15)',
+        secondary: 'rgba(209, 213, 219, 0.2)',
+        particle: 'bg-gray-200',
+        vignette: 'rgba(156, 163, 175, 0.04), rgba(209, 213, 219, 0.02)'
+      };
+    }
+  };
+
+  const colors = getEffectColors(temperature);
+  const mode = temperature <= 20 ? 'cool' : temperature >= 24 ? 'warm' : 'comfort';
 
   return (
     <>
@@ -549,123 +604,64 @@ function ClimateSection() {
                   className="object-cover"
                   style={{ objectPosition: '45% center' }}
                 />
-                {/* Cool Mode - Continuous Air Streams */}
-                {mode === 'cool' && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1.5, ease: [0.21, 0.47, 0.32, 0.98] }}
-                    className="absolute inset-0"
-                  >
-                    {/* Continuous air streams - matching warm mode intensity */}
-                    {[...Array(4)].map((_, i) => (
-                      <div
-                        key={`airstream-${i}`}
-                        className="absolute pointer-events-none"
-                        style={{
-                          top: `${15 + i * 18}%`,
-                          left: '-20%',
-                          width: '300px',
-                          height: '4px',
-                          background: `linear-gradient(90deg, 
-                            transparent 0%, 
-                            rgba(59, 130, 246, 0.18) 30%, 
-                            rgba(96, 165, 250, 0.25) 70%, 
-                            transparent 100%
-                          )`,
-                          animation: `airFlow ${8 + i * 0.8}s ease-in-out infinite ${i * 1.5}s`,
-                          filter: 'blur(2px)'
-                        }}
-                      />
-                    ))}
-                    
-                    {/* Continuous subtle cool vignette */}
-                    <div 
-                      className="absolute inset-0 pointer-events-none"
+                {/* Dynamic Climate Effects */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1.5, ease: [0.21, 0.47, 0.32, 0.98] }}
+                  className="absolute inset-0"
+                >
+                  {/* Air streams with dynamic colors */}
+                  {[...Array(4)].map((_, i) => (
+                    <div
+                      key={`airstream-${i}`}
+                      className="absolute pointer-events-none transition-all duration-500"
                       style={{
-                        background: `
-                          radial-gradient(ellipse 300px 200px at 40% 40%, 
-                            rgba(59, 130, 246, 0.05) 0%, 
-                            rgba(96, 165, 250, 0.03) 40%,
-                            transparent 70%
-                          )
-                        `,
-                        animation: 'pulse 6s ease-in-out infinite'
+                        top: `${15 + i * 18}%`,
+                        left: mode === 'cool' ? '-20%' : undefined,
+                        right: mode === 'warm' ? '-20%' : undefined,
+                        width: '300px',
+                        height: '4px',
+                        background: `linear-gradient(90deg, 
+                          transparent 0%, 
+                          ${colors.primary} 30%, 
+                          ${colors.secondary} 70%, 
+                          transparent 100%
+                        )`,
+                        animation: `${mode === 'cool' ? 'airFlow' : 'sunbeamSubtle'} ${8 + i * 0.8}s ease-in-out infinite ${i * 1.5}s`,
+                        filter: 'blur(2px)'
                       }}
                     />
-                    
-                    {/* Cool particle effects - matching warm mode */}
-                    {[...Array(3)].map((_, i) => (
-                      <div
-                        key={`cool-particle-${i}`}
-                        className="absolute w-1 h-1 bg-blue-200 rounded-full opacity-40"
-                        style={{
-                          left: `${20 + (i % 3) * 25}%`,
-                          top: `${25 + (i % 2) * 20}%`,
-                          animation: `particleFloat ${4 + (i * 0.4)}s ease-in-out infinite ${i * 0.7}s`
-                        }}
-                      />
-                    ))}
-                  </motion.div>
-                )}
-                {mode === 'warm' && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1.5, ease: [0.21, 0.47, 0.32, 0.98] }}
-                    className="absolute inset-0"
-                  >
-                    {/* Continuous subtle sunlight beams */}
-                    {[...Array(4)].map((_, i) => (
-                      <div
-                        key={`sunbeam-${i}`}
-                        className="absolute pointer-events-none"
-                        style={{
-                          top: `${10 + i * 20}%`,
-                          right: '-20%',
-                          width: '300px',
-                          height: '4px',
-                          background: `linear-gradient(90deg, 
-                            transparent 0%, 
-                            rgba(255, 193, 7, 0.1) 30%, 
-                            rgba(255, 152, 0, 0.15) 70%, 
-                            transparent 100%
-                          )`,
-                          animation: `sunbeamSubtle ${8 + i * 0.8}s ease-in-out infinite ${i * 1.5}s`,
-                          filter: 'blur(2px)'
-                        }}
-                      />
-                    ))}
-                    
-                    {/* Continuous subtle warm vignette */}
-                    <div 
-                      className="absolute inset-0 pointer-events-none"
+                  ))}
+                  
+                  {/* Dynamic vignette effect */}
+                  <div 
+                    className="absolute inset-0 pointer-events-none transition-all duration-500"
+                    style={{
+                      background: `
+                        radial-gradient(ellipse 300px 200px at ${mode === 'cool' ? '40%' : '60%'} 40%, 
+                          ${colors.vignette.split(',')[0]} 0%, 
+                          ${colors.vignette.split(',')[1]} 40%,
+                          transparent 70%
+                        )
+                      `,
+                      animation: 'pulse 6s ease-in-out infinite'
+                    }}
+                  />
+                  
+                  {/* Dynamic particles */}
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={`particle-${i}`}
+                      className={`absolute w-1 h-1 ${colors.particle} rounded-full opacity-40 transition-all duration-500`}
                       style={{
-                        background: `
-                          radial-gradient(ellipse 300px 200px at 60% 40%, 
-                            rgba(255, 193, 7, 0.05) 0%, 
-                            rgba(255, 152, 0, 0.03) 40%,
-                            transparent 70%
-                          )
-                        `,
-                        animation: 'pulse 6s ease-in-out infinite'
+                        left: `${20 + (i % 3) * 25}%`,
+                        top: `${25 + (i % 2) * 20}%`,
+                        animation: `particleFloat ${4 + (i * 0.4)}s ease-in-out infinite ${i * 0.7}s`
                       }}
                     />
-                    
-                    {/* Additional warm particle effects */}
-                    {[...Array(3)].map((_, i) => (
-                      <div
-                        key={`warm-particle-${i}`}
-                        className="absolute w-1 h-1 bg-orange-200 rounded-full opacity-40"
-                        style={{
-                          left: `${20 + (i % 3) * 25}%`,
-                          top: `${25 + (i % 2) * 20}%`,
-                          animation: `particleFloat ${4 + (i * 0.4)}s ease-in-out infinite ${i * 0.7}s`
-                        }}
-                      />
-                    ))}
-                  </motion.div>
-                )}
+                  ))}
+                </motion.div>
                 <div className="absolute bottom-20 left-1/2 -translate-x-1/2">
                   <motion.div 
                     className={`bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20 transition-all duration-500 ${
