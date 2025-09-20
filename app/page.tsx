@@ -219,15 +219,15 @@ function LightsSection() {
               <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
                 <motion.button
                   onClick={() => {
-                    if (isAnimating || !videoLoaded) return;
-                    
                     const action = curtainsState === 'open' ? 'closing' : 'opening';
-                    if ((action === 'closing' && curtainsState === 'closed') || 
-                        (action === 'opening' && curtainsState === 'open')) return;
+                    // Don't do anything if already in desired state
+                    if (action === 'closing' && curtainsState === 'closed') return;
+                    if (action === 'opening' && curtainsState === 'open') return;
                     
                     setManualControl(true);
                     playCurtainVideo(action);
                   }}
+                  disabled={isAnimating || !videoLoaded}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="
