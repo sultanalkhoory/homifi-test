@@ -542,7 +542,7 @@ function ClimateSection() {
                 )}
                 {mode === 'warm' && (
                   <>
-                    {/* Subtle sunlight beams */}
+                    {/* Continuous subtle sunlight beams */}
                     {[...Array(4)].map((_, i) => (
                       <div
                         key={`sunbeam-${i}`}
@@ -564,7 +564,7 @@ function ClimateSection() {
                       />
                     ))}
                     
-                    {/* Subtle warm vignette */}
+                    {/* Continuous subtle warm vignette */}
                     <div 
                       className="absolute inset-0 pointer-events-none"
                       style={{
@@ -578,6 +578,19 @@ function ClimateSection() {
                         animation: 'pulse 6s ease-in-out infinite'
                       }}
                     />
+                    
+                    {/* Additional warm particle effects */}
+                    {[...Array(3)].map((_, i) => (
+                      <div
+                        key={`warm-particle-${i}`}
+                        className="absolute w-1 h-1 bg-orange-200 rounded-full opacity-40"
+                        style={{
+                          left: `${20 + (i % 3) * 25}%`,
+                          top: `${25 + (i % 2) * 20}%`,
+                          animation: `particleFloat ${4 + (i * 0.4)}s ease-in-out infinite ${i * 0.7}s`
+                        }}
+                      />
+                    ))}
                   </>
                 )}
                 <div className="absolute bottom-20 left-1/2 -translate-x-1/2">
