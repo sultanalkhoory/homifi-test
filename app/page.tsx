@@ -151,7 +151,7 @@ function LightsSection() {
             Exactly as you want it.
           </p>
         </motion.div>
-        
+
         {/* iPhone */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -184,8 +184,8 @@ function LightsSection() {
                   quality={100}
                 />
               </motion.div>
-              
-              {/* Single Liquid Glass Toggle Button */}
+
+              {/* Toggle Button */}
               <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
                 <motion.button
                   onClick={() => {
@@ -201,53 +201,16 @@ function LightsSection() {
                     bg-white/12 hover:bg-white/18 shadow-lg
                   "
                   style={{
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)'
+                    background:
+                      'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)',
                   }}
                 >
                   {lightsState === 'off' ? 'Lights Off' : 'Lights On'}
-                  
-                  {/* Glass shine effect */}
-                  <div 
+                  <div
                     className="absolute inset-0 rounded-full pointer-events-none"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)'
-                    }}
-                  />
-                </motion.button>
-              </div>
-              {/* Single Liquid Glass Toggle Button */}
-              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
-                <motion.button
-                  onClick={() => {
-                    const action = curtainsState === 'open' ? 'closing' : 'opening';
-                    // Don't do anything if already in desired state
-                    if (action === 'closing' && curtainsState === 'closed') return;
-                    if (action === 'opening' && curtainsState === 'open') return;
-                    
-                    setManualControl(true);
-                    playCurtainVideo(action);
-                  }}
-                  disabled={isAnimating || !videoLoaded}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="
-                    relative px-6 py-3 rounded-full text-sm font-medium
-                    backdrop-blur-xl border border-white/20
-                    transition-all duration-300 cursor-pointer text-white
-                    bg-white/12 hover:bg-white/18 shadow-lg
-                  "
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)'
-                  }}
-                  disabled={isAnimating}
-                >
-                  {curtainsState === 'open' ? 'Close Curtains' : 'Open Curtains'}
-                  
-                  {/* Glass shine effect */}
-                  <div 
-                    className="absolute inset-0 rounded-full pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)'
+                      background:
+                        'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
                     }}
                   />
                 </motion.button>
@@ -260,7 +223,7 @@ function LightsSection() {
   );
 }
 
-// Curtains Section - KEEPING OUR WORKING VERSION
+// Curtains Section (restored with Open/Close GlassButtons)
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -270,26 +233,24 @@ function CurtainsSection() {
   const [manualControl, setManualControl] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [showCanvas, setShowCanvas] = useState(false);
-  
+
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
-  
-  // Initialize video with first frame
+
+  // Initialize video
   useEffect(() => {
     if (videoRef.current) {
       const video = videoRef.current;
       video.src = '/curtains-closing.mp4';
-      
       video.addEventListener('loadeddata', () => {
         video.currentTime = 0;
         video.pause();
         setVideoLoaded(true);
       });
-      
       video.load();
     }
   }, []);
-  
-  // Auto-play curtains closing on scroll
+
+  // Auto close on scroll
   useEffect(() => {
     if (isInView && !manualControl && curtainsState === 'open' && videoLoaded) {
       const timer = setTimeout(() => {
@@ -298,100 +259,88 @@ function CurtainsSection() {
       return () => clearTimeout(timer);
     }
   }, [isInView, manualControl, curtainsState, videoLoaded]);
-  
-  // Capture current frame to canvas
+
+  // Capture frame to canvas
   const captureCurrentFrame = () => {
     if (!videoRef.current || !canvasRef.current) return;
-    
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    
     if (!ctx) return;
-    
     canvas.width = video.videoWidth || 280;
     canvas.height = video.videoHeight || 560;
-    
     try {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       setShowCanvas(true);
-    } catch (error) {
-      console.log('Could not capture frame');
-    }
+    } catch {}
   };
-  
+
   const playCurtainVideo = (action: 'opening' | 'closing') => {
     if (!videoRef.current || isAnimating || !videoLoaded) return;
-    
     setIsAnimating(true);
     const video = videoRef.current;
-    const newSrc = action === 'opening' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
-    
+    const newSrc =
+      action === 'opening' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
     const currentSrc = video.src.split('/').pop() || '';
     const newSrcFile = newSrc.split('/').pop() || '';
-    
+
     if (currentSrc === newSrcFile) {
-      // Same video, just replay from beginning
       setShowCanvas(false);
       video.currentTime = 0;
       video.play().catch(() => {});
     } else {
-      // Different video - capture current frame first
       captureCurrentFrame();
-      
-      // Create preload video
       const preloadVideo = document.createElement('video');
       preloadVideo.src = newSrc;
       preloadVideo.muted = true;
       preloadVideo.playsInline = true;
       preloadVideo.preload = 'auto';
-      preloadVideo.style.position = 'absolute';
-      preloadVideo.style.top = '-9999px';
-      preloadVideo.style.left = '-9999px';
       document.body.appendChild(preloadVideo);
-      
-      preloadVideo.addEventListener('canplaythrough', () => {
-        // Switch video source
-        video.src = newSrc;
-        video.currentTime = 0;
-        
-        video.addEventListener('loadeddata', () => {
-          setShowCanvas(false); // Hide canvas, show video
-          video.play().catch(() => {});
-          document.body.removeChild(preloadVideo);
-        }, { once: true });
-        
-        video.load();
-      }, { once: true });
-      
+
+      preloadVideo.addEventListener(
+        'canplaythrough',
+        () => {
+          video.src = newSrc;
+          video.currentTime = 0;
+          video.addEventListener(
+            'loadeddata',
+            () => {
+              setShowCanvas(false);
+              video.play().catch(() => {});
+              document.body.removeChild(preloadVideo);
+            },
+            { once: true }
+          );
+          video.load();
+        },
+        { once: true }
+      );
       preloadVideo.load();
     }
-    
+
     video.onended = () => {
       video.pause();
-      // Set the correct end state based on action
       setCurtainsState(action === 'opening' ? 'open' : 'closed');
-      // FIXED: Position video at appropriate frame for BOTH actions
-      video.currentTime = video.duration - 0.1; // Near end for BOTH states
+      video.currentTime = video.duration - 0.1;
       setIsAnimating(false);
     };
   };
-  
+
   const handleManualToggle = (action: 'opening' | 'closing') => {
     if (isAnimating || !videoLoaded) return;
-    
-    // Don't do anything if already in desired state
     if (action === 'closing' && curtainsState === 'closed') return;
     if (action === 'opening' && curtainsState === 'open') return;
-    
     setManualControl(true);
     playCurtainVideo(action);
   };
-  
+
   return (
-    <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-gray-50">
+    <section
+      ref={containerRef}
+      className="min-h-screen flex items-center py-20 bg-gray-50"
+    >
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        {/* iPhone with Video Animation */}
+        {/* iPhone */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -401,24 +350,23 @@ function CurtainsSection() {
         >
           <IPhoneFrame>
             <div className="relative w-full h-full overflow-hidden bg-black">
-              {/* Loading placeholder */}
               {!videoLoaded && (
                 <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
                   <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                 </div>
               )}
-              
-              {/* Canvas for holding current frame */}
               <canvas
                 ref={canvasRef}
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-100 ${showCanvas ? 'opacity-100 z-20' : 'opacity-0 z-10'}`}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-100 ${
+                  showCanvas ? 'opacity-100 z-20' : 'opacity-0 z-10'
+                }`}
                 style={{ objectPosition: '60% center' }}
               />
-              
-              {/* Video */}
               <video
                 ref={videoRef}
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${videoLoaded ? 'opacity-100' : 'opacity-0'} ${showCanvas ? 'z-10' : 'z-20'}`}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+                  videoLoaded ? 'opacity-100' : 'opacity-0'
+                } ${showCanvas ? 'z-10' : 'z-20'}`}
                 style={{ objectPosition: '60% center' }}
                 muted
                 playsInline
@@ -427,8 +375,8 @@ function CurtainsSection() {
             </div>
           </IPhoneFrame>
         </motion.div>
-        
-        {/* Text Content */}
+
+        {/* Text */}
         <motion.div
           initial={{ opacity: 0, x: 30 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -446,13 +394,27 @@ function CurtainsSection() {
           <p className="text-lg text-gray-600 font-light mb-8">
             Exactly when you need it.
           </p>
+          <div className="flex gap-3">
+            <GlassButton
+              active={curtainsState === 'closed'}
+              onClick={() => handleManualToggle('closing')}
+            >
+              Close Curtains
+            </GlassButton>
+            <GlassButton
+              active={curtainsState === 'open'}
+              onClick={() => handleManualToggle('opening')}
+            >
+              Open Curtains
+            </GlassButton>
+          </div>
         </motion.div>
       </div>
     </section>
   );
 }
 
-// Climate Section with Gradual Temperature Transitions
+// Climate Section (Claude’s cycling toggle kept)
 function ClimateSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [temperature, setTemperature] = useState(26);
@@ -471,17 +433,14 @@ function ClimateSection() {
   const animateToTemperature = (targetTemp: number) => {
     if (isAnimating) return;
     setIsAnimating(true);
-    
     const currentTemp = temperature;
     const steps = Math.abs(targetTemp - currentTemp);
     const direction = targetTemp > currentTemp ? 1 : -1;
-    
     let step = 0;
     const interval = setInterval(() => {
       step++;
-      const newTemp = currentTemp + (direction * step);
+      const newTemp = currentTemp + direction * step;
       setTemperature(newTemp);
-      
       if (step >= steps) {
         clearInterval(interval);
         setIsAnimating(false);
@@ -492,52 +451,46 @@ function ClimateSection() {
   const handleTempCycle = () => {
     if (isAnimating) return;
     setManual(true);
-    
-    const currentMode = temperature <= 20 ? 'cool' : temperature >= 24 ? 'warm' : 'comfort';
+    const currentMode =
+      temperature <= 20 ? 'cool' : temperature >= 24 ? 'warm' : 'comfort';
     let nextTemp: number;
-    
     switch (currentMode) {
       case 'cool':
-        nextTemp = 22; // Go to comfort
+        nextTemp = 22;
         break;
       case 'comfort':
-        nextTemp = 26; // Go to warm
+        nextTemp = 26;
         break;
       case 'warm':
-        nextTemp = 18; // Go to cool
+        nextTemp = 18;
         break;
       default:
         nextTemp = 22;
     }
-    
     animateToTemperature(nextTemp);
   };
 
-  // Dynamic color calculation based on temperature
-  const getEffectColors = (temp: number) => {
+    const getEffectColors = (temp: number) => {
     if (temp >= 24) {
-      // Warm colors (orange/amber)
       return {
         primary: 'rgba(255, 193, 7, 0.1)',
         secondary: 'rgba(255, 152, 0, 0.15)',
         particle: 'bg-orange-200',
-        vignette: 'rgba(255, 193, 7, 0.05), rgba(255, 152, 0, 0.03)'
+        vignette: 'rgba(255, 193, 7, 0.05), rgba(255, 152, 0, 0.03)',
       };
     } else if (temp <= 20) {
-      // Cool colors (blue)
       return {
         primary: 'rgba(59, 130, 246, 0.18)',
         secondary: 'rgba(96, 165, 250, 0.25)',
         particle: 'bg-blue-200',
-        vignette: 'rgba(59, 130, 246, 0.05), rgba(96, 165, 250, 0.03)'
+        vignette: 'rgba(59, 130, 246, 0.05), rgba(96, 165, 250, 0.03)',
       };
     } else {
-      // Comfort/neutral colors (white/light gray)
       return {
         primary: 'rgba(156, 163, 175, 0.15)',
         secondary: 'rgba(209, 213, 219, 0.2)',
         particle: 'bg-gray-200',
-        vignette: 'rgba(156, 163, 175, 0.04), rgba(209, 213, 219, 0.02)'
+        vignette: 'rgba(156, 163, 175, 0.04), rgba(209, 213, 219, 0.02)',
       };
     }
   };
@@ -616,6 +569,7 @@ function ClimateSection() {
               The perfect temperature, automatically.
             </p>
           </motion.div>
+
           {/* iPhone */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -633,81 +587,79 @@ function ClimateSection() {
                   className="object-cover"
                   style={{ objectPosition: '45% center' }}
                 />
+
                 {/* Dynamic Climate Effects */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ duration: 1.5, ease: [0.21, 0.47, 0.32, 0.98] }}
+                  transition={{ duration: 1.5 }}
                   className="absolute inset-0"
                 >
-                  {/* Air streams with dynamic colors */}
                   {[...Array(4)].map((_, i) => (
                     <div
                       key={`airstream-${i}`}
-                      className="absolute pointer-events-none transition-all duration-500"
+                      className="absolute pointer-events-none"
                       style={{
                         top: `${15 + i * 18}%`,
                         left: mode === 'cool' ? '-20%' : undefined,
                         right: mode === 'warm' ? '-20%' : undefined,
                         width: '300px',
                         height: '4px',
-                        background: `linear-gradient(90deg, 
-                          transparent 0%, 
-                          ${colors.primary} 30%, 
-                          ${colors.secondary} 70%, 
-                          transparent 100%
-                        )`,
-                        animation: `${mode === 'cool' ? 'airFlow' : 'sunbeamSubtle'} ${8 + i * 0.8}s ease-in-out infinite ${i * 1.5}s`,
-                        filter: 'blur(2px)'
+                        background: `linear-gradient(90deg, transparent 0%, ${colors.primary} 30%, ${colors.secondary} 70%, transparent 100%)`,
+                        animation: `${
+                          mode === 'cool' ? 'airFlow' : 'sunbeamSubtle'
+                        } ${8 + i * 0.8}s ease-in-out infinite ${i * 1.5}s`,
+                        filter: 'blur(2px)',
                       }}
                     />
                   ))}
-                  
-                  {/* Dynamic vignette effect */}
-                  <div 
-                    className="absolute inset-0 pointer-events-none transition-all duration-500"
+
+                  {/* Dynamic vignette */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
                     style={{
                       background: `
-                        radial-gradient(ellipse 300px 200px at ${mode === 'cool' ? '40%' : '60%'} 40%, 
+                        radial-gradient(ellipse 300px 200px at ${
+                          mode === 'cool' ? '40%' : '60%'
+                        } 40%, 
                           ${colors.vignette.split(',')[0]} 0%, 
                           ${colors.vignette.split(',')[1]} 40%,
                           transparent 70%
                         )
                       `,
-                      animation: 'pulse 6s ease-in-out infinite'
+                      animation: 'pulse 6s ease-in-out infinite',
                     }}
                   />
-                  
-                  {/* Dynamic particles */}
+
+                  {/* Particles */}
                   {[...Array(3)].map((_, i) => (
                     <div
                       key={`particle-${i}`}
-                      className={`absolute w-1 h-1 ${colors.particle} rounded-full opacity-40 transition-all duration-500`}
+                      className={`absolute w-1 h-1 ${colors.particle} rounded-full opacity-40`}
                       style={{
                         left: `${20 + (i % 3) * 25}%`,
                         top: `${25 + (i % 2) * 20}%`,
-                        animation: `particleFloat ${4 + (i * 0.4)}s ease-in-out infinite ${i * 0.7}s`
+                        animation: `particleFloat ${
+                          4 + i * 0.4
+                        }s ease-in-out infinite ${i * 0.7}s`,
                       }}
                     />
                   ))}
                 </motion.div>
-                
-                {/* Liquid Glass Temperature Display */}
+
+                {/* Temperature Display */}
                 <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30">
-                  <motion.div 
+                  <motion.div
                     className="
                       relative px-6 py-3 rounded-full
                       backdrop-blur-xl border border-white/20
                       transition-all duration-500 shadow-lg
                       bg-white/12
                     "
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)'
-                    }}
                   >
                     <div className="text-center">
                       <div
-                        className={`text-2xl font-light transition-all duration-500 ${
+                        className={`text-2xl font-light ${
                           mode === 'cool'
                             ? 'text-blue-300'
                             : mode === 'warm'
@@ -725,18 +677,10 @@ function ClimateSection() {
                           : 'Perfect'}
                       </div>
                     </div>
-                    
-                    {/* Glass shine effect */}
-                    <div 
-                      className="absolute inset-0 rounded-full pointer-events-none"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)'
-                      }}
-                    />
                   </motion.div>
                 </div>
-                
-                {/* Cycling Mode Button */}
+
+                {/* Cycling Button */}
                 <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
                   <motion.button
                     onClick={handleTempCycle}
@@ -749,36 +693,29 @@ function ClimateSection() {
                       bg-white/12 hover:bg-white/18 shadow-lg
                     "
                     style={{
-                      background: mode === 'cool' 
-                        ? 'linear-gradient(135deg, rgba(59,130,246,0.2) 0%, rgba(59,130,246,0.1) 100%)'
-                        : mode === 'warm'
-                        ? 'linear-gradient(135deg, rgba(255,193,7,0.2) 0%, rgba(255,193,7,0.1) 100%)'
-                        : 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)'
+                      background:
+                        mode === 'cool'
+                          ? 'linear-gradient(135deg, rgba(59,130,246,0.2) 0%, rgba(59,130,246,0.1) 100%)'
+                          : mode === 'warm'
+                          ? 'linear-gradient(135deg, rgba(255,193,7,0.2) 0%, rgba(255,193,7,0.1) 100%)'
+                          : 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)',
                     }}
                     disabled={isAnimating}
                   >
-                    {mode === 'cool' ? 'Cool' : mode === 'warm' ? 'Warm' : 'Comfort'}
-                    
-                    {/* Glass shine effect */}
-                    <div 
+                    {mode === 'cool'
+                      ? 'Cool'
+                      : mode === 'warm'
+                      ? 'Warm'
+                      : 'Comfort'}
+                    <div
                       className="absolute inset-0 rounded-full pointer-events-none"
                       style={{
-                        background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)'
+                        background:
+                          'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
                       }}
                     />
                   </motion.button>
                 </div>
-                
-                {/* Cooling effect overlay */}
-                {mode === 'cool' && (
-                  <div 
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(180deg, rgba(59, 130, 246, 0.05) 0%, transparent 70%)',
-                      animation: 'pulse 3s ease-in-out infinite'
-                    }}
-                  />
-                )}
               </div>
             </IPhoneFrame>
           </motion.div>
@@ -792,7 +729,9 @@ function ClimateSection() {
 function Footer() {
   return (
     <footer className="py-16 text-center bg-white">
-      <p className="text-sm text-gray-500">Designed in Dubai. Built for your home.</p>
+      <p className="text-sm text-gray-500">
+        Designed in Dubai. Built for your home.
+      </p>
     </footer>
   );
 }
@@ -809,3 +748,4 @@ export default function HomePage() {
     </main>
   );
 }
+
