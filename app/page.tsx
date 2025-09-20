@@ -652,24 +652,6 @@ function ClimateSection() {
                       className="absolute inset-0 rounded-full pointer-events-none"
                       style={{
                         background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
-                         }}
-                </div>
-              </div>
-            </div>
-          </IPhoneFrame>
-        </motion.div>
-      </div>
-    </section>
-  );
-} font-light">{temperature}°C</div>
-                      <div className="text-[8px] uppercase tracking-wide opacity-80">
-                        {mode === 'cool' ? 'Cooling' : mode === 'warm' ? 'Warming' : 'Comfort'}
-                      </div>
-                    </div>
-                    <div
-                      className="absolute inset-0 rounded-full pointer-events-none"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
                       }}
                     />
                   </div>
