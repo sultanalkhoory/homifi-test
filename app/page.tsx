@@ -742,30 +742,6 @@ function ClimateSection() {
       </section>
     </>
   );
-}1/2 transform -translate-x-1/2">
-                <motion.div 
-                  className={`bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20 transition-all duration-500 ${
-                    isActive ? 'shadow-lg scale-105' : 'shadow-md'
-                  }`}
-                >
-                  <div className="text-center">
-                    <div className={`text-2xl font-light transition-all duration-500 ${
-                      isActive ? 'text-blue-600' : 'text-gray-600'
-                    }`}>
-                      {temperature}°C
-                    </div>
-                    <div className="text-xs text-gray-500 uppercase tracking-wide">
-                      {temperature < 20 ? 'Cooling' : temperature > 24 ? 'Warming' : 'Perfect'}
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </IPhoneFrame>
-        </motion.div>
-      </div>
-    </section>
-  );
 }
 
 // Footer
