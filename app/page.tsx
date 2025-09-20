@@ -407,7 +407,11 @@ function CurtainsSection() {
 }
 
 /* --------------------------------------------------
-   🌡️ Climate Section – Gradual Temp Transitions + Dynamic Effects
+   🌡️ Climate Section – FIXED VERSION
+   - Using ChatGPT's working CSS keyframes approach
+   - Controls moved INSIDE iPhone 
+   - Temperature display made static (no animations/blur effects)
+   - Bigger buttons as requested
    -------------------------------------------------- */
 function ClimateSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -552,24 +556,6 @@ function ClimateSection() {
             <p className="text-lg text-gray-600 font-light mb-8">
               The perfect temperature, automatically.
             </p>
-
-            <div className="flex gap-3">
-              <GlassButton
-                label="Cool"
-                active={temperature === 18}
-                onClick={() => handleTempChange(18)}
-              />
-              <GlassButton
-                label="Comfort"
-                active={temperature === 22}
-                onClick={() => handleTempChange(22)}
-              />
-              <GlassButton
-                label="Warm"
-                active={temperature === 26}
-                onClick={() => handleTempChange(26)}
-              />
-            </div>
           </motion.div>
 
           {/* iPhone */}
@@ -655,32 +641,94 @@ function ClimateSection() {
                   ))}
                 </motion.div>
 
-                {/* Temperature Bubble */}
-                <div className="absolute bottom-20 left-1/2 -translate-x-1/2">
-                  <motion.div
-                    className={`bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20`}
-                  >
-                    <div className="text-center">
-                      <div
-                        className={`text-2xl font-light ${
+                {/* Controls INSIDE iPhone */}
+                <div className="absolute inset-x-0 bottom-0 z-30">
+                  <div className="flex flex-col items-center justify-end pb-8 px-4 gap-4">
+                    {/* Temperature Bubble - STATIC, NO BLUR/ANIMATIONS */}
+                    <div className="relative px-4 py-2 rounded-full bg-white/80 border border-white/40 shadow-md">
+                      <div className="text-center">
+                        <div className={`text-xl font-light ${
                           mode === 'cool'
                             ? 'text-blue-600'
                             : mode === 'warm'
                             ? 'text-orange-600'
                             : 'text-gray-600'
-                        }`}
-                      >
-                        {temperature}°C
-                      </div>
-                      <div className="text-xs text-gray-500 uppercase tracking-wide">
-                        {mode === 'cool'
-                          ? 'Cooling'
-                          : mode === 'warm'
-                          ? 'Warming'
-                          : 'Perfect'}
+                        }`}>
+                          {temperature}°C
+                        </div>
+                        <div className="text-xs text-gray-500 uppercase tracking-wide">
+                          {mode === 'cool'
+                            ? 'Cooling'
+                            : mode === 'warm'
+                            ? 'Warming'
+                            : 'Perfect'}
+                        </div>
                       </div>
                     </div>
-                  </motion.div>
+
+                    {/* Mode Buttons - BIGGER, INSIDE iPhone */}
+                    <div className="flex gap-2">
+                      <motion.button
+                        onClick={() => handleTempChange(18)}
+                        whileTap={{ scale: 0.92 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                        className={`
+                          relative px-5 py-2.5 rounded-full text-sm font-medium
+                          backdrop-blur-xl border border-white/20 text-white shadow-lg
+                          transition-all duration-300 cursor-pointer
+                          ${temperature === 18 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
+                        `}
+                      >
+                        Cool
+                        <div
+                          className="absolute inset-0 rounded-full pointer-events-none"
+                          style={{
+                            background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
+                          }}
+                        />
+                      </motion.button>
+                      
+                      <motion.button
+                        onClick={() => handleTempChange(22)}
+                        whileTap={{ scale: 0.92 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                        className={`
+                          relative px-5 py-2.5 rounded-full text-sm font-medium
+                          backdrop-blur-xl border border-white/20 text-white shadow-lg
+                          transition-all duration-300 cursor-pointer
+                          ${temperature === 22 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
+                        `}
+                      >
+                        Comfort
+                        <div
+                          className="absolute inset-0 rounded-full pointer-events-none"
+                          style={{
+                            background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
+                          }}
+                        />
+                      </motion.button>
+                      
+                      <motion.button
+                        onClick={() => handleTempChange(26)}
+                        whileTap={{ scale: 0.92 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                        className={`
+                          relative px-5 py-2.5 rounded-full text-sm font-medium
+                          backdrop-blur-xl border border-white/20 text-white shadow-lg
+                          transition-all duration-300 cursor-pointer
+                          ${temperature === 26 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
+                        `}
+                      >
+                        Warm
+                        <div
+                          className="absolute inset-0 rounded-full pointer-events-none"
+                          style={{
+                            background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
+                          }}
+                        />
+                      </motion.button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </IPhoneFrame>
