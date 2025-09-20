@@ -549,7 +549,7 @@ function ClimateSection() {
                   className="object-cover"
                   style={{ objectPosition: '45% center' }}
                 />
-                {/* Cool Mode - Animated Air Streams with Smooth Fade-In */}
+                {/* Cool Mode - Continuous Air Streams */}
                 {mode === 'cool' && (
                   <motion.div
                     initial={{ opacity: 0 }}
@@ -557,59 +557,55 @@ function ClimateSection() {
                     transition={{ duration: 1.5, ease: [0.21, 0.47, 0.32, 0.98] }}
                     className="absolute inset-0"
                   >
-                    {/* Wavy air streams */}
-                    {[...Array(3)].map((_, i) => (
+                    {/* Continuous air streams - matching warm mode intensity */}
+                    {[...Array(4)].map((_, i) => (
                       <div
-                        key={i}
+                        key={`airstream-${i}`}
                         className="absolute pointer-events-none"
                         style={{
-                          top: `${25 + i * 15}%`,
-                          left: '-10%',
-                          width: '280px',
-                          height: '20px',
-                          animation: `airFlow ${
-                            4 + i * 0.5
-                          }s ease-in-out infinite ${i * 0.8}s`,
-                        }}
-                      >
-                        <svg width="280" height="20">
-                          <path
-                            d={`M 0,10 Q 70,${5 + i * 2} 140,10 T 280,10`}
-                            stroke="rgba(59,130,246,0.3)"
-                            strokeWidth="2"
-                            fill="none"
-                            style={{ filter: 'blur(1px)', strokeLinecap: 'round' }}
-                          />
-                        </svg>
-                      </div>
-                    ))}
-                    
-                    {/* Floating particles */}
-                    {[...Array(6)].map((_, i) => (
-                      <div
-                        key={`particle-${i}`}
-                        className="absolute w-1 h-1 bg-blue-300 rounded-full opacity-80"
-                        style={{
-                          left: `${15 + (i % 3) * 20}%`,
-                          top: `${30 + (i % 2) * 15}%`,
-                          animation: `particleFloat ${3 + (i * 0.3)}s ease-in-out infinite ${i * 0.5}s`
+                          top: `${15 + i * 18}%`,
+                          left: '-20%',
+                          width: '300px',
+                          height: '4px',
+                          background: `linear-gradient(90deg, 
+                            transparent 0%, 
+                            rgba(59, 130, 246, 0.1) 30%, 
+                            rgba(96, 165, 250, 0.15) 70%, 
+                            transparent 100%
+                          )`,
+                          animation: `airFlow ${8 + i * 0.8}s ease-in-out infinite ${i * 1.5}s`,
+                          filter: 'blur(2px)'
                         }}
                       />
                     ))}
                     
-                    {/* Subtle wave effect */}
+                    {/* Continuous subtle cool vignette */}
                     <div 
                       className="absolute inset-0 pointer-events-none"
                       style={{
                         background: `
-                          radial-gradient(ellipse 180px 80px at 50% 35%, 
-                            rgba(59, 130, 246, 0.08) 0%, 
-                            transparent 60%
+                          radial-gradient(ellipse 300px 200px at 40% 40%, 
+                            rgba(59, 130, 246, 0.05) 0%, 
+                            rgba(96, 165, 250, 0.03) 40%,
+                            transparent 70%
                           )
                         `,
-                        animation: 'pulse 5s ease-in-out infinite'
+                        animation: 'pulse 6s ease-in-out infinite'
                       }}
                     />
+                    
+                    {/* Cool particle effects - matching warm mode */}
+                    {[...Array(3)].map((_, i) => (
+                      <div
+                        key={`cool-particle-${i}`}
+                        className="absolute w-1 h-1 bg-blue-200 rounded-full opacity-40"
+                        style={{
+                          left: `${20 + (i % 3) * 25}%`,
+                          top: `${25 + (i % 2) * 20}%`,
+                          animation: `particleFloat ${4 + (i * 0.4)}s ease-in-out infinite ${i * 0.7}s`
+                        }}
+                      />
+                    ))}
                   </motion.div>
                 )}
                 {mode === 'warm' && (
