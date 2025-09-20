@@ -509,6 +509,113 @@ function ClimateSection() {
               The perfect temperature, automatically.
             </p>
             
+// Climate Section with Gradual Temperature Progression
+function ClimateSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [temperature, setTemperature] = useState(26); // Start at warm
+  const [isActive, setIsActive] = useState(false);
+  const [manualControl, setManualControl] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+  
+  const isInView = useInView(containerRef, { once: true, amount: 0.4 });
+  
+  // Gradual temperature progression: 26 → 25 → 24 → 23 → 22 → 21 → 20 → 19 → 18
+  useEffect(() => {
+    if (isInView && !manualControl && !hasStarted) {
+      setHasStarted(true);
+      setIsActive(true);
+      
+      // Gradually decrease temperature every 500ms
+      const temperatures = [25, 24, 23, 22, 21, 20, 19, 18];
+      temperatures.forEach((temp, index) => {
+        setTimeout(() => {
+          setTemperature(temp);
+        }, (index + 1) * 500); // 500ms intervals
+      });
+    }
+  }, [isInView, manualControl, hasStarted]);
+  
+  const handleTempChange = (newTemp: number) => {
+    setManualControl(true);
+    setTemperature(newTemp);
+    setIsActive(newTemp !== 22);
+  };
+  
+  const getTemperatureMode = () => {
+    if (temperature <= 20) return 'cool';
+    if (temperature >= 24) return 'warm';
+    return 'comfort';
+  };
+  
+  const mode = getTemperatureMode();
+  
+  return (
+    <>
+      <style jsx global>{`
+        @keyframes airFlow {
+          0% {
+            transform: translateX(-80px) translateY(5px) scale(0.8);
+            opacity: 0;
+          }
+          15% {
+            opacity: 0.4;
+          }
+          85% {
+            opacity: 0.4;
+          }
+          100% {
+            transform: translateX(300px) translateY(-15px) scale(1.1);
+            opacity: 0;
+          }
+        }
+        @keyframes particleFloat {
+          0% {
+            transform: translateX(-20px) translateY(10px);
+            opacity: 0;
+          }
+          50% {
+            opacity: 0.6;
+          }
+          100% {
+            transform: translateX(200px) translateY(-20px);
+            opacity: 0;
+          }
+        }
+        @keyframes sunbeamSubtle {
+          0% {
+            opacity: 0;
+            transform: rotate(-3deg) translateY(10px);
+          }
+          50% {
+            opacity: 0.15;
+          }
+          100% {
+            opacity: 0;
+            transform: rotate(3deg) translateY(-10px);
+          }
+        }
+      `}</style>
+      
+      <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-gradient-to-br from-blue-50 to-cyan-50">
+        <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          {/* Text Content */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+            viewport={{ once: true }}
+          >
+            <div className="text-sm uppercase tracking-wider text-blue-600 font-medium mb-3">
+              Perfect Climate
+            </div>
+            <h2 className="text-4xl md:text-5xl font-thin text-gray-900 mb-4 leading-tight">
+              Always<br />
+              comfortable.
+            </h2>
+            <p className="text-lg text-gray-600 font-light mb-8">
+              The perfect temperature, automatically.
+            </p>
+            
             <div className="space-y-4">
               <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
                 <span className="text-gray-700 font-medium">Temperature</span>
@@ -539,7 +646,186 @@ function ClimateSection() {
                 <GlassButton active={temperature === 26} onClick={() => handleTempChange(26)}>Warm</GlassButton>
               </div>
             </div>
-          </motion.div>backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+          </motion.div>
+          
+          {/* iPhone with Climate Visualization */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+            viewport={{ once: true }}
+            className="flex justify-center"
+          >
+            <IPhoneFrame>
+              <div className="relative w-full h-full overflow-hidden">
+                {/* Room Image */}
+                <Image
+                  src="/Curtains-Open-Lights-On.png"
+                  alt="Room with climate control"
+                  fill
+                  quality={100}
+                  className="object-cover"
+                  style={{ objectPosition: '45% center' }}
+                />
+                
+                {/* Cool Mode - Animated Air Streams (EXACT original animations) */}
+                {mode === 'cool' && (
+                  <>
+                    {/* Wavy air streams */}
+                    {[...Array(3)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="absolute pointer-events-none"
+                        style={{
+                          top: `${25 + i * 15}%`,
+                          left: '-10%',
+                          width: '280px',
+                          height: '20px',
+                          animation: `airFlow ${4 + i * 0.5}s ease-in-out infinite ${i * 0.8}s`
+                        }}
+                      >
+                        <svg width="280" height="20" viewBox="0 0 280 20" className="w-full h-full">
+                          <path
+                            d={`M 0,10 Q 70,${5 + i * 2} 140,10 T 280,10`}
+                            stroke="rgba(59, 130, 246, 0.3)"
+                            strokeWidth="2"
+                            fill="none"
+                            style={{
+                              filter: 'blur(1px)',
+                              strokeLinecap: 'round'
+                            }}
+                          />
+                        </svg>
+                      </div>
+                    ))}
+                    
+                    {/* Floating particles - Reduced */}
+                    {[...Array(6)].map((_, i) => (
+                      <div
+                        key={`particle-${i}`}
+                        className="absolute w-1 h-1 bg-blue-300 rounded-full opacity-80"
+                        style={{
+                          left: `${15 + (i % 3) * 20}%`,
+                          top: `${30 + (i % 2) * 15}%`,
+                          animation: `particleFloat ${3 + (i * 0.3)}s ease-in-out infinite ${i * 0.5}s`
+                        }}
+                      />
+                    ))}
+                    
+                    {/* Subtle wave effect */}
+                    <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: `
+                          radial-gradient(ellipse 180px 80px at 50% 35%, 
+                            rgba(59, 130, 246, 0.08) 0%, 
+                            transparent 60%
+                          )
+                        `,
+                        animation: 'pulse 5s ease-in-out infinite'
+                      }}
+                    />
+                  </>
+                )}
+                
+                {/* Warm Mode - Subtle Sunlight Beams */}
+                {mode === 'warm' && (
+                  <>
+                    {/* More subtle sunlight beams */}
+                    {[...Array(4)].map((_, i) => (
+                      <div
+                        key={`sunbeam-${i}`}
+                        className="absolute pointer-events-none"
+                        style={{
+                          top: `${10 + i * 20}%`,
+                          right: '-20%',
+                          width: '300px',
+                          height: '4px',
+                          background: `linear-gradient(90deg, 
+                            transparent 0%, 
+                            rgba(255, 193, 7, 0.1) 30%, 
+                            rgba(255, 152, 0, 0.15) 70%, 
+                            transparent 100%
+                          )`,
+                          animation: `sunbeamSubtle ${8 + i * 0.8}s ease-in-out infinite ${i * 1.5}s`,
+                          filter: 'blur(2px)'
+                        }}
+                      />
+                    ))}
+                    
+                    {/* More subtle warm vignette */}
+                    <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: `
+                          radial-gradient(ellipse 300px 200px at 60% 40%, 
+                            rgba(255, 193, 7, 0.05) 0%, 
+                            rgba(255, 152, 0, 0.03) 40%,
+                            transparent 70%
+                          )
+                        `,
+                        animation: 'pulse 6s ease-in-out infinite'
+                      }}
+                    />
+                  </>
+                )}
+                
+                {/* Temperature Display */}
+                <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
+                  <motion.div 
+                    className={`bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20 transition-all duration-500 ${
+                      mode === 'cool' ? 'shadow-lg scale-105 shadow-blue-500/20' : 
+                      mode === 'warm' ? 'shadow-lg scale-105 shadow-orange-500/20' :
+                      'shadow-md'
+                    }`}
+                    animate={mode === 'cool' ? { 
+                      boxShadow: [
+                        '0 10px 25px rgba(59, 130, 246, 0.2)',
+                        '0 10px 35px rgba(59, 130, 246, 0.3)',
+                        '0 10px 25px rgba(59, 130, 246, 0.2)'
+                      ]
+                    } : mode === 'warm' ? {
+                      boxShadow: [
+                        '0 10px 25px rgba(255, 152, 0, 0.2)',
+                        '0 10px 35px rgba(255, 152, 0, 0.3)',
+                        '0 10px 25px rgba(255, 152, 0, 0.2)'
+                      ]
+                    } : {}}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <div className="text-center">
+                      <div className={`text-2xl font-light transition-all duration-500 ${
+                        mode === 'cool' ? 'text-blue-600' : 
+                        mode === 'warm' ? 'text-orange-600' :
+                        'text-gray-600'
+                      }`}>
+                        {temperature}°C
+                      </div>
+                      <div className="text-xs text-gray-500 uppercase tracking-wide">
+                        {mode === 'cool' ? 'Cooling' : mode === 'warm' ? 'Warming' : 'Perfect'}
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+                
+                {/* Cooling effect overlay */}
+                {mode === 'cool' && (
+                  <div 
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(180deg, rgba(59, 130, 246, 0.05) 0%, transparent 70%)',
+                      animation: 'pulse 3s ease-in-out infinite'
+                    }}
+                  />
+                )}
+              </div>
+            </IPhoneFrame>
+          </motion.div>
+        </div>
+      </section>
+    </>
+  );
+}backdrop-blur-sm rounded-2xl p-4 border border-white/20">
                 <span className="text-gray-700 font-medium">Temperature</span>
                 <div className="flex items-center space-x-3">
                   <button
