@@ -470,8 +470,8 @@ function ClimateSection() {
     if (temp >= 24) {
       // Warm colors (orange/amber)
       return {
-        primary: 'rgba(255, 193, 7, 0.1)',
-        secondary: 'rgba(255, 152, 0, 0.15)',
+        primary: 'rgba(255, 193, 7, 0.18)',
+        secondary: 'rgba(255, 152, 0, 0.25)',
         particle: 'bg-orange-200',
         vignette: 'rgba(255, 193, 7, 0.05), rgba(255, 152, 0, 0.03)'
       };
@@ -486,8 +486,8 @@ function ClimateSection() {
     } else {
       // Comfort/neutral colors (white/light gray)
       return {
-        primary: 'rgba(156, 163, 175, 0.15)',
-        secondary: 'rgba(209, 213, 219, 0.2)',
+        primary: 'rgba(156, 163, 175, 0.18)',
+        secondary: 'rgba(209, 213, 219, 0.25)',
         particle: 'bg-gray-200',
         vignette: 'rgba(156, 163, 175, 0.04), rgba(209, 213, 219, 0.02)'
       };
