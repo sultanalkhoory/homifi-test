@@ -215,9 +215,34 @@ function LightsSection() {
                   />
                 </motion.button>
               </div>
-            </div>
-          </IPhoneFrame>
-        </motion.div>
+              {/* Single Liquid Glass Toggle Button */}
+              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
+                <motion.button
+                  onClick={() => handleManualToggle(curtainsState === 'open' ? 'closing' : 'opening')}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="
+                    relative px-6 py-3 rounded-full text-sm font-medium
+                    backdrop-blur-xl border border-white/20
+                    transition-all duration-300 cursor-pointer text-white
+                    bg-white/12 hover:bg-white/18 shadow-lg
+                  "
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)'
+                  }}
+                  disabled={isAnimating}
+                >
+                  {curtainsState === 'open' ? 'Close Curtains' : 'Open Curtains'}
+                  
+                  {/* Glass shine effect */}
+                  <div 
+                    className="absolute inset-0 rounded-full pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)'
+                    }}
+                  />
+                </motion.button>
+              </div>
       </div>
     </section>
   );
@@ -409,22 +434,6 @@ function CurtainsSection() {
           <p className="text-lg text-gray-600 font-light mb-8">
             Exactly when you need it.
           </p>
-          
-          {/* iOS 18 Glass Controls */}
-          <div className="flex gap-3">
-            <GlassButton 
-              active={curtainsState === 'closed'}
-              onClick={() => handleManualToggle('closing')}
-            >
-              Close Curtains
-            </GlassButton>
-            <GlassButton 
-              active={curtainsState === 'open'}
-              onClick={() => handleManualToggle('opening')}
-            >
-              Open Curtains
-            </GlassButton>
-          </div>
         </motion.div>
       </div>
     </section>
@@ -468,10 +477,28 @@ function ClimateSection() {
     }, 400);
   };
 
-  const handleTempChange = (newTemp: number) => {
-    if (temperature === newTemp || isAnimating) return;
+  const handleTempCycle = () => {
+    if (isAnimating) return;
     setManual(true);
-    animateToTemperature(newTemp);
+    
+    const currentMode = temperature <= 20 ? 'cool' : temperature >= 24 ? 'warm' : 'comfort';
+    let nextTemp: number;
+    
+    switch (currentMode) {
+      case 'cool':
+        nextTemp = 22; // Go to comfort
+        break;
+      case 'comfort':
+        nextTemp = 26; // Go to warm
+        break;
+      case 'warm':
+        nextTemp = 18; // Go to cool
+        break;
+      default:
+        nextTemp = 22;
+    }
+    
+    animateToTemperature(nextTemp);
   };
 
   // Dynamic color calculation based on temperature
@@ -576,28 +603,6 @@ function ClimateSection() {
             <p className="text-lg text-gray-600 font-light mb-8">
               The perfect temperature, automatically.
             </p>
-            
-            {/* Toggle Buttons */}
-            <div className="flex gap-3">
-              <GlassButton 
-                active={temperature === 18} 
-                onClick={() => handleTempChange(18)}
-              >
-                Cool
-              </GlassButton>
-              <GlassButton 
-                active={temperature === 22} 
-                onClick={() => handleTempChange(22)}
-              >
-                Comfort
-              </GlassButton>
-              <GlassButton 
-                active={temperature === 26} 
-                onClick={() => handleTempChange(26)}
-              >
-                Warm
-              </GlassButton>
-            </div>
           </motion.div>
           {/* iPhone */}
           <motion.div
@@ -674,27 +679,33 @@ function ClimateSection() {
                     />
                   ))}
                 </motion.div>
-                <div className="absolute bottom-20 left-1/2 -translate-x-1/2">
+                
+                {/* Liquid Glass Temperature Display */}
+                <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30">
                   <motion.div 
-                    className={`bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20 transition-all duration-500 ${
-                      mode === 'cool' ? 'shadow-lg scale-105 shadow-blue-500/20' : 
-                      mode === 'warm' ? 'shadow-lg scale-105 shadow-orange-500/20' :
-                      'shadow-md'
-                    }`}
+                    className="
+                      relative px-6 py-3 rounded-full
+                      backdrop-blur-xl border border-white/20
+                      transition-all duration-500 shadow-lg
+                      bg-white/12
+                    "
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)'
+                    }}
                   >
                     <div className="text-center">
                       <div
                         className={`text-2xl font-light transition-all duration-500 ${
                           mode === 'cool'
-                            ? 'text-blue-600'
+                            ? 'text-blue-300'
                             : mode === 'warm'
-                            ? 'text-orange-600'
-                            : 'text-gray-600'
+                            ? 'text-orange-300'
+                            : 'text-gray-200'
                         }`}
                       >
                         {temperature}°C
                       </div>
-                      <div className="text-xs text-gray-500 uppercase tracking-wide">
+                      <div className="text-xs text-white/70 uppercase tracking-wide">
                         {mode === 'cool'
                           ? 'Cooling'
                           : mode === 'warm'
@@ -702,7 +713,48 @@ function ClimateSection() {
                           : 'Perfect'}
                       </div>
                     </div>
+                    
+                    {/* Glass shine effect */}
+                    <div 
+                      className="absolute inset-0 rounded-full pointer-events-none"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)'
+                      }}
+                    />
                   </motion.div>
+                </div>
+                
+                {/* Cycling Mode Button */}
+                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
+                  <motion.button
+                    onClick={handleTempCycle}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="
+                      relative px-6 py-3 rounded-full text-sm font-medium
+                      backdrop-blur-xl border border-white/20
+                      transition-all duration-300 cursor-pointer text-white
+                      bg-white/12 hover:bg-white/18 shadow-lg
+                    "
+                    style={{
+                      background: mode === 'cool' 
+                        ? 'linear-gradient(135deg, rgba(59,130,246,0.2) 0%, rgba(59,130,246,0.1) 100%)'
+                        : mode === 'warm'
+                        ? 'linear-gradient(135deg, rgba(255,193,7,0.2) 0%, rgba(255,193,7,0.1) 100%)'
+                        : 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)'
+                    }}
+                    disabled={isAnimating}
+                  >
+                    {mode === 'cool' ? 'Cool' : mode === 'warm' ? 'Warm' : 'Comfort'}
+                    
+                    {/* Glass shine effect */}
+                    <div 
+                      className="absolute inset-0 rounded-full pointer-events-none"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)'
+                      }}
+                    />
+                  </motion.button>
                 </div>
                 
                 {/* Cooling effect overlay */}
