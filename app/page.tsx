@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
@@ -137,7 +137,7 @@ function HeroSection() {
   );
 }
 
-// Lights Section
+// Enhanced Lights Section with Timer-Based Animation
 function LightsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [manualControl, setManualControl] = useState(false);
@@ -149,7 +149,7 @@ function LightsSection() {
     if (isInView && !manualControl && lightsState === 'off') {
       const timer = setTimeout(() => {
         setLightsState('on');
-      }, 600);
+      }, 600); // Slower timing - lights turn on at 600ms
       return () => clearTimeout(timer);
     }
   }, [isInView, manualControl, lightsState]);
@@ -207,7 +207,7 @@ function LightsSection() {
         >
           <IPhoneFrame>
             <div className="relative w-full h-full overflow-hidden">
-              {/* Lights Off Image */}
+              {/* Lights Off Image - Ensure no white space */}
               <div className="absolute inset-0 bg-black">
                 <Image
                   src="/Curtains-Closed-Lights-Off.png"
@@ -225,7 +225,7 @@ function LightsSection() {
                 />
               </div>
               
-              {/* Lights On Image */}
+              {/* Lights On Image - Controlled by timer or manual */}
               <motion.div
                 className="absolute inset-0"
                 animate={{ opacity: lightsState === 'on' ? 1 : 0 }}
@@ -253,18 +253,20 @@ function LightsSection() {
   );
 }
 
-// Simple Curtains Section
+// Curtains Section - Video with Proper Frame Holding
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [curtainsState, setCurtainsState] = useState<'open' | 'closed'>('open');
   const [isAnimating, setIsAnimating] = useState(false);
   const [manualControl, setManualControl] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [showCanvas, setShowCanvas] = useState(false);
   
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
   
-  // Initialize with curtains-closing video, paused at first frame
+  // Initialize video with first frame
   useEffect(() => {
     if (videoRef.current) {
       const video = videoRef.current;
@@ -280,79 +282,114 @@ function CurtainsSection() {
     }
   }, []);
   
-  // Auto-close curtains when scrolled into view
+  // Auto-play curtains closing on scroll
   useEffect(() => {
-    if (isInView && !manualControl && curtainsState === 'open' && videoLoaded && !isAnimating) {
+    if (isInView && !manualControl && curtainsState === 'open' && videoLoaded) {
       const timer = setTimeout(() => {
-        closeCurtains();
+        playCurtainVideo('closing');
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [isInView, manualControl, curtainsState, videoLoaded, isAnimating]);
+  }, [isInView, manualControl, curtainsState, videoLoaded]);
   
-  const closeCurtains = () => {
-    if (!videoRef.current || isAnimating) return;
+  // Capture current frame to canvas
+  const captureCurrentFrame = () => {
+    if (!videoRef.current || !canvasRef.current) return;
     
-    setIsAnimating(true);
     const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
     
-    video.src = '/curtains-closing.mp4';
+    if (!ctx) return;
     
-    video.addEventListener('loadeddata', () => {
-      video.currentTime = 0;
-      video.play().catch(() => {});
-    }, { once: true });
+    canvas.width = video.videoWidth || 280;
+    canvas.height = video.videoHeight || 560;
     
-    video.addEventListener('ended', () => {
-      video.pause();
-      setCurtainsState('closed');
-      setIsAnimating(false);
-    }, { once: true });
-    
-    video.load();
+    try {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      setShowCanvas(true);
+    } catch (error) {
+      console.log('Could not capture frame');
+    }
   };
   
-  const openCurtains = () => {
-    if (!videoRef.current || isAnimating) return;
+  const playCurtainVideo = (action: 'opening' | 'closing') => {
+    if (!videoRef.current || isAnimating || !videoLoaded) return;
     
     setIsAnimating(true);
     const video = videoRef.current;
+    const newSrc = action === 'opening' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
     
-    video.src = '/curtains-opening.mp4';
+    const currentSrc = video.src.split('/').pop() || '';
+    const newSrcFile = newSrc.split('/').pop() || '';
     
-    video.addEventListener('loadeddata', () => {
+    if (currentSrc === newSrcFile) {
+      // Same video, just replay from beginning
+      setShowCanvas(false);
       video.currentTime = 0;
       video.play().catch(() => {});
-    }, { once: true });
+    } else {
+      // Different video - capture current frame first
+      captureCurrentFrame();
+      
+      // Create preload video
+      const preloadVideo = document.createElement('video');
+      preloadVideo.src = newSrc;
+      preloadVideo.muted = true;
+      preloadVideo.playsInline = true;
+      preloadVideo.preload = 'auto';
+      preloadVideo.style.position = 'absolute';
+      preloadVideo.style.top = '-9999px';
+      preloadVideo.style.left = '-9999px';
+      document.body.appendChild(preloadVideo);
+      
+      preloadVideo.addEventListener('canplaythrough', () => {
+        // Switch video source
+        video.src = newSrc;
+        video.currentTime = 0;
+        
+        video.addEventListener('loadeddata', () => {
+          setShowCanvas(false); // Hide canvas, show video
+          video.play().catch(() => {});
+          document.body.removeChild(preloadVideo);
+        }, { once: true });
+        
+        video.load();
+      }, { once: true });
+      
+      preloadVideo.load();
+    }
     
-    video.addEventListener('ended', () => {
+    video.onended = () => {
       video.pause();
-      setCurtainsState('open'); // Fixed: should be 'open' not 'closed'
+      // Set the correct end state based on action
+      setCurtainsState(action === 'opening' ? 'open' : 'closed');
+      // Position video at appropriate frame
+// Change this part in the onended handler:
+if (action === 'closing') {
+  video.currentTime = video.duration - 0.1; // Near end for closed state
+} else {
+  video.currentTime = video.duration - 0.1; // Should be near END for open state, not 0
+}
       setIsAnimating(false);
-    }, { once: true });
-    
-    video.load();
+    };
   };
   
   const handleManualToggle = (action: 'opening' | 'closing') => {
     if (isAnimating || !videoLoaded) return;
     
+    // Don't do anything if already in desired state
     if (action === 'closing' && curtainsState === 'closed') return;
     if (action === 'opening' && curtainsState === 'open') return;
     
     setManualControl(true);
-    
-    if (action === 'closing') {
-      closeCurtains();
-    } else {
-      openCurtains();
-    }
+    playCurtainVideo(action);
   };
   
   return (
     <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-gray-50">
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        {/* iPhone with Video */}
+        {/* iPhone with Video Animation */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -362,15 +399,24 @@ function CurtainsSection() {
         >
           <IPhoneFrame>
             <div className="relative w-full h-full overflow-hidden bg-black">
+              {/* Loading placeholder */}
               {!videoLoaded && (
                 <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
                   <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                 </div>
               )}
               
+              {/* Canvas for holding current frame */}
+              <canvas
+                ref={canvasRef}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-100 ${showCanvas ? 'opacity-100 z-20' : 'opacity-0 z-10'}`}
+                style={{ objectPosition: '60% center' }}
+              />
+              
+              {/* Video */}
               <video
                 ref={videoRef}
-                className={`w-full h-full object-cover transition-opacity duration-300 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${videoLoaded ? 'opacity-100' : 'opacity-0'} ${showCanvas ? 'z-10' : 'z-20'}`}
                 style={{ objectPosition: '60% center' }}
                 muted
                 playsInline
@@ -399,6 +445,7 @@ function CurtainsSection() {
             Exactly when you need it.
           </p>
           
+          {/* iOS 18 Glass Controls */}
           <div className="flex gap-3">
             <GlassButton 
               active={curtainsState === 'closed'}
@@ -416,243 +463,6 @@ function CurtainsSection() {
         </motion.div>
       </div>
     </section>
-  );
-}
-
-// Climate Section with AC Breeze Effects
-function ClimateSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [temperature, setTemperature] = useState(22);
-  const [isActive, setIsActive] = useState(false);
-  const [manualControl, setManualControl] = useState(false);
-  
-  const isInView = useInView(containerRef, { once: true, amount: 0.4 });
-  
-  // Auto-activate climate when scrolled into view
-  useEffect(() => {
-    if (isInView && !manualControl && !isActive) {
-      const timer = setTimeout(() => {
-        setIsActive(true);
-        setTemperature(20);
-      }, 600);
-      return () => clearTimeout(timer);
-    }
-  }, [isInView, manualControl, isActive]);
-  
-  const handleTempChange = (newTemp: number) => {
-    setManualControl(true);
-    setTemperature(newTemp);
-    setIsActive(newTemp !== 22);
-  };
-  
-  return (
-    <>
-      <style jsx global>{`
-        @keyframes airFlow {
-          0% {
-            transform: translateX(-80px) translateY(5px) scale(0.8);
-            opacity: 0;
-          }
-          15% {
-            opacity: 0.4;
-          }
-          85% {
-            opacity: 0.4;
-          }
-          100% {
-            transform: translateX(300px) translateY(-15px) scale(1.1);
-            opacity: 0;
-          }
-        }
-        @keyframes particleFloat {
-          0% {
-            transform: translateX(-20px) translateY(10px);
-            opacity: 0;
-          }
-          50% {
-            opacity: 0.6;
-          }
-          100% {
-            transform: translateX(200px) translateY(-20px);
-            opacity: 0;
-          }
-        }
-      `}</style>
-      
-      <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-gradient-to-br from-blue-50 to-cyan-50">
-        <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Text Content */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-            viewport={{ once: true }}
-          >
-            <div className="text-sm uppercase tracking-wider text-blue-600 font-medium mb-3">
-              Perfect Climate
-            </div>
-            <h2 className="text-4xl md:text-5xl font-thin text-gray-900 mb-4 leading-tight">
-              Always<br />
-              comfortable.
-            </h2>
-            <p className="text-lg text-gray-600 font-light mb-8">
-              The perfect temperature, automatically.
-            </p>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-                <span className="text-gray-700 font-medium">Temperature</span>
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={() => handleTempChange(Math.max(16, temperature - 1))}
-                    className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600 font-bold transition-colors"
-                  >
-                    −
-                  </button>
-                  <span className={`text-2xl font-light text-gray-800 min-w-[60px] text-center transition-all duration-500 ${isActive ? 'text-blue-600' : ''}`}>
-                    {temperature}°C
-                  </span>
-                  <button
-                    onClick={() => handleTempChange(Math.min(30, temperature + 1))}
-                    className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600 font-bold transition-colors"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-              
-              <div className="flex gap-2">
-                <GlassButton active={temperature === 18} onClick={() => handleTempChange(18)}>Cool</GlassButton>
-                <GlassButton active={temperature === 22} onClick={() => handleTempChange(22)}>Comfort</GlassButton>
-                <GlassButton active={temperature === 26} onClick={() => handleTempChange(26)}>Warm</GlassButton>
-              </div>
-            </div>
-          </motion.div>
-          
-          {/* iPhone with Climate Visualization */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-            viewport={{ once: true }}
-            className="flex justify-center"
-          >
-            <IPhoneFrame>
-              <div className="relative w-full h-full overflow-hidden">
-                {/* Room Image */}
-                <Image
-                  src="/Curtains-Open-Lights-On.png"
-                  alt="Room with climate control"
-                  fill
-                  quality={100}
-                  className="object-cover"
-                  style={{ objectPosition: '45% center' }}
-                />
-                
-                {/* Animated Air Streams - Wavy and Subtle */}
-                {isActive && (
-                  <>
-                    {/* Wavy air streams */}
-                    {[...Array(3)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="absolute pointer-events-none"
-                        style={{
-                          top: `${25 + i * 15}%`,
-                          left: '-10%',
-                          width: '280px',
-                          height: '20px',
-                          animation: `airFlow ${4 + i * 0.5}s ease-in-out infinite ${i * 0.8}s`
-                        }}
-                      >
-                        <svg width="280" height="20" viewBox="0 0 280 20" className="w-full h-full">
-                          <path
-                            d={`M 0,10 Q 70,${5 + i * 2} 140,10 T 280,10`}
-                            stroke="rgba(59, 130, 246, 0.3)"
-                            strokeWidth="2"
-                            fill="none"
-                            style={{
-                              filter: 'blur(1px)',
-                              strokeLinecap: 'round'
-                            }}
-                          />
-                        </svg>
-                      </div>
-                    ))}
-                    
-                    {/* Floating particles - Reduced */}
-                    {[...Array(6)].map((_, i) => (
-                      <div
-                        key={`particle-${i}`}
-                        className="absolute w-1 h-1 bg-blue-300 rounded-full opacity-80"
-                        style={{
-                          left: `${15 + (i % 3) * 20}%`,
-                          top: `${30 + (i % 2) * 15}%`,
-                          animation: `particleFloat ${3 + (i * 0.3)}s ease-in-out infinite ${i * 0.5}s`
-                        }}
-                      />
-                    ))}
-                    
-                    {/* Subtle wave effect */}
-                    <div 
-                      className="absolute inset-0 pointer-events-none"
-                      style={{
-                        background: `
-                          radial-gradient(ellipse 180px 80px at 50% 35%, 
-                            rgba(59, 130, 246, 0.08) 0%, 
-                            transparent 60%
-                          )
-                        `,
-                        animation: 'pulse 5s ease-in-out infinite'
-                      }}
-                    />
-                  </>
-                )}
-                
-                {/* Temperature Display */}
-                <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
-                  <motion.div 
-                    className={`bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20 transition-all duration-500 ${
-                      isActive ? 'shadow-lg scale-105 shadow-blue-500/20' : 'shadow-md'
-                    }`}
-                    animate={isActive ? { 
-                      boxShadow: [
-                        '0 10px 25px rgba(59, 130, 246, 0.2)',
-                        '0 10px 35px rgba(59, 130, 246, 0.3)',
-                        '0 10px 25px rgba(59, 130, 246, 0.2)'
-                      ]
-                    } : {}}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    <div className="text-center">
-                      <div className={`text-2xl font-light transition-all duration-500 ${
-                        isActive ? 'text-blue-600' : 'text-gray-600'
-                      }`}>
-                        {temperature}°C
-                      </div>
-                      <div className="text-xs text-gray-500 uppercase tracking-wide">
-                        {temperature < 20 ? 'Cooling' : temperature > 24 ? 'Warming' : 'Perfect'}
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
-                
-                {/* Cooling effect overlay */}
-                {isActive && temperature < 22 && (
-                  <div 
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(180deg, rgba(59, 130, 246, 0.05) 0%, transparent 70%)',
-                      animation: 'pulse 3s ease-in-out infinite'
-                    }}
-                  />
-                )}
-              </div>
-            </IPhoneFrame>
-          </motion.div>
-        </div>
-      </section>
-    </>
   );
 }
 
@@ -674,7 +484,6 @@ export default function HomePage() {
       <HeroSection />
       <LightsSection />
       <CurtainsSection />
-      <ClimateSection />
       <Footer />
     </main>
   );
