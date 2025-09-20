@@ -218,7 +218,16 @@ function LightsSection() {
               {/* Single Liquid Glass Toggle Button */}
               <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
                 <motion.button
-                  onClick={() => handleManualToggle(curtainsState === 'open' ? 'closing' : 'opening')}
+                  onClick={() => {
+                    if (isAnimating || !videoLoaded) return;
+                    
+                    const action = curtainsState === 'open' ? 'closing' : 'opening';
+                    if ((action === 'closing' && curtainsState === 'closed') || 
+                        (action === 'opening' && curtainsState === 'open')) return;
+                    
+                    setManualControl(true);
+                    playCurtainVideo(action);
+                  }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="
