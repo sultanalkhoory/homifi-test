@@ -224,23 +224,32 @@ function CurtainsSection() {
     }
   }, [isInView, manual, state]);
 
-  const playVideo = (action: 'open' | 'close') => {
-    if (videoRef.current) {
-      const video = videoRef.current;
-      video.src =
-        action === 'open' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
-      video.currentTime = 0;
-      
-      video.play().then(() => {
+const playVideo = (action: 'open' | 'close') => {
+  if (videoRef.current) {
+    const video = videoRef.current;
+    video.src =
+      action === 'open' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
+    video.currentTime = 0;
+
+    // ✅ Fix for iOS Safari / mobile
+    video.muted = true;
+    video.playsInline = true;
+    video.load(); // force reload before play()
+
+    video
+      .play()
+      .then(() => {
         setVideoError(false);
-      }).catch(() => {
+        setState(action === 'open' ? 'open' : 'closed');
+      })
+      .catch((err) => {
+        console.warn('Curtain video play error:', err);
         setVideoError(true);
         setState(action === 'open' ? 'open' : 'closed');
       });
-      
-      setState(action === 'open' ? 'open' : 'closed');
-    }
-  };
+  }
+};
+
 
   return (
     <section
