@@ -223,12 +223,12 @@ function LightsSection() {
   );
 }
 
-// Curtains Section (restored with Open/Close GlassButtons)
+// Curtains Section with Single Cycling Button
 function CurtainsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [curtainsState, setCurtainsState] = useState<'open' | 'closed'>('open');
+  const [curtainsState, setCurtainsState] = useState<"open" | "closed">("open");
   const [isAnimating, setIsAnimating] = useState(false);
   const [manualControl, setManualControl] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
@@ -236,12 +236,11 @@ function CurtainsSection() {
 
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
 
-  // Initialize video
   useEffect(() => {
     if (videoRef.current) {
       const video = videoRef.current;
-      video.src = '/curtains-closing.mp4';
-      video.addEventListener('loadeddata', () => {
+      video.src = "/curtains-closing.mp4";
+      video.addEventListener("loadeddata", () => {
         video.currentTime = 0;
         video.pause();
         setVideoLoaded(true);
@@ -250,39 +249,43 @@ function CurtainsSection() {
     }
   }, []);
 
-  // Auto close on scroll
   useEffect(() => {
-    if (isInView && !manualControl && curtainsState === 'open' && videoLoaded) {
+    if (isInView && !manualControl && curtainsState === "open" && videoLoaded) {
       const timer = setTimeout(() => {
-        playCurtainVideo('closing');
+        playCurtainVideo("closing");
       }, 800);
       return () => clearTimeout(timer);
     }
   }, [isInView, manualControl, curtainsState, videoLoaded]);
 
-  // Capture frame to canvas
   const captureCurrentFrame = () => {
     if (!videoRef.current || !canvasRef.current) return;
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
     canvas.width = video.videoWidth || 280;
     canvas.height = video.videoHeight || 560;
+
     try {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       setShowCanvas(true);
-    } catch {}
+    } catch {
+      console.log("Could not capture frame");
+    }
   };
 
-  const playCurtainVideo = (action: 'opening' | 'closing') => {
+  const playCurtainVideo = (action: "opening" | "closing") => {
     if (!videoRef.current || isAnimating || !videoLoaded) return;
+
     setIsAnimating(true);
     const video = videoRef.current;
     const newSrc =
-      action === 'opening' ? '/curtains-opening.mp4' : '/curtains-closing.mp4';
-    const currentSrc = video.src.split('/').pop() || '';
-    const newSrcFile = newSrc.split('/').pop() || '';
+      action === "opening" ? "/curtains-opening.mp4" : "/curtains-closing.mp4";
+
+    const currentSrc = video.src.split("/").pop() || "";
+    const newSrcFile = newSrc.split("/").pop() || "";
 
     if (currentSrc === newSrcFile) {
       setShowCanvas(false);
@@ -290,20 +293,23 @@ function CurtainsSection() {
       video.play().catch(() => {});
     } else {
       captureCurrentFrame();
-      const preloadVideo = document.createElement('video');
+      const preloadVideo = document.createElement("video");
       preloadVideo.src = newSrc;
       preloadVideo.muted = true;
       preloadVideo.playsInline = true;
-      preloadVideo.preload = 'auto';
+      preloadVideo.preload = "auto";
+      preloadVideo.style.position = "absolute";
+      preloadVideo.style.top = "-9999px";
+      preloadVideo.style.left = "-9999px";
       document.body.appendChild(preloadVideo);
 
       preloadVideo.addEventListener(
-        'canplaythrough',
+        "canplaythrough",
         () => {
           video.src = newSrc;
           video.currentTime = 0;
           video.addEventListener(
-            'loadeddata',
+            "loadeddata",
             () => {
               setShowCanvas(false);
               video.play().catch(() => {});
@@ -315,23 +321,22 @@ function CurtainsSection() {
         },
         { once: true }
       );
+
       preloadVideo.load();
     }
 
     video.onended = () => {
       video.pause();
-      setCurtainsState(action === 'opening' ? 'open' : 'closed');
+      setCurtainsState(action === "opening" ? "open" : "closed");
       video.currentTime = video.duration - 0.1;
       setIsAnimating(false);
     };
   };
 
-  const handleManualToggle = (action: 'opening' | 'closing') => {
+  const handleCycle = () => {
     if (isAnimating || !videoLoaded) return;
-    if (action === 'closing' && curtainsState === 'closed') return;
-    if (action === 'opening' && curtainsState === 'open') return;
     setManualControl(true);
-    playCurtainVideo(action);
+    playCurtainVideo(curtainsState === "open" ? "closing" : "opening");
   };
 
   return (
@@ -340,11 +345,11 @@ function CurtainsSection() {
       className="min-h-screen flex items-center py-20 bg-gray-50"
     >
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        {/* iPhone */}
+        {/* iPhone with Curtains Video */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+          transition={{ duration: 0.8 }}
           viewport={{ once: true }}
           className="flex justify-center order-2 md:order-1"
         >
@@ -358,61 +363,77 @@ function CurtainsSection() {
               <canvas
                 ref={canvasRef}
                 className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-100 ${
-                  showCanvas ? 'opacity-100 z-20' : 'opacity-0 z-10'
+                  showCanvas ? "opacity-100 z-20" : "opacity-0 z-10"
                 }`}
-                style={{ objectPosition: '60% center' }}
+                style={{ objectPosition: "60% center" }}
               />
               <video
                 ref={videoRef}
                 className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-                  videoLoaded ? 'opacity-100' : 'opacity-0'
-                } ${showCanvas ? 'z-10' : 'z-20'}`}
-                style={{ objectPosition: '60% center' }}
+                  videoLoaded ? "opacity-100" : "opacity-0"
+                } ${showCanvas ? "z-10" : "z-20"}`}
+                style={{ objectPosition: "60% center" }}
                 muted
                 playsInline
                 preload="auto"
               />
             </div>
+
+            {/* Single Cycling Liquid Glass Button */}
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
+              <motion.button
+                onClick={handleCycle}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                disabled={isAnimating}
+                className="
+                  relative px-6 py-3 rounded-full text-sm font-medium
+                  backdrop-blur-xl border border-white/20
+                  transition-all duration-300 cursor-pointer text-white
+                  bg-white/12 hover:bg-white/18 shadow-lg
+                "
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)",
+                }}
+              >
+                {curtainsState === "open" ? "Close Curtains" : "Open Curtains"}
+                <div
+                  className="absolute inset-0 rounded-full pointer-events-none"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)",
+                  }}
+                />
+              </motion.button>
+            </div>
           </IPhoneFrame>
         </motion.div>
 
-        {/* Text */}
+        {/* Text Content */}
         <motion.div
           initial={{ opacity: 0, x: 30 }}
           whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+          transition={{ duration: 0.8 }}
           viewport={{ once: true }}
           className="order-1 md:order-2"
         >
-          <div className="text-sm uppercase tracking-wider text-blue-600 font-medium mb-3">
+          <div className="text-sm uppercase tracking-wider text-blue-600 mb-3">
             Perfect Privacy
           </div>
           <h2 className="text-4xl md:text-5xl font-thin text-gray-900 mb-4 leading-tight">
-            Comfort<br />
+            Comfort <br />
             and control.
           </h2>
           <p className="text-lg text-gray-600 font-light mb-8">
             Exactly when you need it.
           </p>
-          <div className="flex gap-3">
-            <GlassButton
-              active={curtainsState === 'closed'}
-              onClick={() => handleManualToggle('closing')}
-            >
-              Close Curtains
-            </GlassButton>
-            <GlassButton
-              active={curtainsState === 'open'}
-              onClick={() => handleManualToggle('opening')}
-            >
-              Open Curtains
-            </GlassButton>
-          </div>
         </motion.div>
       </div>
     </section>
   );
 }
+
 
 // Climate Section with Glass Buttons + Tinted Temperature Bubble
 function ClimateSection() {
