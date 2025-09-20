@@ -641,11 +641,11 @@ function ClimateSection() {
                   ))}
                 </motion.div>
 
-                {/* Wall-mounted Smart Thermostat */}
-                <div className="absolute top-1/3 right-8 z-30">
+                {/* Wall-mounted Smart Thermostat - positioned on left wall between panels */}
+                <div className="absolute top-1/2 left-6 z-30 -translate-y-1/2">
                   <div className="relative">
-                    {/* Thermostat body - small, white, wall-mounted style */}
-                    <div className="w-20 h-20 bg-white rounded-full shadow-lg border border-gray-200">
+                    {/* Thermostat body - small, white, wall-mounted on actual wall */}
+                    <div className="w-16 h-16 bg-white rounded-full shadow-lg border border-gray-200">
                       {/* Outer ring indicator */}
                       <div 
                         className="absolute inset-1 rounded-full border-2"
@@ -657,7 +657,7 @@ function ClimateSection() {
                       {/* Center display */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <div 
-                          className="text-lg font-medium"
+                          className="text-sm font-medium"
                           style={{
                             color: mode === 'cool' ? '#3b82f6' : mode === 'warm' ? '#f59e0b' : '#6b7280'
                           }}
