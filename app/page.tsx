@@ -96,7 +96,7 @@ function GlassButton({
       disabled={disabled}
       whileHover={{ scale: 1.05, y: -2 }} // gentle lift + scale
       whileTap={{ scale: 0.92 }} // haptic bounce
-      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+      transition={{ type: 'spring', stiffness: 600, damping: 15 }}
       className={`
         relative px-6 py-3 rounded-full text-sm font-medium
         backdrop-blur-xl border border-white/20 text-white shadow-lg
@@ -688,7 +688,7 @@ function ClimateSection() {
                         onClick={() => handleTempChange(18)}
                         whileHover={{ scale: 1.05, y: -2 }} // gentle lift + scale
                         whileTap={{ scale: 0.92 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                        transition={{ type: 'spring', stiffness: 600, damping: 15 }}
                         className={`
                           relative px-4 py-2 rounded-full text-sm font-medium
                           backdrop-blur-xl border border-white/20 text-white shadow-lg
@@ -709,7 +709,7 @@ function ClimateSection() {
                         onClick={() => handleTempChange(22)}
                         whileHover={{ scale: 1.05, y: -2 }} // gentle lift + scale
                         whileTap={{ scale: 0.92 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                        transition={{ type: 'spring', stiffness: 600, damping: 15 }}
                         className={`
                           relative px-4 py-2 rounded-full text-sm font-medium
                           backdrop-blur-xl border border-white/20 text-white shadow-lg
@@ -730,7 +730,7 @@ function ClimateSection() {
                         onClick={() => handleTempChange(26)}
                         whileHover={{ scale: 1.05, y: -2 }} // gentle lift + scale
                         whileTap={{ scale: 0.92 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                        transition={{ type: 'spring', stiffness: 600, damping: 15 }}
                         className={`
                           relative px-4 py-2 rounded-full text-sm font-medium
                           backdrop-blur-xl border border-white/20 text-white shadow-lg
