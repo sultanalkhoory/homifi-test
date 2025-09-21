@@ -409,11 +409,7 @@ function CurtainsSection() {
 }
 
 /* --------------------------------------------------
-   🌡️ Climate Section – FIXED VERSION
-   - Using ChatGPT's working CSS keyframes approach
-   - Controls moved INSIDE iPhone 
-   - Temperature display made static (no animations/blur effects)
-   - Bigger buttons as requested
+   🌡️ Climate Section – Corrected Version
    -------------------------------------------------- */
 function ClimateSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -549,7 +545,7 @@ function ClimateSection() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <div className="text-sm uppercase text-blue-600 mb-3">
+            <div className="text-sm uppercase tracking-wider text-blue-600 mb-3">
               Perfect Climate
             </div>
             <h2 className="text-4xl md:text-5xl font-thin text-gray-900 mb-4">
@@ -643,39 +639,40 @@ function ClimateSection() {
                   ))}
                 </motion.div>
 
-                {/* Wall-mounted Smart Thermostat - liquid glass style, much smaller */}
+                {/* Wall-mounted Smart Thermostat */}
                 <div className="absolute top-[40%] left-12 z-30">
                   <div className="relative">
-                    {/* Thermostat body - liquid glass style, very small */}
                     <div className="w-8 h-8 backdrop-blur-xl bg-white/20 rounded-full shadow-lg border border-white/30">
-                      {/* Outer ring indicator - subtle glow */}
-                      <div 
+                      <div
                         className="absolute inset-0.5 rounded-full border"
                         style={{
-                          borderColor: mode === 'cool' ? 'rgba(59, 130, 246, 0.6)' : mode === 'warm' ? 'rgba(245, 158, 11, 0.6)' : 'rgba(107, 114, 128, 0.6)',
-                          boxShadow: mode === 'cool' ? '0 0 8px rgba(59, 130, 246, 0.3)' : mode === 'warm' ? '0 0 8px rgba(245, 158, 11, 0.3)' : '0 0 8px rgba(107, 114, 128, 0.2)'
+                          borderColor:
+                            mode === 'cool'
+                              ? 'rgba(59, 130, 246, 0.6)'
+                              : mode === 'warm'
+                              ? 'rgba(245, 158, 11, 0.6)'
+                              : 'rgba(107, 114, 128, 0.6)',
+                          boxShadow:
+                            mode === 'cool'
+                              ? '0 0 8px rgba(59, 130, 246, 0.3)'
+                              : mode === 'warm'
+                              ? '0 0 8px rgba(245, 158, 11, 0.3)'
+                              : '0 0 8px rgba(107, 114, 128, 0.2)',
                         }}
                       />
-                      
-                      {/* Center display */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <div 
-                          className="text-[10px] font-medium text-white"
-                        >
+                        <div className="text-[10px] font-medium text-white">
                           {temperature}°
                         </div>
                       </div>
-                      
-                      {/* Glass shine effect */}
                       <div
                         className="absolute inset-0 rounded-full pointer-events-none"
                         style={{
-                          background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%)',
+                          background:
+                            'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%)',
                         }}
                       />
                     </div>
-                    
-                    {/* Subtle wall mount shadow */}
                     <div className="absolute inset-0 bg-black/5 rounded-full blur-sm translate-x-0.5 translate-y-0.5 -z-10" />
                   </div>
                 </div>
@@ -693,6 +690,28 @@ function ClimateSection() {
                           relative px-4 py-2 rounded-full text-sm font-medium
                           backdrop-blur-xl border border-white/20 text-white shadow-lg
                           transition-all duration-200 cursor-pointer
+                          ${temperature === 18 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12'}
+                        `}
+                      >
+                        Cool
+                        <div
+                          className="absolute inset-0 rounded-full pointer-events-none"
+                          style={{
+                            background:
+                              'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
+                          }}
+                        />
+                      </motion.button>
+
+                      <motion.button
+                        onClick={() => handleTempChange(22)}
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.92 }}
+                        transition={{ duration: 0.1, ease: 'easeOut' }}
+                        className={`
+                          relative px-4 py-2 rounded-full text-sm font-medium
+                          backdrop-blur-xl border border-white/20 text-white shadow-lg
+                          transition-all duration-200 cursor-pointer
                           ${temperature === 22 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12'}
                         `}
                       >
@@ -700,11 +719,12 @@ function ClimateSection() {
                         <div
                           className="absolute inset-0 rounded-full pointer-events-none"
                           style={{
-                            background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
+                            background:
+                              'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
                           }}
                         />
                       </motion.button>
-                      
+
                       <motion.button
                         onClick={() => handleTempChange(26)}
                         whileHover={{ scale: 1.05, y: -2 }}
@@ -721,7 +741,8 @@ function ClimateSection() {
                         <div
                           className="absolute inset-0 rounded-full pointer-events-none"
                           style={{
-                            background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
+                            background:
+                              'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
                           }}
                         />
                       </motion.button>
@@ -736,6 +757,7 @@ function ClimateSection() {
     </>
   );
 }
+
 
 /* --------------------------------------------------
    🔐 Security Section
@@ -1026,25 +1048,3 @@ export default function HomePage() {
       <Footer />
     </main>
   );
-}temperature === 18 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12'}
-                        `}
-                      >
-                        Cool
-                        <div
-                          className="absolute inset-0 rounded-full pointer-events-none"
-                          style={{
-                            background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
-                          }}
-                        />
-                      </motion.button>
-                      
-                      <motion.button
-                        onClick={() => handleTempChange(22)}
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.92 }}
-                        transition={{ duration: 0.1, ease: 'easeOut' }}
-                        className={`
-                          relative px-4 py-2 rounded-full text-sm font-medium
-                          backdrop-blur-xl border border-white/20 text-white shadow-lg
-                          transition-all duration-200 cursor-pointer
-                          ${
