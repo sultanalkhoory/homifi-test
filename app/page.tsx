@@ -185,7 +185,9 @@ function HeroSection() {
                   <div className="flex items-center space-x-2">
                     <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-2.257-.257A6 6 0 1118 8zm-2 0a4 4 0 11-8 0 4 4 0 018 0zm-5-1.757l.414.414a1 1 0 01-1.414 1.414L9.586 8a1 1 0 010-1.414l.414-.414a1 1 0 011.414 1.414L11 8.414V11a1 1 0 11-2 0V8.414z" clipRule="evenodd" />
+                        <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm12 2H4v8h12V6z" clipRule="evenodd" />
+                        <path d="M6 8h8v2H6V8z" />
+                        <path d="M6 11h4v1H6v-1z" />
                       </svg>
                     </div>
                     <div>
@@ -230,7 +232,9 @@ function HeroSection() {
                   <div className="flex items-center space-x-2">
                     <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                        <circle cx="10" cy="8" r="6" fill="currentColor" opacity="0.9"/>
+                        <path d="M6.5 10a1 1 0 01.8-.4h5.4a1 1 0 01.8.4l1.2 1.6a1 1 0 01-.8 1.6H6.1a1 1 0 01-.8-1.6L6.5 10z" fill="currentColor" opacity="0.6"/>
+                        <path d="M8.5 7l1.5 1.5L11.5 7" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
                       </svg>
                     </div>
                     <div>
