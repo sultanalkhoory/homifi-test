@@ -680,13 +680,13 @@ function ClimateSection() {
                   </div>
                 </div>
 
-                {/* Mode Buttons - slightly smaller */}
+                {/* Mode Buttons */}
                 <div className="absolute inset-x-0 bottom-0 z-30">
                   <div className="flex justify-center pb-8 px-4">
                     <div className="flex gap-2">
                       <motion.button
                         onClick={() => handleTempChange(18)}
-                        whileHover={{ scale: 1.05, y: -2 }} // gentle lift + scale
+                        whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.92 }}
                         transition={{ duration: 0.1, ease: 'easeOut' }}
                         className={`
@@ -707,7 +707,7 @@ function ClimateSection() {
                       
                       <motion.button
                         onClick={() => handleTempChange(26)}
-                        whileHover={{ scale: 1.05, y: -2 }} // gentle lift + scale
+                        whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.92 }}
                         transition={{ duration: 0.1, ease: 'easeOut' }}
                         className={`
@@ -1026,10 +1026,7 @@ export default function HomePage() {
       <Footer />
     </main>
   );
-}
-                          backdrop-blur-xl border border-white/20 text-white shadow-lg
-                          transition-all duration-200 cursor-pointer
-                          ${temperature === 18 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12'}
+}temperature === 18 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12'}
                         `}
                       >
                         Cool
@@ -1043,8 +1040,11 @@ export default function HomePage() {
                       
                       <motion.button
                         onClick={() => handleTempChange(22)}
-                        whileHover={{ scale: 1.05, y: -2 }} // gentle lift + scale
+                        whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.92 }}
                         transition={{ duration: 0.1, ease: 'easeOut' }}
                         className={`
                           relative px-4 py-2 rounded-full text-sm font-medium
+                          backdrop-blur-xl border border-white/20 text-white shadow-lg
+                          transition-all duration-200 cursor-pointer
+                          ${
