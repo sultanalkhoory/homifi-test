@@ -137,15 +137,24 @@ function GlassButton({
 function HeroSection() {
   return (
     <section className="min-h-screen relative flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-6">
+      {/* Navigation with logo */}
+      <nav className="absolute top-0 left-0 right-0 z-50 px-6 py-6">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center">
+            {/* HomiFi Logo */}
+            <img 
+              src="/homifi-logo.svg" 
+              alt="HomiFi" 
+              className="h-8 w-auto"
+            />
+          </div>
+          {/* Future nav items can go here */}
+        </div>
+      </nav>
+
       <div className="max-w-6xl mx-auto text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <h1 className="text-5xl md:text-7xl font-thin text-gray-900 mb-6 tracking-tight">
-            HomiFi
-          </h1>
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+          <h1 className="text-5xl md:text-7xl font-thin text-gray-900 mb-6 tracking-tight">HomiFi</h1>
           <p className="text-xl md:text-2xl text-gray-600 font-light mb-12 max-w-3xl mx-auto">
             Your home. Intelligently connected.
           </p>
