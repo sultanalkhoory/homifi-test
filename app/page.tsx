@@ -136,14 +136,25 @@ function GlassButton({
    -------------------------------------------------- */
 function HeroSection() {
   return (
-    <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-6">
+    <section className="min-h-screen relative flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-6">
       <div className="max-w-6xl mx-auto text-center">
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-          <h1 className="text-5xl md:text-7xl font-thin text-gray-900 mb-6 tracking-tight">HomiFi</h1>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <h1 className="text-5xl md:text-7xl font-thin text-gray-900 mb-6 tracking-tight">
+            HomiFi
+          </h1>
           <p className="text-xl md:text-2xl text-gray-600 font-light mb-12 max-w-3xl mx-auto">
             Your home. Intelligently connected.
           </p>
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, delay: 0.3 }} className="flex justify-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex justify-center"
+          >
             <IPhoneFrame>
               <Image
                 src="/Curtains-Open-Lights-On.png"
@@ -156,21 +167,35 @@ function HeroSection() {
               />
             </IPhoneFrame>
           </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 2 }}
-            className="absolute bottom-12 text-gray-600 text-lg font-light animate-bounce cursor-pointer"
-            onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-          >
-            Experience HomiFi
-          </motion.div>
         </motion.div>
       </div>
+
+      {/* Experience HomiFi scroll cue */}
+      <motion.div
+        initial={{ y: 0, opacity: 0.7 }}
+        animate={{ y: [0, 8, 0], opacity: [0.7, 1, 0.7] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-500 text-sm font-light cursor-pointer"
+        onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+      >
+        <div className="flex flex-col items-center">
+          <span className="tracking-wide">Experience HomiFi</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mt-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </motion.div>
     </section>
   );
 }
+
 
 /* --------------------------------------------------
    💡 Lights Section
