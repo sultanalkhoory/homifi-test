@@ -157,13 +157,28 @@ function HeroSection() {
         className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200"
         style={{ pointerEvents: showStickyNav ? 'auto' : 'none' }}
       >
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
-          <img 
-            src="/homifi-icon.png" 
-            alt="HomiFi" 
-            className="h-6 w-6"
-          />
-          <nav className="hidden md:flex items-center space-x-8">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
+          <div className="relative">
+            <img 
+              src="/homifi-icon.png" 
+              alt="HomiFi" 
+              className="h-5 w-5"
+              style={{
+                filter: 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.15))',
+                borderRadius: '50%'
+              }}
+            />
+            {/* Subtle glow effect */}
+            <div 
+              className="absolute inset-0 rounded-full opacity-30"
+              style={{
+                background: 'radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%)',
+                filter: 'blur(4px)',
+                transform: 'scale(1.5)'
+              }}
+            />
+          </div>
+          <nav className="hidden md:flex items-center space-x-6">
             <a href="#features" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
               Features
             </a>
@@ -179,7 +194,7 @@ function HeroSection() {
           </nav>
           
           {/* Mobile menu button */}
-          <button className="md:hidden p-2">
+          <button className="md:hidden p-1">
             <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
