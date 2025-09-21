@@ -77,6 +77,7 @@ function IPhoneFrame({ children }: { children: React.ReactNode }) {
    - Unified style across all sections (same font/weight)
    - Subtle active glow (thin ring, low opacity)
    - Animated label (fade/scale) + haptic-like bounce
+   - Enhanced hover: gentle lift + scale
    -------------------------------------------------- */
 function GlassButton({
   label,
@@ -93,13 +94,14 @@ function GlassButton({
     <motion.button
       onClick={onClick}
       disabled={disabled}
+      whileHover={{ scale: 1.05, y: -2 }} // gentle lift + scale
       whileTap={{ scale: 0.92 }} // haptic bounce
       transition={{ type: 'spring', stiffness: 400, damping: 20 }}
       className={`
         relative px-6 py-3 rounded-full text-sm font-medium
         backdrop-blur-xl border border-white/20 text-white shadow-lg
-        transition-all duration-300 cursor-pointer
-        ${active ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
+        transition-all duration-200 cursor-pointer
+        ${active ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12'}
       `}
       style={{
         background:
@@ -642,7 +644,7 @@ function ClimateSection() {
                 </motion.div>
 
                 {/* Wall-mounted Smart Thermostat - liquid glass style, much smaller */}
-                <div className="absolute top-[40%] left-14 z-30">
+                <div className="absolute top-[40%] left-12 z-30">
                   <div className="relative">
                     {/* Thermostat body - liquid glass style, very small */}
                     <div className="w-8 h-8 backdrop-blur-xl bg-white/20 rounded-full shadow-lg border border-white/30">
@@ -684,13 +686,14 @@ function ClimateSection() {
                     <div className="flex gap-2">
                       <motion.button
                         onClick={() => handleTempChange(18)}
+                        whileHover={{ scale: 1.05, y: -2 }} // gentle lift + scale
                         whileTap={{ scale: 0.92 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                         className={`
                           relative px-4 py-2 rounded-full text-sm font-medium
                           backdrop-blur-xl border border-white/20 text-white shadow-lg
-                          transition-all duration-300 cursor-pointer
-                          ${temperature === 18 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
+                          transition-all duration-200 cursor-pointer
+                          ${temperature === 18 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12'}
                         `}
                       >
                         Cool
@@ -704,13 +707,14 @@ function ClimateSection() {
                       
                       <motion.button
                         onClick={() => handleTempChange(22)}
+                        whileHover={{ scale: 1.05, y: -2 }} // gentle lift + scale
                         whileTap={{ scale: 0.92 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                         className={`
                           relative px-4 py-2 rounded-full text-sm font-medium
                           backdrop-blur-xl border border-white/20 text-white shadow-lg
-                          transition-all duration-300 cursor-pointer
-                          ${temperature === 22 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
+                          transition-all duration-200 cursor-pointer
+                          ${temperature === 22 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12'}
                         `}
                       >
                         Comfort
@@ -724,13 +728,14 @@ function ClimateSection() {
                       
                       <motion.button
                         onClick={() => handleTempChange(26)}
+                        whileHover={{ scale: 1.05, y: -2 }} // gentle lift + scale
                         whileTap={{ scale: 0.92 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                         className={`
                           relative px-4 py-2 rounded-full text-sm font-medium
                           backdrop-blur-xl border border-white/20 text-white shadow-lg
-                          transition-all duration-300 cursor-pointer
-                          ${temperature === 26 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12 hover:bg-white/18'}
+                          transition-all duration-200 cursor-pointer
+                          ${temperature === 26 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12'}
                         `}
                       >
                         Warm
