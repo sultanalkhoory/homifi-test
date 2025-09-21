@@ -136,71 +136,136 @@ function GlassButton({
    -------------------------------------------------- */
 function HeroSection() {
   return (
-    <section className="min-h-screen relative flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-6 overflow-hidden">
-      {/* Radial Glow Behind iPhone */}
-      <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
-        <div className="w-[500px] h-[500px] rounded-full bg-blue-200/20 blur-3xl" />
-      </div>
-
-      <div className="max-w-6xl mx-auto text-center relative z-10">
+    <section className="min-h-screen relative flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-6">
+      <div className="max-w-6xl mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          {/* Title */}
-          <h1 className="text-5xl md:text-7xl font-thin text-gray-900 mb-4 tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-thin text-gray-900 mb-6 tracking-tight">
             HomiFi
           </h1>
-
-          {/* Primary Tagline */}
-          <p className="text-xl md:text-2xl text-gray-600 font-light mb-3 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-gray-600 font-light mb-12 max-w-3xl mx-auto">
             Your home. Intelligently connected.
           </p>
+          <div className="relative flex flex-col items-center">
+            {/* Floating feature cards around iPhone */}
+            <div className="relative">
+              {/* Top left card - Voice Control */}
+              <motion.div
+                initial={{ opacity: 0, x: -20, y: 20 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="absolute -top-4 -left-20 md:-left-32 z-10"
+              >
+                <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-4 shadow-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">Voice Control</div>
+                      <div className="text-xs text-gray-600">Hey Siri</div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
 
-          {/* Secondary Tagline */}
-          <p className="text-lg md:text-xl text-gray-500 font-light mb-12">
-            Designed for Apple Home. Integrated with everything else.
-          </p>
+              {/* Top right card - Energy Saving */}
+              <motion.div
+                initial={{ opacity: 0, x: 20, y: 20 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
+                className="absolute -top-4 -right-20 md:-right-32 z-10"
+              >
+                <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-4 shadow-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">Energy Saving</div>
+                      <div className="text-xs text-gray-600">-23% usage</div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
 
-          {/* iPhone Showcase */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col items-center"
-          >
-            <IPhoneFrame>
-              <Image
-                src="/Curtains-Open-Lights-On.png"
-                alt="Beautiful home interior"
-                fill
-                className="object-cover"
-                style={{ objectPosition: "45% center" }}
-                quality={100}
-                priority
-              />
-            </IPhoneFrame>
+              {/* Bottom left card - Security */}
+              <motion.div
+                initial={{ opacity: 0, x: -20, y: -20 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{ duration: 0.8, delay: 1.0 }}
+                className="absolute -bottom-4 -left-20 md:-left-32 z-10"
+              >
+                <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-4 shadow-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">Security</div>
+                      <div className="text-xs text-gray-600">All secure</div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
 
-            {/* CTA Buttons */}
-            <div className="flex justify-center gap-4 mt-10">
-              <GlassButton
-                label="Explore Features"
-                onClick={() =>
-                  window.scrollTo({ top: window.innerHeight, behavior: "smooth" })
-                }
-              />
-              <GlassButton label="Get in Touch" />
+              {/* Bottom right card - Automation */}
+              <motion.div
+                initial={{ opacity: 0, x: 20, y: -20 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{ duration: 0.8, delay: 1.2 }}
+                className="absolute -bottom-4 -right-20 md:-right-32 z-10"
+              >
+                <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-4 shadow-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">Automation</div>
+                      <div className="text-xs text-gray-600">47 devices</div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* iPhone in center */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
+                <IPhoneFrame>
+                  <Image
+                    src="/Curtains-Open-Lights-On.png"
+                    alt="Beautiful home interior"
+                    fill
+                    className="object-cover"
+                    style={{ objectPosition: '45% center' }}
+                    quality={100}
+                    priority
+                  />
+                </IPhoneFrame>
+              </motion.div>
             </div>
-
-            {/* Experience HomiFi scroll indicator */}
+            
+            {/* Experience HomiFi scroll indicator - centered under iPhone */}
             <motion.div
               animate={{ y: [0, 8, 0] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-              className="text-gray-500 text-sm font-light cursor-pointer tracking-wide mt-12"
-              onClick={() =>
-                window.scrollTo({ top: window.innerHeight, behavior: "smooth" })
-              }
+              className="text-gray-500 text-sm font-light cursor-pointer tracking-wide mt-8"
+              onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
             >
               <div className="flex flex-col items-center">
                 <span>Experience HomiFi</span>
@@ -216,40 +281,8 @@ function HeroSection() {
                 </svg>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         </motion.div>
-      </div>
-
-      {/* Floating Keywords */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center space-y-12 text-8xl md:text-9xl font-thin tracking-widest select-none pointer-events-none z-0">
-        <motion.span
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="text-gray-900 opacity-10"
-        >
-          Lights
-        </motion.span>
-        <motion.span
-          animate={{ y: [0, -15, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          className="text-gray-900 opacity-10"
-        >
-          Curtains
-        </motion.span>
-        <motion.span
-          animate={{ y: [0, -12, 0] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-          className="text-gray-900 opacity-10"
-        >
-          Climate
-        </motion.span>
-        <motion.span
-          animate={{ y: [0, -18, 0] }}
-          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-          className="text-gray-900 opacity-10"
-        >
-          Security
-        </motion.span>
       </div>
     </section>
   );
