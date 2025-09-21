@@ -403,7 +403,7 @@ function LightsSection() {
               {/* Button */}
               <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30">
                 <GlassButton
-                  label={lightsState === 'off' ? 'Lights Off' : 'Lights On'}
+                  label={lightsState === 'off' ? 'Turn On Lights' : 'Turn Off Lights'}
                   onClick={() => {
                     setManualControl(true);
                     setLightsState(lightsState === 'off' ? 'on' : 'off');
