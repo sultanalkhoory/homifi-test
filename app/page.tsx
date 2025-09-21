@@ -158,26 +158,14 @@ function HeroSection() {
         style={{ pointerEvents: showStickyNav ? 'auto' : 'none' }}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-          <div className="relative">
-            <img 
-              src="/homifi-icon.png" 
-              alt="HomiFi" 
-              className="h-5 w-5"
-              style={{
-                filter: 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.15))',
-                borderRadius: '50%'
-              }}
-            />
-            {/* Subtle glow effect */}
-            <div 
-              className="absolute inset-0 rounded-full opacity-30"
-              style={{
-                background: 'radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%)',
-                filter: 'blur(4px)',
-                transform: 'scale(1.5)'
-              }}
-            />
-          </div>
+          <img 
+            src="/homifi-icon.png" 
+            alt="HomiFi" 
+            className="h-5 w-5"
+            style={{
+              filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.1))'
+            }}
+          />
           <nav className="hidden md:flex items-center space-x-6">
             <a href="#features" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
               Features
@@ -209,7 +197,7 @@ function HeroSection() {
             <motion.img
               src="/homifi-logo.png"
               alt="HomiFi"
-              className="h-12 md:h-14 w-auto mx-auto mb-6"
+              className="h-10 md:h-12 w-auto mx-auto mb-6"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
