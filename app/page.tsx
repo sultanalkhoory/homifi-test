@@ -164,7 +164,27 @@ function HeroSection() {
             alt="HomiFi" 
             className="h-8 w-8"
           />
-          {/* Future nav items */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <a href="#features" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+              Features
+            </a>
+            <a href="#how-it-works" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+              How it Works
+            </a>
+            <a href="#pricing" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+              Pricing
+            </a>
+            <a href="#contact" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+              Contact
+            </a>
+          </nav>
+          
+          {/* Mobile menu button */}
+          <button className="md:hidden p-2">
+            <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
       </motion.nav>
 
