@@ -136,7 +136,7 @@ function GlassButton({
    -------------------------------------------------- */
 function HeroSection() {
   return (
-    <section className="min-h-screen relative flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-6">
+    <section className="min-h-screen relative flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-6 overflow-hidden">
       {/* Radial Glow Behind iPhone */}
       <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
         <div className="w-[500px] h-[500px] rounded-full bg-blue-200/20 blur-3xl" />
@@ -193,7 +193,7 @@ function HeroSection() {
               <GlassButton label="Get in Touch" />
             </div>
 
-            {/* Experience HomiFi scroll indicator - stays under everything */}
+            {/* Experience HomiFi scroll indicator */}
             <motion.div
               animate={{ y: [0, 8, 0] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
@@ -220,23 +220,40 @@ function HeroSection() {
         </motion.div>
       </div>
 
-      {/* Optional floating hint words (Apple style) */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.08 }}
-        transition={{ duration: 2, delay: 1 }}
-        className="absolute inset-0 flex items-center justify-center text-7xl font-thin tracking-widest select-none pointer-events-none"
-      >
-        <span className="mx-4">Lights</span>
-        <span className="mx-4">Curtains</span>
-        <span className="mx-4">Climate</span>
-        <span className="mx-4">Security</span>
-      </motion.div>
+      {/* Floating Keywords */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center space-y-12 text-8xl md:text-9xl font-thin tracking-widest select-none pointer-events-none z-0">
+        <motion.span
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          className="text-gray-900 opacity-10"
+        >
+          Lights
+        </motion.span>
+        <motion.span
+          animate={{ y: [0, -15, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          className="text-gray-900 opacity-10"
+        >
+          Curtains
+        </motion.span>
+        <motion.span
+          animate={{ y: [0, -12, 0] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+          className="text-gray-900 opacity-10"
+        >
+          Climate
+        </motion.span>
+        <motion.span
+          animate={{ y: [0, -18, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+          className="text-gray-900 opacity-10"
+        >
+          Security
+        </motion.span>
+      </div>
     </section>
   );
 }
-
-
 
 /* --------------------------------------------------
    💡 Lights Section
