@@ -137,18 +137,33 @@ function GlassButton({
 function HeroSection() {
   return (
     <section className="min-h-screen relative flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-6">
-      <div className="max-w-6xl mx-auto text-center">
+      {/* Radial Glow Behind iPhone */}
+      <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
+        <div className="w-[500px] h-[500px] rounded-full bg-blue-200/20 blur-3xl" />
+      </div>
+
+      <div className="max-w-6xl mx-auto text-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-5xl md:text-7xl font-thin text-gray-900 mb-6 tracking-tight">
+          {/* Title */}
+          <h1 className="text-5xl md:text-7xl font-thin text-gray-900 mb-4 tracking-tight">
             HomiFi
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 font-light mb-12 max-w-3xl mx-auto">
+
+          {/* Primary Tagline */}
+          <p className="text-xl md:text-2xl text-gray-600 font-light mb-3 max-w-3xl mx-auto">
             Your home. Intelligently connected.
           </p>
+
+          {/* Secondary Tagline */}
+          <p className="text-lg md:text-xl text-gray-500 font-light mb-12">
+            Designed for Apple Home. Integrated with everything else.
+          </p>
+
+          {/* iPhone Showcase */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -161,18 +176,31 @@ function HeroSection() {
                 alt="Beautiful home interior"
                 fill
                 className="object-cover"
-                style={{ objectPosition: '45% center' }}
+                style={{ objectPosition: "45% center" }}
                 quality={100}
                 priority
               />
             </IPhoneFrame>
-            
-            {/* Experience HomiFi scroll indicator - centered under iPhone */}
+
+            {/* CTA Buttons */}
+            <div className="flex justify-center gap-4 mt-10">
+              <GlassButton
+                label="Explore Features"
+                onClick={() =>
+                  window.scrollTo({ top: window.innerHeight, behavior: "smooth" })
+                }
+              />
+              <GlassButton label="Get in Touch" />
+            </div>
+
+            {/* Experience HomiFi scroll indicator - stays under everything */}
             <motion.div
               animate={{ y: [0, 8, 0] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-              className="text-gray-500 text-sm font-light cursor-pointer tracking-wide mt-8"
-              onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+              className="text-gray-500 text-sm font-light cursor-pointer tracking-wide mt-12"
+              onClick={() =>
+                window.scrollTo({ top: window.innerHeight, behavior: "smooth" })
+              }
             >
               <div className="flex flex-col items-center">
                 <span>Experience HomiFi</span>
@@ -191,9 +219,23 @@ function HeroSection() {
           </motion.div>
         </motion.div>
       </div>
+
+      {/* Optional floating hint words (Apple style) */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.08 }}
+        transition={{ duration: 2, delay: 1 }}
+        className="absolute inset-0 flex items-center justify-center text-7xl font-thin tracking-widest select-none pointer-events-none"
+      >
+        <span className="mx-4">Lights</span>
+        <span className="mx-4">Curtains</span>
+        <span className="mx-4">Climate</span>
+        <span className="mx-4">Security</span>
+      </motion.div>
     </section>
   );
 }
+
 
 
 /* --------------------------------------------------
