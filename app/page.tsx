@@ -162,7 +162,7 @@ function HeroSection() {
           <img 
             src="/homifi-icon.png" 
             alt="HomiFi" 
-            className="h-8 w-8"
+            className="h-6 w-6"
           />
           <nav className="hidden md:flex items-center space-x-8">
             <a href="#features" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
@@ -195,7 +195,7 @@ function HeroSection() {
             <motion.img
               src="/homifi-logo.png"
               alt="HomiFi"
-              className="h-16 md:h-20 w-auto mx-auto mb-6"
+              className="h-12 md:h-14 w-auto mx-auto mb-6"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
