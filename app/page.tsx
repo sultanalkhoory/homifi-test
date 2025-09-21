@@ -137,21 +137,6 @@ function GlassButton({
 function HeroSection() {
   return (
     <section className="min-h-screen relative flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-6">
-      {/* Navigation with logo */}
-      <nav className="absolute top-0 left-0 right-0 z-50 px-6 py-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center">
-            {/* HomiFi Logo */}
-            <img 
-              src="/homifi-logo.svg" 
-              alt="HomiFi" 
-              className="h-8 w-auto"
-            />
-          </div>
-          {/* Future nav items can go here */}
-        </div>
-      </nav>
-
       <div className="max-w-6xl mx-auto text-center">
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
           <h1 className="text-5xl md:text-7xl font-thin text-gray-900 mb-6 tracking-tight">HomiFi</h1>
@@ -241,9 +226,7 @@ function HeroSection() {
                   <div className="flex items-center space-x-2">
                     <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <circle cx="10" cy="8" r="6" fill="currentColor" opacity="0.9"/>
-                        <path d="M6.5 10a1 1 0 01.8-.4h5.4a1 1 0 01.8.4l1.2 1.6a1 1 0 01-.8 1.6H6.1a1 1 0 01-.8-1.6L6.5 10z" fill="currentColor" opacity="0.6"/>
-                        <path d="M8.5 7l1.5 1.5L11.5 7" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
                       </svg>
                     </div>
                     <div>
