@@ -1026,7 +1026,8 @@ export default function HomePage() {
       <Footer />
     </main>
   );
-}/20 text-white shadow-lg
+}
+                          backdrop-blur-xl border border-white/20 text-white shadow-lg
                           transition-all duration-200 cursor-pointer
                           ${temperature === 18 ? 'bg-white/18 text-gray-900 ring-1 ring-white/25' : 'bg-white/12'}
                         `}
@@ -1047,4 +1048,3 @@ export default function HomePage() {
                         transition={{ duration: 0.1, ease: 'easeOut' }}
                         className={`
                           relative px-4 py-2 rounded-full text-sm font-medium
-                          backdrop-blur-xl border border-white
