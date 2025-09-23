@@ -139,30 +139,28 @@ function HeroSection() {
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const showStickyNav = scrollY > 100;
 
   return (
     <>
-      {/* Sticky Navigation with power button icon */}
+      {/* Sticky Navigation */}
       <motion.nav
         initial={{ opacity: 0 }}
         animate={{ opacity: showStickyNav ? 1 : 0 }}
         transition={{ duration: 0.2 }}
         className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200"
-        style={{ pointerEvents: showStickyNav ? 'auto' : 'none' }}
+        style={{ pointerEvents: showStickyNav ? "auto" : "none" }}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
           <img
             src="/homifi-icon.png"
             alt="HomiFi"
             className="h-5 w-5"
-            style={{
-              filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.1))',
-            }}
+            style={{ filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.1))" }}
           />
           <nav className="hidden md:flex items-center space-x-6">
             <a href="#features" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
@@ -181,7 +179,7 @@ function HeroSection() {
         </div>
       </motion.nav>
 
-      {/* Hero */}
+      {/* Hero Section */}
       <section className="min-h-screen relative flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-6">
         <div className="max-w-6xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
@@ -199,16 +197,15 @@ function HeroSection() {
             </p>
 
             <div className="relative flex flex-col items-center">
-              {/* Floating feature cards around iPhone */}
               <div className="relative">
-                {/* Card helper for floating idle motion */}
+                {/* Floating feature cards */}
                 {[
                   {
-                    id: 'voice',
-                    pos: 'absolute -top-4 -left-20 md:-left-32',
-                    color: 'bg-blue-500',
-                    title: 'Voice Control',
-                    subtitle: 'Just ask Siri',
+                    id: "voice",
+                    pos: "absolute -top-4 -left-20 md:-left-32",
+                    color: "bg-blue-500",
+                    title: "Voice Control",
+                    subtitle: "Just ask Siri",
                     icon: (
                       <path
                         fillRule="evenodd"
@@ -219,10 +216,10 @@ function HeroSection() {
                     delay: 0.6,
                   },
                   {
-                    id: 'homekey',
-                    pos: 'absolute -top-4 -right-20 md:-right-32',
-                    color: 'bg-green-500',
-                    title: 'HomeKey',
+                    id: "homekey",
+                    pos: "absolute -top-4 -right-20 md:-right-32",
+                    color: "bg-green-500",
+                    title: "HomeKey",
                     subtitle: "Tap. You're home.",
                     icon: (
                       <>
@@ -238,10 +235,10 @@ function HeroSection() {
                     delay: 0.8,
                   },
                   {
-                    id: 'security',
-                    pos: 'absolute -bottom-4 -left-20 md:-left-32',
-                    color: 'bg-red-500',
-                    title: 'Security',
+                    id: "security",
+                    pos: "absolute -bottom-4 -left-20 md:-left-32",
+                    color: "bg-red-500",
+                    title: "Security",
                     subtitle: "See who's here",
                     icon: (
                       <>
@@ -256,11 +253,11 @@ function HeroSection() {
                     delay: 1.0,
                   },
                   {
-                    id: 'automation',
-                    pos: 'absolute -bottom-4 -right-20 md:-right-32',
-                    color: 'bg-purple-500',
-                    title: 'Automation',
-                    subtitle: 'Set the mood',
+                    id: "automation",
+                    pos: "absolute -bottom-4 -right-20 md:-right-32",
+                    color: "bg-purple-500",
+                    title: "Automation",
+                    subtitle: "Set the mood",
                     icon: (
                       <path
                         fillRule="evenodd"
@@ -281,7 +278,7 @@ function HeroSection() {
                   >
                     <motion.div
                       animate={{ y: [0, -6, 0] }}
-                      transition={{ duration: 3 + idx, repeat: Infinity, ease: 'easeInOut' }}
+                      transition={{ duration: 3 + idx, repeat: Infinity, ease: "easeInOut" }}
                       className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-4 shadow-lg"
                     >
                       <div className="flex items-center space-x-2">
@@ -299,32 +296,37 @@ function HeroSection() {
                   </motion.div>
                 ))}
 
-                {/* iPhone in center */}
+                {/* iPhone in center (animated like yolocode) */}
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
+                  initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
                   style={{ y: scrollY * 0.05 }}
                 >
-                  <IPhoneFrame>
-                    <motion.img
-                      src="/Curtains-Open-Lights-On.png"
-                      alt="Beautiful home interior"
-                      className="object-cover"
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 1, delay: 0.5 }}
-                    />
-                  </IPhoneFrame>
+                  <motion.div
+                    animate={{ y: [0, -10, 0], rotate: [0, 0.4, 0, -0.4, 0] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <IPhoneFrame>
+                      <Image
+                        src="/Curtains-Open-Lights-On.png"
+                        alt="Beautiful home interior"
+                        fill
+                        className="object-cover"
+                        quality={100}
+                        priority
+                      />
+                    </IPhoneFrame>
+                  </motion.div>
                 </motion.div>
               </div>
 
-              {/* Experience HomiFi scroll indicator */}
+              {/* Scroll indicator */}
               <motion.div
                 animate={{ y: [0, 8, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                 className="text-gray-500 text-sm font-light cursor-pointer tracking-wide mt-8"
-                onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+                onClick={() => window.scrollTo({ top: window.innerHeight, behavior: "smooth" })}
               >
                 <div className="flex flex-col items-center">
                   <span>Experience HomiFi</span>
@@ -347,6 +349,7 @@ function HeroSection() {
     </>
   );
 }
+
 
 
 /* --------------------------------------------------
