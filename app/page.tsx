@@ -5,9 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 /* --------------------------------------------------
-   📱 iPhone 17 Pro Frame Component
-   - Updated to match iPhone 17 Pro specifications
-   - Black aluminum frame design
+   📱 iPhone 15/16 Frame Component
+   - Parallax runs ONLY on mobile (disabled on desktop)
    -------------------------------------------------- */
 function IPhoneFrame({ children }: { children: React.ReactNode }) {
   const frameRef = useRef<HTMLDivElement>(null);
@@ -41,32 +40,29 @@ function IPhoneFrame({ children }: { children: React.ReactNode }) {
     <div className="relative" ref={frameRef}>
       <motion.div
         style={isMobile ? { y } : {}}
-        className="relative w-[280px] h-[570px] bg-black rounded-[50px] p-2 shadow-[0_0_0_2px_#000000,0_0_60px_rgba(0,0,0,0.5)]"
+        className="relative w-[280px] h-[560px] bg-black rounded-[45px] p-2 shadow-[0_0_0_2px_#1a1a1a,0_0_60px_rgba(0,0,0,0.4)]"
       >
-        {/* Black aluminum frame */}
-        <div className="absolute inset-0 rounded-[50px] bg-gradient-to-br from-gray-800 via-gray-900 to-black" />
-        
-        <div className="relative w-full h-full bg-black rounded-[42px] overflow-hidden border border-gray-800">
+        <div className="relative w-full h-full bg-white rounded-[37px] overflow-hidden">
           <div className="absolute inset-0">{children}</div>
 
           {/* Subtle screen glare */}
           <div
-            className="absolute inset-0 pointer-events-none rounded-[42px]"
+            className="absolute inset-0 pointer-events-none rounded-[37px]"
             style={{
               background:
-                'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 25%, transparent 50%, transparent 75%, rgba(255,255,255,0.02) 100%)',
+                'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 25%, transparent 50%, transparent 75%, rgba(255,255,255,0.02) 100%)',
             }}
           />
 
-          {/* Dynamic Island - larger for iPhone 17 Pro */}
-          <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[95px] h-[26px] bg-black rounded-full z-30">
+          {/* Dynamic Island */}
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[85px] h-[22px] bg-black rounded-full z-30">
             <div className="flex items-center justify-center h-full relative">
               <div className="absolute left-3 w-1.5 h-1.5 bg-gray-900 rounded-full" />
               <div className="absolute right-3 w-3 h-0.5 bg-gray-900 rounded-full" />
             </div>
           </div>
 
-          {/* Static time (iPhone style) */}
+          {/* Static time (Apple-like) */}
           <div className="absolute top-2 left-4 text-white text-sm font-medium z-30 drop-shadow-sm">
             9:41
           </div>
