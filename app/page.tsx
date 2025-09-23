@@ -944,7 +944,6 @@ function ClimateSection() {
   );
 }
 
-
 /* --------------------------------------------------
    🔐 Apple-Style Security Section with Liquid Glass
    -------------------------------------------------- */
