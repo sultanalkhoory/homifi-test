@@ -945,7 +945,7 @@ function ClimateSection() {
 }
 
 /* --------------------------------------------------
-   🔐 Apple-Style Security Section with Liquid Glass
+   🔐 Security Section with Proper Dynamic Island
    -------------------------------------------------- */
 function SecuritySection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -954,7 +954,6 @@ function SecuritySection() {
   const [manualControl, setManualControl] = useState(false);
   const isInView = useInView(containerRef, { once: true, amount: 0.4 });
 
-  // Auto trigger doorbell when section enters viewport
   useEffect(() => {
     if (isInView && !manualControl && !doorbellRing) {
       const timer = setTimeout(() => setDoorbellRing(true), 1000);
@@ -962,20 +961,18 @@ function SecuritySection() {
     }
   }, [isInView, manualControl, doorbellRing]);
 
-  const handleAnswer = () => {
-    setManualControl(true);
-    setDoorbellRing(false);
-  };
-
   const handleUnlock = () => {
     setManualControl(true);
-    setShowUnlockAnimation(true);
-    // Dismiss doorbell notification immediately when unlock starts
     setDoorbellRing(false);
-    // Hide unlock animation after 2 seconds
+    setShowUnlockAnimation(true);
     setTimeout(() => {
       setShowUnlockAnimation(false);
     }, 2000);
+  };
+
+  const handleAnswer = () => {
+    setManualControl(true);
+    setDoorbellRing(false);
   };
 
   const handleDismiss = () => {
@@ -986,7 +983,6 @@ function SecuritySection() {
   return (
     <section ref={containerRef} className="min-h-screen flex items-center py-20 bg-white">
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        {/* Copy */}
         <motion.div 
           initial={{ opacity: 0, x: -30 }} 
           whileInView={{ opacity: 1, x: 0 }} 
@@ -1002,7 +998,6 @@ function SecuritySection() {
           </p>
         </motion.div>
 
-        {/* iPhone with Apple Home Integration */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }} 
           whileInView={{ opacity: 1, y: 0 }} 
@@ -1012,7 +1007,6 @@ function SecuritySection() {
         >
           <IPhoneFrame>
             <div className="relative w-full h-full overflow-hidden bg-black">
-              {/* Home app background */}
               <Image
                 src="/Curtains-Open-Lights-On.png"
                 alt="Apple Home app view"
@@ -1021,104 +1015,62 @@ function SecuritySection() {
                 style={{ objectPosition: '45% center' }}
                 quality={100}
               />
-
-              {/* Subtle dark overlay */}
               <div className="absolute inset-0 bg-black/10" />
 
-              {/* Unlock animation in Dynamic Island area */}
-              <AnimatePresence>
+              {/* Dynamic Island Unlock Animation */}
+              <AnimatePresence mode="wait">
                 {showUnlockAnimation && (
                   <motion.div
                     className="absolute top-2 left-1/2 -translate-x-1/2 z-40"
                   >
                     <motion.div
-                      initial={{ width: 95, height: 26, opacity: 1 }}
-                      animate={{ 
-                        width: 200, 
-                        height: 50,
-                        opacity: 1
-                      }}
-                      exit={{ 
-                        width: 95, 
-                        height: 26,
-                        opacity: 0 
-                      }}
+                      initial={{ width: 95, height: 26 }}
+                      animate={{ width: 120, height: 32 }}
+                      exit={{ width: 95, height: 26 }}
                       transition={{ 
-                        duration: 0.6,
-                        ease: [0.25, 0.46, 0.45, 0.94]
+                        duration: 0.45,
+                        ease: [0.32, 0.72, 0, 1]
                       }}
-                      className="bg-black rounded-full flex items-center justify-center relative"
+                      className="bg-black rounded-full flex items-center justify-center"
                       style={{
-                        boxShadow: '0 8px 16px rgba(0,0,0,0.3), inset 0 0 0 0.5px rgba(255,255,255,0.1)'
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.3), inset 0 0 0 0.5px rgba(255,255,255,0.15)'
                       }}
                     >
                       <motion.div
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ 
-                          delay: 0.25,
-                          duration: 0.4,
-                          ease: [0.25, 0.46, 0.45, 0.94]
-                        }}
-                        className="flex items-center space-x-2.5"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.25, delay: 0.1 }}
+                        className="flex items-center gap-1.5 px-2"
                       >
-                        <motion.div
-                          initial={{ scale: 0.5, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ 
-                            delay: 0.3,
-                            duration: 0.35,
-                            ease: [0.34, 1.56, 0.64, 1]
-                          }}
-                          className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center"
-                        >
-                          <svg
-                            className="w-3 h-3 text-white"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
+                        <div className="w-3 h-3 rounded-full bg-green-500 flex items-center justify-center">
+                          <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
                           </svg>
-                        </motion.div>
-                        <motion.span
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ 
-                            delay: 0.35,
-                            duration: 0.3
-                          }}
-                          className="text-white text-xs font-medium tracking-tight pr-1"
-                          style={{ fontSize: '11px' }}
-                        >
-                          Door Unlocked
-                        </motion.span>
+                        </div>
+                        <span className="text-white text-[9px] font-medium">Unlocked</span>
                       </motion.div>
                     </motion.div>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {/* Apple-style doorbell notification */}
+              {/* Doorbell Notification */}
               <AnimatePresence>
                 {doorbellRing && (
                   <motion.div 
-                    initial={{ opacity: 0, y: -30 }}
+                    initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -30 }}
-                    transition={{ 
-                      duration: 0.5,
-                      ease: [0.32, 0.72, 0, 1]
-                    }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
                     className="absolute inset-x-4 top-28 z-50"
                   >
-                    {/* Liquid glass notification container */}
                     <div 
                       className="backdrop-blur-2xl border border-white/30 rounded-3xl shadow-2xl overflow-hidden"
                       style={{
                         background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.08) 100%)',
                       }}
                     >
-                      {/* Notification header */}
                       <div className="p-4 pb-2">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center space-x-2">
@@ -1140,12 +1092,8 @@ function SecuritySection() {
                           </div>
                         </div>
                         
-                        {/* Video preview with realistic person detection */}
                         <div className="w-full h-32 bg-gray-800 rounded-2xl mb-3 relative overflow-hidden">
-                          {/* Simulated doorbell camera view */}
                           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-700 to-gray-600" />
-                          
-                          {/* Person detection outline */}
                           <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -1167,7 +1115,6 @@ function SecuritySection() {
                         </div>
                       </div>
                       
-                      {/* Action buttons with liquid glass effect */}
                       <div className="px-4 pb-4">
                         <div className="grid grid-cols-3 gap-2">
                           <motion.button
@@ -1216,8 +1163,7 @@ function SecuritySection() {
                 )}
               </AnimatePresence>
 
-              {/* Manual trigger when no doorbell active */}
-              {!doorbellRing && (
+              {!doorbellRing && !showUnlockAnimation && (
                 <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30">
                   <GlassButton
                     label="Ring Doorbell"
@@ -1235,7 +1181,6 @@ function SecuritySection() {
     </section>
   );
 }
-
 /* --------------------------------------------------
    📺 Apple TV Interlude
    -------------------------------------------------- */
