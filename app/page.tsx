@@ -1023,6 +1023,54 @@ function SecuritySection() {
               {/* Subtle dark overlay */}
               <div className="absolute inset-0 bg-black/10" />
 
+              {/* Unlock animation in Dynamic Island area */}
+              <AnimatePresence>
+                {showUnlockAnimation && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="absolute top-2 left-1/2 -translate-x-1/2 z-40"
+                  >
+                    <motion.div
+                      initial={{ width: 95 }}
+                      animate={{ width: 160 }}
+                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                      className="bg-black rounded-full h-[26px] px-4 flex items-center justify-center space-x-2"
+                    >
+                      <motion.div
+                        initial={{ scale: 0, rotate: -30 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ duration: 0.4, delay: 0.1 }}
+                      >
+                        <svg
+                          className="w-4 h-4 text-green-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={3}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </motion.div>
+                      <motion.span
+                        initial={{ opacity: 0, x: -5 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-green-400 text-xs font-semibold"
+                      >
+                        Unlocked
+                      </motion.span>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {/* Apple-style doorbell notification */}
               <AnimatePresence>
                 {doorbellRing && (
@@ -1082,56 +1130,6 @@ function SecuritySection() {
                               </div>
                             </div>
                           </motion.div>
-
-                          {/* Unlock animation overlay */}
-                          <AnimatePresence>
-                            {showUnlockAnimation && (
-                              <motion.div
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 1.2 }}
-                                transition={{ duration: 0.4 }}
-                                className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center"
-                              >
-                                <motion.div
-                                  initial={{ scale: 0.5, rotate: -30 }}
-                                  animate={{ scale: 1, rotate: 0 }}
-                                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                                  className="relative"
-                                >
-                                  {/* Unlock icon with checkmark */}
-                                  <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center">
-                                    <motion.svg
-                                      initial={{ pathLength: 0 }}
-                                      animate={{ pathLength: 1 }}
-                                      transition={{ duration: 0.5, delay: 0.2 }}
-                                      className="w-8 h-8 text-white"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      stroke="currentColor"
-                                      strokeWidth={3}
-                                    >
-                                      <motion.path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M5 13l4 4L19 7"
-                                      />
-                                    </motion.svg>
-                                  </div>
-                                  {/* Glow effect */}
-                                  <div className="absolute inset-0 bg-green-400 rounded-full opacity-40 blur-xl" />
-                                </motion.div>
-                                <motion.div
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ delay: 0.3 }}
-                                  className="absolute bottom-4 text-white text-sm font-semibold"
-                                >
-                                  Unlocked
-                                </motion.div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
                         </div>
                         
                         <div className="text-white text-sm font-medium mb-4">
@@ -1146,11 +1144,11 @@ function SecuritySection() {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={handleDismiss}
-                            className="backdrop-blur-xl border rounded-xl py-2.5 text-xs font-semibold transition-all duration-200 flex items-center justify-center"
+                            className="border rounded-xl py-2.5 text-white text-xs font-semibold transition-all duration-200 flex items-center justify-center"
                             style={{
-                              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.15) 100%)',
-                              borderColor: 'rgba(239, 68, 68, 0.3)',
-                              color: '#FCA5A5'
+                              background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+                              borderColor: 'rgba(239, 68, 68, 0.5)',
+                              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.4)'
                             }}
                           >
                             Dismiss
