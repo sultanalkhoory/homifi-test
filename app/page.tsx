@@ -970,9 +970,11 @@ function SecuritySection() {
   const handleUnlock = () => {
     setManualControl(true);
     setShowUnlockAnimation(true);
+    // Dismiss doorbell notification immediately when unlock starts
+    setDoorbellRing(false);
+    // Hide unlock animation after 2 seconds
     setTimeout(() => {
       setShowUnlockAnimation(false);
-      setDoorbellRing(false);
     }, 2000);
   };
 
