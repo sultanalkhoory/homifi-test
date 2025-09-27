@@ -1040,7 +1040,12 @@ function SecuritySection() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.25, delay: 0.1 }}
+                        transition={{ 
+                          opacity: {
+                            duration: 0.2,
+                            delay: showUnlockAnimation ? 0.15 : 0
+                          }
+                        }}
                         className="flex items-center gap-1.5 px-2"
                       >
                         <div className="w-3 h-3 rounded-full bg-green-500 flex items-center justify-center">
@@ -1181,6 +1186,7 @@ function SecuritySection() {
     </section>
   );
 }
+
 /* --------------------------------------------------
    📺 Apple TV Interlude
    -------------------------------------------------- */
