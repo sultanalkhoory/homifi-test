@@ -1018,23 +1018,27 @@ function SecuritySection() {
               <div className="absolute inset-0 bg-black/10" />
 
               {/* Dynamic Island Unlock Animation */}
-              <AnimatePresence mode="wait">
+              <AnimatePresence>
                 {showUnlockAnimation && (
                   <motion.div
                     className="absolute top-2 left-1/2 -translate-x-1/2 z-40"
+                    initial={{ scaleX: 1, scaleY: 1 }}
+                    animate={{ scaleX: 1.26, scaleY: 1.23 }}
+                    exit={{ scaleX: 1, scaleY: 1 }}
+                    transition={{ 
+                      duration: 0.55,
+                      ease: [0.25, 0.1, 0.25, 1]
+                    }}
+                    style={{
+                      width: 95,
+                      height: 26,
+                      transformOrigin: 'center'
+                    }}
                   >
-                    <motion.div
-                      initial={{ width: 95, height: 26, borderRadius: 50 }}
-                      animate={{ width: 120, height: 32, borderRadius: 50 }}
-                      exit={{ width: 95, height: 26, borderRadius: 50 }}
-                      transition={{ 
-                        duration: 0.5,
-                        ease: [0.4, 0, 0.2, 1]
-                      }}
-                      className="bg-black flex items-center justify-center"
+                    <div
+                      className="w-full h-full bg-black rounded-full flex items-center justify-center"
                       style={{
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.3), inset 0 0 0 0.5px rgba(255,255,255,0.15)',
-                        willChange: 'width, height, border-radius'
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.3), inset 0 0 0 0.5px rgba(255,255,255,0.15)'
                       }}
                     >
                       <motion.div
@@ -1043,18 +1047,32 @@ function SecuritySection() {
                         exit={{ opacity: 0 }}
                         transition={{ 
                           duration: 0.2,
-                          delay: showUnlockAnimation ? 0.15 : 0
+                          delay: 0.15
                         }}
                         className="flex items-center gap-1.5 px-2"
                       >
-                        <div className="w-3 h-3 rounded-full bg-green-500 flex items-center justify-center">
-                          <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-                          </svg>
-                        </div>
+                        {/* Animated lock icon */}
+                        <motion.div
+                          initial={{ rotate: 0 }}
+                          animate={{ rotate: [0, -10, 5, 0] }}
+                          transition={{ duration: 0.4, delay: 0.2 }}
+                          className="relative"
+                        >
+                          <motion.svg 
+                            className="w-3 h-3 text-green-500" 
+                            fill="currentColor" 
+                            viewBox="0 0 24 24"
+                            initial={{ scale: 1 }}
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ duration: 0.3, delay: 0.2 }}
+                          >
+                            {/* Open lock */}
+                            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h2c0-1.66 1.34-3 3-3s3 1.34 3 3v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>
+                          </motion.svg>
+                        </motion.div>
                         <span className="text-white text-[9px] font-medium">Unlocked</span>
                       </motion.div>
-                    </motion.div>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
