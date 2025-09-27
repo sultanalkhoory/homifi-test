@@ -1034,8 +1034,8 @@ function SecuritySection() {
                     <motion.div
                       initial={{ width: 95, height: 26, opacity: 1 }}
                       animate={{ 
-                        width: 115, 
-                        height: 30,
+                        width: 200, 
+                        height: 50,
                         opacity: 1
                       }}
                       exit={{ 
@@ -1102,10 +1102,13 @@ function SecuritySection() {
               <AnimatePresence>
                 {doorbellRing && (
                   <motion.div 
-                    initial={{ scale: 0.9, opacity: 0, y: -20 }}
-                    animate={{ scale: 1, opacity: 1, y: 0 }}
-                    exit={{ scale: 0.9, opacity: 0, y: -20 }}
-                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                    initial={{ opacity: 0, y: -30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -30 }}
+                    transition={{ 
+                      duration: 0.5,
+                      ease: [0.32, 0.72, 0, 1]
+                    }}
                     className="absolute inset-x-4 top-28 z-50"
                   >
                     {/* Liquid glass notification container */}
