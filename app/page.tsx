@@ -1010,39 +1010,8 @@ function SecuritySection() {
                 quality={100}
               />
 
-              {/* Apple Home UI overlay */}
-              <div className="absolute inset-0 bg-black/20">
-                {/* Top status bar area with softer gradient */}
-                <div 
-                  className="absolute top-0 left-0 right-0 h-24 opacity-90"
-                  style={{
-                    background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 70%, transparent 100%)'
-                  }}
-                />
-                
-                {/* Liquid glass navigation cards - subtle grid */}
-                <div className="absolute top-16 left-4 right-4">
-                  <div className="grid grid-cols-3 gap-2">
-                    {/* Climate card */}
-                    <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-2 shadow-lg">
-                      <div className="text-white text-xs font-medium mb-1">Climate</div>
-                      <div className="text-white/80 text-xs">22°C</div>
-                    </div>
-                    
-                    {/* Lights card */}
-                    <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-2 shadow-lg">
-                      <div className="text-white text-xs font-medium mb-1">Lights</div>
-                      <div className="text-white/80 text-xs">7 On</div>
-                    </div>
-                    
-                    {/* Security card - active state */}
-                    <div className="backdrop-blur-xl bg-orange-500/20 border border-orange-400/30 rounded-xl p-2 shadow-lg">
-                      <div className="text-white text-xs font-medium mb-1">Security</div>
-                      <div className="text-orange-200 text-xs">Active</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Subtle dark overlay */}
+              <div className="absolute inset-0 bg-black/10" />
 
               {/* Apple-style doorbell notification */}
               <AnimatePresence>
@@ -1103,13 +1072,6 @@ function SecuritySection() {
                               </div>
                             </div>
                           </motion.div>
-                          
-                          {/* Time overlay */}
-                          <div className="absolute top-2 left-2">
-                            <div className="bg-black/50 px-2 py-1 rounded text-white text-xs font-mono">
-                              12:34 PM
-                            </div>
-                          </div>
                         </div>
                         
                         <div className="text-white text-sm font-medium mb-4">
@@ -1119,7 +1081,7 @@ function SecuritySection() {
                       
                       {/* Action buttons with liquid glass effect */}
                       <div className="px-4 pb-4">
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-3 gap-2">
                           <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
@@ -1130,6 +1092,18 @@ function SecuritySection() {
                             }}
                           >
                             Dismiss
+                          </motion.button>
+                          
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={handleAnswer}
+                            className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-3 text-white text-sm font-medium transition-all duration-200"
+                            style={{
+                              background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
+                            }}
+                          >
+                            Unlock
                           </motion.button>
                           
                           <motion.button
@@ -1170,7 +1144,6 @@ function SecuritySection() {
     </section>
   );
 }
-
 /* --------------------------------------------------
    📺 Apple TV Interlude
    -------------------------------------------------- */
