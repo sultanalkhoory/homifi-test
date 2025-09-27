@@ -950,6 +950,7 @@ function ClimateSection() {
 function SecuritySection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [doorbellRing, setDoorbellRing] = useState(false);
+  const [showUnlockAnimation, setShowUnlockAnimation] = useState(false);
   const [manualControl, setManualControl] = useState(false);
   const isInView = useInView(containerRef, { once: true, amount: 0.4 });
 
@@ -964,6 +965,15 @@ function SecuritySection() {
   const handleAnswer = () => {
     setManualControl(true);
     setDoorbellRing(false);
+  };
+
+  const handleUnlock = () => {
+    setManualControl(true);
+    setShowUnlockAnimation(true);
+    setTimeout(() => {
+      setShowUnlockAnimation(false);
+      setDoorbellRing(false);
+    }, 2000);
   };
 
   const handleDismiss = () => {
@@ -1072,6 +1082,56 @@ function SecuritySection() {
                               </div>
                             </div>
                           </motion.div>
+
+                          {/* Unlock animation overlay */}
+                          <AnimatePresence>
+                            {showUnlockAnimation && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 1.2 }}
+                                transition={{ duration: 0.4 }}
+                                className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center"
+                              >
+                                <motion.div
+                                  initial={{ scale: 0.5, rotate: -30 }}
+                                  animate={{ scale: 1, rotate: 0 }}
+                                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                                  className="relative"
+                                >
+                                  {/* Unlock icon with checkmark */}
+                                  <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center">
+                                    <motion.svg
+                                      initial={{ pathLength: 0 }}
+                                      animate={{ pathLength: 1 }}
+                                      transition={{ duration: 0.5, delay: 0.2 }}
+                                      className="w-8 h-8 text-white"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                      strokeWidth={3}
+                                    >
+                                      <motion.path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M5 13l4 4L19 7"
+                                      />
+                                    </motion.svg>
+                                  </div>
+                                  {/* Glow effect */}
+                                  <div className="absolute inset-0 bg-green-400 rounded-full opacity-40 blur-xl" />
+                                </motion.div>
+                                <motion.div
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.3 }}
+                                  className="absolute bottom-4 text-white text-sm font-semibold"
+                                >
+                                  Unlocked
+                                </motion.div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
                         
                         <div className="text-white text-sm font-medium mb-4">
@@ -1086,9 +1146,11 @@ function SecuritySection() {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={handleDismiss}
-                            className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-3 text-white text-sm font-medium transition-all duration-200"
+                            className="backdrop-blur-xl border rounded-xl py-2.5 text-xs font-semibold transition-all duration-200 flex items-center justify-center"
                             style={{
-                              background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
+                              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.15) 100%)',
+                              borderColor: 'rgba(239, 68, 68, 0.3)',
+                              color: '#FCA5A5'
                             }}
                           >
                             Dismiss
@@ -1097,8 +1159,8 @@ function SecuritySection() {
                           <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            onClick={handleAnswer}
-                            className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-3 text-white text-sm font-medium transition-all duration-200"
+                            onClick={handleUnlock}
+                            className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl py-2.5 text-white text-xs font-semibold transition-all duration-200 flex items-center justify-center"
                             style={{
                               background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
                             }}
@@ -1110,9 +1172,10 @@ function SecuritySection() {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={handleAnswer}
-                            className="bg-blue-500 border border-blue-400/50 rounded-2xl p-3 text-white text-sm font-semibold transition-all duration-200"
+                            className="border rounded-xl py-2.5 text-white text-xs font-semibold transition-all duration-200 flex items-center justify-center"
                             style={{
                               background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
+                              borderColor: 'rgba(59, 130, 246, 0.5)',
                               boxShadow: '0 4px 12px rgba(59, 130, 246, 0.4)'
                             }}
                           >
@@ -1144,6 +1207,7 @@ function SecuritySection() {
     </section>
   );
 }
+
 /* --------------------------------------------------
    📺 Apple TV Interlude
    -------------------------------------------------- */
