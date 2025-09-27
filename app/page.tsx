@@ -1027,33 +1027,51 @@ function SecuritySection() {
               <AnimatePresence>
                 {showUnlockAnimation && (
                   <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
                     className="absolute top-2 left-1/2 -translate-x-1/2 z-40"
                   >
                     <motion.div
-                      initial={{ width: 95, height: 26 }}
-                      animate={{ width: 180, height: 44 }}
-                      transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-                      className="bg-black rounded-full flex items-center justify-center overflow-hidden"
+                      initial={{ width: 95, height: 26, opacity: 1 }}
+                      animate={{ 
+                        width: 200, 
+                        height: 50,
+                        opacity: 1
+                      }}
+                      exit={{ 
+                        width: 95, 
+                        height: 26,
+                        opacity: 0 
+                      }}
+                      transition={{ 
+                        duration: 0.6,
+                        ease: [0.25, 0.46, 0.45, 0.94]
+                      }}
+                      className="bg-black rounded-full flex items-center justify-center relative"
                       style={{
-                        boxShadow: '0 0 0 0.5px rgba(255,255,255,0.1)'
+                        boxShadow: '0 8px 16px rgba(0,0,0,0.3), inset 0 0 0 0.5px rgba(255,255,255,0.1)'
                       }}
                     >
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.15, duration: 0.25 }}
-                        className="flex items-center space-x-2"
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ 
+                          delay: 0.25,
+                          duration: 0.4,
+                          ease: [0.25, 0.46, 0.45, 0.94]
+                        }}
+                        className="flex items-center space-x-2.5"
                       >
                         <motion.div
-                          initial={{ rotate: -20 }}
-                          animate={{ rotate: 0 }}
-                          transition={{ duration: 0.3 }}
+                          initial={{ scale: 0.5, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ 
+                            delay: 0.3,
+                            duration: 0.35,
+                            ease: [0.34, 1.56, 0.64, 1]
+                          }}
+                          className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center"
                         >
                           <svg
-                            className="w-5 h-5 text-green-400"
+                            className="w-3 h-3 text-white"
                             fill="currentColor"
                             viewBox="0 0 24 24"
                           >
@@ -1063,8 +1081,12 @@ function SecuritySection() {
                         <motion.span
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
-                          transition={{ delay: 0.2 }}
-                          className="text-white text-sm font-semibold pr-2"
+                          transition={{ 
+                            delay: 0.35,
+                            duration: 0.3
+                          }}
+                          className="text-white text-xs font-medium tracking-tight pr-1"
+                          style={{ fontSize: '11px' }}
                         >
                           Door Unlocked
                         </motion.span>
