@@ -1024,16 +1024,17 @@ function SecuritySection() {
                     className="absolute top-2 left-1/2 -translate-x-1/2 z-40"
                   >
                     <motion.div
-                      initial={{ width: 95, height: 26 }}
-                      animate={{ width: 120, height: 32 }}
-                      exit={{ width: 95, height: 26 }}
+                      initial={{ width: 95, height: 26, borderRadius: 50 }}
+                      animate={{ width: 120, height: 32, borderRadius: 50 }}
+                      exit={{ width: 95, height: 26, borderRadius: 50 }}
                       transition={{ 
-                        duration: 0.45,
-                        ease: [0.32, 0.72, 0, 1]
+                        duration: 0.5,
+                        ease: [0.4, 0, 0.2, 1]
                       }}
-                      className="bg-black rounded-full flex items-center justify-center"
+                      className="bg-black flex items-center justify-center"
                       style={{
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.3), inset 0 0 0 0.5px rgba(255,255,255,0.15)'
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.3), inset 0 0 0 0.5px rgba(255,255,255,0.15)',
+                        willChange: 'width, height, border-radius'
                       }}
                     >
                       <motion.div
@@ -1041,10 +1042,8 @@ function SecuritySection() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ 
-                          opacity: {
-                            duration: 0.2,
-                            delay: showUnlockAnimation ? 0.15 : 0
-                          }
+                          duration: 0.2,
+                          delay: showUnlockAnimation ? 0.15 : 0
                         }}
                         className="flex items-center gap-1.5 px-2"
                       >
