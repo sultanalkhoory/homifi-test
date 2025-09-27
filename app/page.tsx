@@ -1034,8 +1034,8 @@ function SecuritySection() {
                     <motion.div
                       initial={{ width: 95, height: 26, opacity: 1 }}
                       animate={{ 
-                        width: 200, 
-                        height: 50,
+                        width: 115, 
+                        height: 30,
                         opacity: 1
                       }}
                       exit={{ 
