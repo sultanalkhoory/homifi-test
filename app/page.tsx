@@ -1027,45 +1027,48 @@ function SecuritySection() {
               <AnimatePresence>
                 {showUnlockAnimation && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.4 }}
                     className="absolute top-2 left-1/2 -translate-x-1/2 z-40"
                   >
                     <motion.div
-                      initial={{ width: 95 }}
-                      animate={{ width: 160 }}
-                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                      className="bg-black rounded-full h-[26px] px-4 flex items-center justify-center space-x-2"
+                      initial={{ width: 95, height: 26 }}
+                      animate={{ width: 180, height: 44 }}
+                      transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+                      className="bg-black rounded-full flex items-center justify-center overflow-hidden"
+                      style={{
+                        boxShadow: '0 0 0 0.5px rgba(255,255,255,0.1)'
+                      }}
                     >
                       <motion.div
-                        initial={{ scale: 0, rotate: -30 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={{ duration: 0.4, delay: 0.1 }}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.15, duration: 0.25 }}
+                        className="flex items-center space-x-2"
                       >
-                        <svg
-                          className="w-4 h-4 text-green-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={3}
+                        <motion.div
+                          initial={{ rotate: -20 }}
+                          animate={{ rotate: 0 }}
+                          transition={{ duration: 0.3 }}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
+                          <svg
+                            className="w-5 h-5 text-green-400"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                          </svg>
+                        </motion.div>
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.2 }}
+                          className="text-white text-sm font-semibold pr-2"
+                        >
+                          Door Unlocked
+                        </motion.span>
                       </motion.div>
-                      <motion.span
-                        initial={{ opacity: 0, x: -5 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="text-green-400 text-xs font-semibold"
-                      >
-                        Unlocked
-                      </motion.span>
                     </motion.div>
                   </motion.div>
                 )}
