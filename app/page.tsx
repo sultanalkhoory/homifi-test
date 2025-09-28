@@ -197,7 +197,7 @@ function HeroSection() {
             <motion.img
               src="/homifi-logo.png"
               alt="HomiFi"
-              className="h-10 md:h-12 w-auto mx-auto mb-6"
+              className="h-10 md:h-12 w-auto mx-auto mb-6 mt-8"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
